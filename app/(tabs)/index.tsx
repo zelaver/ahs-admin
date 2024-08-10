@@ -26,7 +26,7 @@ export default function Home() {
             </View>
             <View className="saldo px-3 py-2 bg-blue-800 rounded-lg flex-col box-content">
               <View className="flex-row justify-between items-center mb-1">
-                <Text className="text-base font-bold text-white">Saldo Toko</Text>
+                <Text className="text-base font-bold text-white font-inter ">Saldo Toko</Text>
                 <Icon
                   name="more-2-fill"
                   color="white"
@@ -131,7 +131,7 @@ export default function Home() {
                   />
                 </View>
                 <View className="flex-row items-center opacity-50">
-                  <Text className="text-gray-700 text-xs font-normal">Ubah Saldo</Text>
+                  <Text className="text-gray-700 text-xs font-normal font-inter">Ubah Saldo</Text>
                   <Icon
                     name="arrow-right-s-line"
                     size={12}

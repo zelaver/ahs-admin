@@ -52,6 +52,15 @@ export default function TabLayout() {
           ),
         }}
       />
+      {/* <Tabs.Screen
+        name="kontak"
+        options={{
+          title: 'Pesanan',
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon icon={"list-unordered"} color={color} name="Pesanan" focused={focused} />
+          ),
+        }}
+      /> */}
       
     </Tabs>
 
