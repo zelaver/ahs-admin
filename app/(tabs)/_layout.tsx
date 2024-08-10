@@ -28,9 +28,11 @@ export default function TabLayout() {
         tabBarShowLabel: false,
         tabBarActiveTintColor: "#60a5fa",
         tabBarStyle: {
-          height: 87,
+          height: 60,
+          display: "flex",
           borderTopColor: "#4b5563",
           borderTopWidth: 1
+          
         }
         
       }}>
@@ -52,15 +54,33 @@ export default function TabLayout() {
           ),
         }}
       />
-      {/* <Tabs.Screen
+      <Tabs.Screen
         name="kontak"
         options={{
-          title: 'Pesanan',
+          title: 'kontak',
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon icon={"list-unordered"} color={color} name="Pesanan" focused={focused} />
+            <TabIcon icon={"contacts-book-2-line"} color={color} name="Kontak" focused={focused} />
           ),
         }}
-      /> */}
+      />
+      <Tabs.Screen
+        name="histori"
+        options={{
+          title: 'histori',
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon icon={"history-line"} color={color} name="Histori" focused={focused} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profil"
+        options={{
+          title: 'profil',
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon icon={"user-3-line"} color={color} name="Profil" focused={focused} />
+          ),
+        }}
+      />
       
     </Tabs>
 
