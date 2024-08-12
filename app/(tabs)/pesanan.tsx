@@ -2,7 +2,7 @@ import { View, Text, SafeAreaView, ScrollView } from "react-native";
 import React from "react";
 import SearchInput from "@/components/SearchInput";
 import Icon from "react-native-remix-icon";
-import PesananItem from "@/components/PesananItem";
+import OrderItem from "@/components/OrderItem";
 
 const Pesanan = () => {
   return (
@@ -42,13 +42,13 @@ const Pesanan = () => {
                 <Icon name="pencil-line" size={16}></Icon>
               </View>
             </View>
-            <PesananItem/>
-            <PesananItem/>
-            <PesananItem/>
-            <PesananItem/>
-            <PesananItem/>
-            <PesananItem/>
-            <PesananItem/>
+            <OrderItem/>
+            <OrderItem/>
+            <OrderItem/>
+            <OrderItem/>
+            <OrderItem/>
+            <OrderItem/>
+            <OrderItem/>
           </View>
         </View>
       </ScrollView>

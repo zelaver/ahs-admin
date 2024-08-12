@@ -1,12 +1,12 @@
-import { View, Text, StyleSheet, Button, TextInput, Image, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import React, { useCallback, useMemo, useRef } from "react";
+import Icon from "react-native-remix-icon";
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import Handle from "@/components/CustomHandle";
-import Icon from "react-native-remix-icon";
 import images from "@/constants/images";
 import CartItem from "@/components/CartItem";
 
-const Histori = () => {
+const OrderItem = () => {
   // ref
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
@@ -39,12 +39,33 @@ const Histori = () => {
   );
 
   return (
-    <View style={styles.container}>
-      <Button
-        onPress={handlePresentModalPress}
-        title="Present Modal"
-        color="black"
-      />
+    <View className="pesanan-item border rounded-lg p-2.5 flex-row justify-between items-center mb-4">
+      <View className="flex-row">
+        <View className="bg-gray-200 rounded-full w-10 h-10 items-center justify-center">
+          <Icon
+            name="home-smile-2-line"
+            size={24}
+          ></Icon>
+        </View>
+        <View className="ml-4">
+          <Text className="text-sm font-medium">Warung Madura</Text>
+          <Text className="text-xs font-normal text-gray-400">6 januari, 2024</Text>
+        </View>
+      </View>
+      <View className="flex-row items-center">
+        <Text className="bg-yellow-500 text-gray-50 text-xs font-semibold px-3 py-1 rounded-md mr-2">
+          Pinjam
+        </Text>
+        <TouchableOpacity
+          onPress={handlePresentModalPress}
+          activeOpacity={0.9}
+        >
+          <Icon
+            name="pencil-line"
+            size={16}
+          />
+        </TouchableOpacity>
+      </View>
       <BottomSheetModal
         ref={bottomSheetModalRef}
         index={0}
@@ -126,26 +147,7 @@ const Histori = () => {
         </BottomSheetScrollView>
       </BottomSheetModal>
     </View>
-    //   </BottomSheetModalProvider>
-    // </GestureHandlerRootView>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 200,
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
-  },
-  contentContainer: {
-    backgroundColor: "white",
-  },
-  itemContainer: {
-    padding: 6,
-    margin: 6,
-    backgroundColor: "#eee",
-  },
-});
-
-export default Histori;
+export default OrderItem;

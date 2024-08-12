@@ -1,10 +1,15 @@
 import { Image, Platform, SafeAreaView, ScrollView, Text, View } from "react-native";
 import Icon from "react-native-remix-icon";
 import images from "@/constants/images";
+import { useCallback, useRef } from "react";
+
 
 export default function Home() {
+  
+
   return (
     <SafeAreaView>
+
       <ScrollView>
         <View className="main py-8 ">
           <View className="section-1 px-5 py-2">

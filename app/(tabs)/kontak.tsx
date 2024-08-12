@@ -21,8 +21,8 @@ const Kontak = () => {
               size={32}
             />
           </View>
-          <View className="section-3 px-5 py-1.5">
-            <View className="kontak-item py-1.5 px-2">
+          <View className="section-3 px-5 py-1.5 ">
+            <View className="kontak-item py-1.5 ">
               <View className="flex-row justify-between items-center mb-2.5">
                 <Text className="text-base font-medium">1. Warung Ester</Text>
                 <Icon
