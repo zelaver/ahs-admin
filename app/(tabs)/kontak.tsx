@@ -2,6 +2,7 @@ import { View, Text, SafeAreaView, ScrollView } from "react-native";
 import React from "react";
 import SearchInput from "@/components/SearchInput";
 import Icon from "react-native-remix-icon";
+import ContactItem from "@/components/ContactItem";
 
 const Kontak = () => {
   return (
@@ -22,47 +23,7 @@ const Kontak = () => {
             />
           </View>
           <View className="section-3 px-5 py-1.5 ">
-            <View className="kontak-item py-1.5 ">
-              <View className="flex-row justify-between items-center mb-2.5">
-                <Text className="text-base font-medium">1. Warung Ester</Text>
-                <Icon
-                  name="pencil-line"
-                  size={20}
-                />
-              </View>
-              <View className="border rounded-md">
-                <View className="phone flex-row items-center border-b">
-                  <View className="bg-blue-800 p-2 rounded-tl-sm mr-3">
-                    <Icon
-                      name="phone-line"
-                      size={20}
-                      color="white"
-                    />
-                  </View>
-                  <Text className="text-sm font-normal">08203823238</Text>
-                </View>
-                <View className="jenis flex-row items-center border-b">
-                  <View className="bg-blue-800 p-2 rounded-tl-sm mr-3">
-                    <Icon
-                      name="home-smile-2-line"
-                      size={20}
-                      color="white"
-                    />
-                  </View>
-                  <Text className="text-sm font-normal">Toko/Warung</Text>
-                </View>
-                <View className="alamat flex-row items-center">
-                  <View className="bg-blue-800 p-2 rounded-tl-sm mr-3">
-                    <Icon
-                      name="map-pin-2-line"
-                      size={20}
-                      color="white"
-                    />
-                  </View>
-                  <Text className="text-sm font-normal">Jl. kampar 3</Text>
-                </View>
-              </View>
-            </View>
+            <ContactItem/>
           </View>
         </View>
       </ScrollView>

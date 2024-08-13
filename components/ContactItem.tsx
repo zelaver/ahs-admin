@@ -5,7 +5,7 @@ import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@g
 import Handle from "@/components/CustomHandle";
 import CartItem from "@/components/CartItem";
 
-const OrderItem = () => {
+const ContactItem = () => {
   // ref
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
@@ -38,51 +38,70 @@ const OrderItem = () => {
   );
 
   return (
-    <View className="pesanan-item border rounded-lg p-2.5 flex-row justify-between items-center mb-4">
-      <View className="flex-row">
-        <View className="bg-gray-200 rounded-full w-10 h-10 items-center justify-center">
-          <Icon
-            name="home-smile-2-line"
-            size={24}
-          ></Icon>
-        </View>
-        <View className="ml-4">
-          <Text className="text-sm font-medium">Warung Madura</Text>
-          <Text className="text-xs font-normal text-gray-400">6 januari, 2024</Text>
-        </View>
-      </View>
-      <View className="flex-row items-center">
-        <Text className="bg-yellow-500 text-gray-50 text-xs font-semibold px-3 py-1 rounded-md mr-2">
-          Pinjam
-        </Text>
+    <View className="kontak-item py-1.5 ">
+      <View className="flex-row justify-between items-center mb-2.5">
+        <Text className="text-base font-medium">1. Warung Ester</Text>
         <TouchableOpacity
           onPress={handlePresentModalPress}
           activeOpacity={0.9}
         >
           <Icon
             name="pencil-line"
-            size={16}
+            size={20}
           />
         </TouchableOpacity>
+      </View>
+      <View className="border rounded-md">
+        <View className="phone flex-row items-center border-b">
+          <View className="bg-blue-800 p-2 rounded-tl-sm mr-3">
+            <Icon
+              name="phone-line"
+              size={20}
+              color="white"
+            />
+          </View>
+          <Text className="text-sm font-normal">08203823238</Text>
+        </View>
+        <View className="jenis flex-row items-center border-b">
+          <View className="bg-blue-800 p-2 rounded-tl-sm mr-3">
+            <Icon
+              name="home-smile-2-line"
+              size={20}
+              color="white"
+            />
+          </View>
+          <Text className="text-sm font-normal">Toko/Warung</Text>
+        </View>
+        <View className="alamat flex-row items-center">
+          <View className="bg-blue-800 p-2 rounded-tl-sm mr-3">
+            <Icon
+              name="map-pin-2-line"
+              size={20}
+              color="white"
+            />
+          </View>
+          <Text className="text-sm font-normal">Jl. kampar 3</Text>
+        </View>
       </View>
       <BottomSheetModal
         ref={bottomSheetModalRef}
         index={0}
         snapPoints={snapPoints}
+        enableDynamicSizing
         onChange={handleSheetChanges}
         backdropComponent={renderBackdrop}
-        handleComponent={(props) => Handle({...props, HandleText: 'Detail Pesanan'})}
+        handleComponent={(props) => Handle({ ...props, HandleText: "Detail Kontak" })}
       >
         <BottomSheetScrollView>
           <View className="main py-3 gap-y-4">
             <View className="customer px-3">
-              <Text className="text-sm font-semibold mb-2.5">Customer:</Text>
+              <Text className="text-sm font-semibold mb-2.5">Nama:</Text>
               <View className="border-2 rounded-md px-3">
                 <TextInput placeholder="isi nama Customer" />
               </View>
             </View>
             <View className="tanggal px-3 ">
-              <Text className="text-sm font-semibold mb-2.5">Tanggal:</Text>
+              <Text className="text-sm font-semibold mb-2.5">Nomor Telepon:</Text>
               <View className="border-2 rounded-md px-3 flex-row items-center">
                 <Icon
                   name="calendar-2-fill"
@@ -95,36 +114,22 @@ const OrderItem = () => {
                 />
               </View>
             </View>
-            <View className="cart border-t border-b py-4">
-              <CartItem />
-              <CartItem />
-              <View className="px-5">
-                <View className="py-4 items-center">
-                  <Icon
-                    name="add-circle-line"
-                    size={32}
-                  />
-                </View>
+            <View className="alamat px-3 ">
+              <Text className="text-sm font-semibold mb-2.5">Alamat:</Text>
+              <View className="border-2 rounded-md px-3 flex-row items-center">
+                <TextInput placeholder="Isi Alamat" />
               </View>
             </View>
-            <View className="total px-3">
-              <View className="py-2 px-3 flex-row justify-between items-center bg-blue-800 rounded-lg">
-                <Text className="text-base font-bold text-gray-50">Total pembayaran</Text>
-                <Text className="text-sm font-bold text-gray-50">25.000</Text>
-              </View>
-            </View>
-            <View className="status px-3">
+            <View className="tipe-pelanggan px-3">
               <Text className="text-sm font-semibold mb-2.5">Status:</Text>
               <View className="status-boxes self-center flex-row gap-x-3">
-                <Text className="px-3 py-1 border rounded-md w-[67px] text-center text-xs border-red-500 text-red-500 font-semibold">
-                  Hutang
+                <Text className="px-3 py-1 border rounded-md text-center text-xs border-blue-800 text-blue-800 font-semibold">
+                  Warung
                 </Text>
-                <Text className="px-3 py-1 border rounded-md w-[67px] text-center text-xs border-yellow-500 text-yellow-500 font-semibold">
-                  Pinjam
+                <Text className="px-3 py-1 rounded-md text-center text-xs bg-blue-800  text-white font-semibold">
+                  Customer
                 </Text>
-                <Text className="px-3 py-1  rounded-md w-[67px] text-center text-xs bg-green-500  font-semibold text-white">
-                  Lunas
-                </Text>
+               
               </View>
             </View>
             <View className="action-button px-3">
@@ -149,4 +154,4 @@ const OrderItem = () => {
   );
 };
 
-export default OrderItem;
+export default ContactItem;

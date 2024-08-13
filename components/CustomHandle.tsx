@@ -4,9 +4,10 @@ import { BottomSheetHandleProps } from "@gorhom/bottom-sheet";
 
 interface HandleProps extends BottomSheetHandleProps {
   style?: StyleProp<ViewStyle>;
+  HandleText?: string;
 }
 
-const Handle: React.FC<HandleProps> = ({ style, animatedIndex }) => {
+const Handle: React.FC<HandleProps> = ({ style, HandleText , animatedIndex }) => {
   return (
     <View className="bg-blue-800 rounded-t-xl py-3">
       {/* <Animated.View
@@ -18,7 +19,7 @@ const Handle: React.FC<HandleProps> = ({ style, animatedIndex }) => {
       </Animated.View> */}
       <View className="w-16 h-1.5 bg-gray-300 mx-auto mb-2.5 rounded-full"></View>
       <Text className="text-center text-gray-100 text-2xl font-inter font-bold">
-        Detail Pesanan
+        {HandleText}
       </Text>
     </View>
   );
