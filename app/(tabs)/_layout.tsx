@@ -100,6 +100,20 @@ export default function TabLayout() {
               ),
             }}
           />
+          <Tabs.Screen
+            name="debug"
+            options={{
+              title: "debug",
+              tabBarIcon: ({ color, focused }) => (
+                <TabIcon
+                  icon={"bug-2"}
+                  color={color}
+                  name="Debug"
+                  focused={focused}
+                />
+              ),
+            }}
+          />
         </Tabs>
       </BottomSheetModalProvider>
     </GestureHandlerRootView>

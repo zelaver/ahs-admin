@@ -2,14 +2,15 @@ import { Image, Platform, SafeAreaView, ScrollView, Text, View } from "react-nat
 import Icon from "react-native-remix-icon";
 import images from "@/constants/images";
 import { useCallback, useRef } from "react";
-
+import { Redirect } from "expo-router";
 
 export default function Home() {
-  
+
+  let debugMode: boolean = true;
+  if(debugMode) return <Redirect href={"/(tabs)/debug"}/>
 
   return (
     <SafeAreaView>
-
       <ScrollView>
         <View className="main py-8 ">
           <View className="section-1 px-5 py-2">
@@ -112,9 +113,9 @@ export default function Home() {
                     color="#374151"
                   ></Icon>
                 </View>
-              </View> 
+              </View>
             </View>
-            
+
             <View className="stok-row-2 flex-row justify-between gap-2 ">
               <View className="mini-box border-2 flex-col rounded-lg px-3 flex-1  gap-y-2 pb-2">
                 <View className="flex-row justify-between items-center ">
@@ -144,7 +145,6 @@ export default function Home() {
                   ></Icon>
                 </View>
               </View>
-              
             </View>
             <View className="stok-row-3 flex-row justify-between gap-2 ">
               <View className="mini-box border-2 flex-col rounded-lg px-3 flex-1  gap-y-2 pb-2">
@@ -203,7 +203,7 @@ export default function Home() {
                     color="#374151"
                   ></Icon>
                 </View>
-              </View> 
+              </View>
             </View>
           </View>
         </View>
@@ -211,3 +211,4 @@ export default function Home() {
     </SafeAreaView>
   );
 }
+

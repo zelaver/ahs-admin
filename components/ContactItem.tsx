@@ -5,14 +5,18 @@ import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@g
 import Handle from "@/components/CustomHandle";
 import CartItem from "@/components/CartItem";
 
-const ContactItem = () => {
-  // ref
+type ContactItem = {
+  index: number
+  name: string
+  address: string
+  phone: string
+  isSubscriber: number
+}
+
+const ContactItem = ({index, name, address, phone, isSubscriber}: ContactItem) => {
+
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-
-  // variables
   const snapPoints = useMemo(() => ["90%"], []);
-
-  // callbacks
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
   }, []);
@@ -40,7 +44,7 @@ const ContactItem = () => {
   return (
     <View className="kontak-item py-1.5 ">
       <View className="flex-row justify-between items-center mb-2.5">
-        <Text className="text-base font-medium">1. Warung Ester</Text>
+        <Text className="text-base font-medium">{index + 1}. {name}</Text>
         <TouchableOpacity
           onPress={handlePresentModalPress}
           activeOpacity={0.9}
@@ -60,17 +64,17 @@ const ContactItem = () => {
               color="white"
             />
           </View>
-          <Text className="text-sm font-normal">08203823238</Text>
+          <Text className="text-sm font-normal">{phone}</Text>
         </View>
         <View className="jenis flex-row items-center border-b">
           <View className="bg-blue-800 p-2 rounded-tl-sm mr-3">
             <Icon
-              name="home-smile-2-line"
+              name={`${isSubscriber? 'home-smile-2-line' : 'user-3-line'}`}
               size={20}
               color="white"
             />
           </View>
-          <Text className="text-sm font-normal">Toko/Warung</Text>
+          <Text className="text-sm font-normal">{isSubscriber ? 'Warung' : 'Customer'}</Text>
         </View>
         <View className="alamat flex-row items-center">
           <View className="bg-blue-800 p-2 rounded-tl-sm mr-3">
@@ -80,7 +84,7 @@ const ContactItem = () => {
               color="white"
             />
           </View>
-          <Text className="text-sm font-normal">Jl. kampar 3</Text>
+          <Text className="text-sm font-normal">{address}</Text>
         </View>
       </View>
       <BottomSheetModal
