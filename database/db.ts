@@ -105,6 +105,7 @@ const execQuery = async () => {
 };
 
 type contact = {
+  id?: number;
   name: string;
   address: string;
   phone: string;
@@ -132,6 +133,28 @@ const addContact = async ({ name, address, phone, isSubscriber }: contact) => {
   }
 };
 
+const updateContact = async ({ name, address, phone, isSubscriber}: contact, id: number) => {
+  const db = await SQLite.openDatabaseAsync("ahs-admin", {
+    useNewConnection: true,
+  });
+  try {
+    const result = await db.runAsync(
+      `
+      UPDATE customers 
+      SET name = ?, address = ?, phone = ?, isSubscriber = ? 
+      WHERE id = ?;
+      `,
+      [name, address, phone, isSubscriber, id]
+      // delete from transactions where id = 'trans001'
+    );
+    return result;
+  } catch (e) {
+    if (e instanceof Error) {
+      console.log(e);
+    }
+  }
+};
+
 const getAllContacts = async () => {
   const db = await SQLite.openDatabaseAsync("ahs-admin", {
     useNewConnection: true,
@@ -139,13 +162,27 @@ const getAllContacts = async () => {
   try {
     const result = await db.getAllAsync(`select * from customers`);
     // console.log(result[0])
-    return result
+    return result;
   } catch (e) {
     if (e instanceof Error) {
       console.log(e);
     }
   }
-
 };
 
-export { initDB, getQuery, getAllTables, execQuery, addContact , getAllContacts};
+const getContact = async (id: number) => {
+  const db = await SQLite.openDatabaseAsync("ahs-admin", {
+    useNewConnection: true,
+  });
+  try {
+    const result = await db.getFirstAsync(`select * from customers where id = ?`, id);
+    // console.log(result[0])
+    return result;
+  } catch (e) {
+    if (e instanceof Error) {
+      console.log(e);
+    }
+  }
+}
+
+export { initDB, getQuery, getAllTables, execQuery, addContact, getAllContacts, updateContact, getContact };

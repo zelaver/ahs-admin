@@ -104,8 +104,19 @@ const Kontak = () => {
             </TouchableOpacity>
           </View>
           <View className="section-3 px-5 py-1.5 ">
-            {contacts.map(({id, name, address, phone, isSubscriber}, i) => {
-              return <ContactItem address={address} index={i} name={name} phone={phone} isSubscriber={isSubscriber}/>;
+            {contacts.map(({ id, name, address, phone, isSubscriber }, i) => {
+              return (
+                <ContactItem
+                  key={id}
+                  address={address}
+                  index={i}
+                  name={name}
+                  phone={phone}
+                  isSubscriber={isSubscriber}
+                  id={id}
+                  fetchContacts={fetchContacts}
+                />
+              );
             })}
           </View>
         </View>
