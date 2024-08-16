@@ -21,17 +21,17 @@ const initDB = async () => {
       isSubscriber BOOLEAN NOT NULL
     );
     CREATE TABLE IF NOT EXISTS transactions (
-      id TEXT PRIMARY KEY, 
+      id INTEGER PRIMARY KEY AUTOINCREMENT, 
       date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
       orderList TEXT NOT NULL, 
-      customerId TEXT, 
+      customerId INTEGER, 
       status TEXT CHECK(status IN ('hutang', 'pinjam', 'lunas')) NOT NULL, 
       total_price DECIMAL(10, 2) NOT NULL, 
       FOREIGN KEY (customerId) REFERENCES customers(id)
     );
     CREATE TABLE IF NOT EXISTS history (
-      id TEXT PRIMARY KEY,
-      transactionId TEXT,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      transactionId INTEGER,
       stock_aqua INTEGER,
       stock_isi_ulang INTEGER,
       stock_galon_kosong INTEGER,
@@ -50,9 +50,11 @@ const getQuery = async () => {
   });
 
   try {
-    const result: any = await db.getAllAsync("SELECT * FROM customers;");
+    const result: any = await db.getAllAsync("SELECT * FROM history;");
     console.log(JSON.stringify(result, 0, 2));
+    // console.log(result[result.length - 1])
     // console.log(typeof JSON.parse(result[0].orderList)[0].productId);
+    // return result
   } catch (e) {
     if (e instanceof Error) {
       console.log(e);
@@ -91,8 +93,10 @@ const execQuery = async () => {
       // 'cust001',
       // 'lunas',
       // 50000.00);
+      // drop table if exists history;
       `
-      drop table if exists customers
+      insert into history (stock_aqua, stock_isi_ulang, stock_galon_kosong, stock_gas_12kg, stock_gas_kosong, saldo)
+      values(10, 10, 10, 10, 10, 200000)
       `
       // delete from customers where name = 'sigma skibid'
     );
@@ -133,7 +137,7 @@ const addContact = async ({ name, address, phone, isSubscriber }: contact) => {
   }
 };
 
-const updateContact = async ({ name, address, phone, isSubscriber}: contact, id: number) => {
+const updateContact = async ({ name, address, phone, isSubscriber }: contact, id: number) => {
   const db = await SQLite.openDatabaseAsync("ahs-admin", {
     useNewConnection: true,
   });
@@ -175,7 +179,7 @@ const deleteContact = async (id: number) => {
     useNewConnection: true,
   });
   try {
-    const result = await db.runAsync('DELETE FROM customers WHERE id = $id', { $id: id }); 
+    const result = await db.runAsync("DELETE FROM customers WHERE id = $id", { $id: id });
     // console.log(result[0])
     return result;
   } catch (e) {
@@ -183,6 +187,31 @@ const deleteContact = async (id: number) => {
       console.log(e);
     }
   }
-}
+};
 
-export { initDB, getQuery, getAllTables, execQuery, addContact, getAllContacts, updateContact, deleteContact };
+const getHistory = async () => {
+  const db = await SQLite.openDatabaseAsync("ahs-admin", {
+    useNewConnection: true,
+  });
+  try {
+    const result = await db.getAllAsync(`select * from history`);
+    // console.log(result[0])
+    return result;
+  } catch (e) {
+    if (e instanceof Error) {
+      console.log(e);
+    }
+  }
+};
+
+export {
+  initDB,
+  getQuery,
+  getAllTables,
+  execQuery,
+  addContact,
+  getAllContacts,
+  updateContact,
+  deleteContact,
+  getHistory
+};

@@ -33,13 +33,11 @@ const ContactItem = ({
   }, []);
   const handleSheetChanges = useCallback(
     (index: number) => {
-      // console.log("handleSheetChanges", index);
       if (index == -1) {
         setEditName(name);
         setEditPhone(phone);
         setEditAddress(address);
         setEditStatus(isSubscriber);
-        console.log(isSubscriber);
       }
     },
     [name, phone, address, isSubscriber]
@@ -145,6 +143,7 @@ const ContactItem = ({
         </Text>
         <TouchableOpacity
           onPress={handlePresentModalPress}
+          className="pl-6"
           activeOpacity={0.9}
         >
           <Icon
@@ -207,7 +206,7 @@ const ContactItem = ({
             </View>
             <View className="nomor telepon px-3 ">
               <Text className="text-sm font-semibold mb-2.5">Nomor Telepon:</Text>
-              <View className="border-2 rounded-md px-3 flex-row items-center">
+              <View className="border-2 rounded-md px-3">
                 <TextInput
                   placeholder="Masukan nomor telepon"
                   value={editPhone}
@@ -217,7 +216,7 @@ const ContactItem = ({
             </View>
             <View className="alamat px-3 ">
               <Text className="text-sm font-semibold mb-2.5">Alamat:</Text>
-              <View className="border-2 rounded-md px-3 flex-row items-center">
+              <View className="border-2 rounded-md px-3">
                 <TextInput
                   placeholder="Isi Alamat"
                   value={editAddress}
@@ -287,23 +286,6 @@ const ContactItem = ({
   );
 };
 
-const showAlert = async (deteleThisContact: any) => {
-  Alert.alert(
-    "Yakin ingin menghapus?",
-    "gak di balikin loh",
-    [
-      {
-        text: "batal",
-        onPress: () => false,
-        style: "cancel",
-      },
-      { text: "hapus", onPress: async () => await deteleThisContact() },
-    ],
-    {
-      cancelable: true,
-      onDismiss() {},
-    }
-  );
-};
+
 
 export default ContactItem;

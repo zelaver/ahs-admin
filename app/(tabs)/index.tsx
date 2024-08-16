@@ -3,13 +3,31 @@ import Icon from "react-native-remix-icon";
 import images from "@/constants/images";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Redirect } from "expo-router";
+import StockItem from "@/components/StockItem";
+import { getHistory } from "@/database/db";
 
 export default function Home() {
   // let debugMode: boolean = true;
 
-  const [debugMode, setDebugMode] = useState<boolean>(true);
+  const [debugMode, setDebugMode] = useState<boolean>();
+  const [stocks, setStocks] = useState();
 
-  
+  const fetchStocks = async () => {
+    try {
+      const data: any = await getHistory()
+      setStocks(data)
+    } catch(e) {
+      if(e instanceof Error){
+        
+      }
+    }
+  }
+
+  useEffect(() => {
+    fetchStocks()
+    console.log(JSON.stringify(stocks, 0 , 2))
+  }, [])
+
   if (debugMode) {
     return <Redirect href={"/(tabs)/debug"} />;
   }
@@ -59,9 +77,9 @@ export default function Home() {
             </View>
           </View>
           <View className="section-3 px-5 flex-col gap-y-2 ">
-            <Text className="text-sm font-bold text-gray-700">Stok/Harga Galon</Text>
-            <View className="stok-row-1 flex-row justify-between gap-2 ">
-              <View className="mini-box border-2 flex-col rounded-lg px-3 flex-1  gap-y-2 pb-2">
+            <Text className="text-sm font-bold text-gray-700 mb-2">Stok/Harga Galon</Text>
+            <View className="stok-row-1 flex-row justify-between mb-4 ">
+              {/* <View className="mini-box border-2 flex-col rounded-lg px-3 flex-1 gap-y-2 pb-2">
                 <View className="flex-row justify-between items-center ">
                   <Text className="text-xs text-gray-700 font-semibold">Aqua</Text>
                   <Icon
@@ -82,133 +100,52 @@ export default function Home() {
                   />
                 </View>
                 <View className="flex-row items-center opacity-50">
-                  <Text className="text-gray-700 text-xs font-normal">Ubah Saldo</Text>
+                  <Text className="text-gray-700 text-xs font-normal">Tambah Stok</Text>
                   <Icon
                     name="arrow-right-s-line"
                     size={12}
                     color="#374151"
                   ></Icon>
                 </View>
-              </View>
-              <View className="mini-box border-2 flex-col rounded-lg px-3 flex-1  gap-y-2 pb-2">
-                <View className="flex-row justify-between items-center">
-                  <Text className="text-xs text-gray-700 font-semibold">Isi Ulang</Text>
-                  <Icon
-                    name="more-2-fill"
-                    color="black"
-                    size={12}
-                  ></Icon>
-                </View>
-                <View className="flex-row justify-between">
-                  <View>
-                    <Text className="stok text-2xl font-semibold text-gray-700">15</Text>
-                    <Text className="harga text-2xl font-semibold text-gray-700">/5K</Text>
-                  </View>
-                  <Image
-                    source={images.isiUlang}
-                    resizeMode="contain"
-                    className="w-14 h-16"
-                  />
-                </View>
-                <View className="flex-row items-center opacity-50">
-                  <Text className="text-gray-700 text-xs font-normal">Ubah Saldo</Text>
-                  <Icon
-                    name="arrow-right-s-line"
-                    size={12}
-                    color="#374151"
-                  ></Icon>
-                </View>
-              </View>
+              </View> */}
+              <StockItem
+                otherStyles="mr-2"
+                image={images.aqua}
+                name="Aqua"
+                price={20}
+                stock={28}
+              />
+              <StockItem
+                image={images.isiUlang}
+                name="Isi Ulang"
+                price={5}
+                stock={10}
+              />
             </View>
 
-            <View className="stok-row-2 flex-row justify-between gap-2 ">
-              <View className="mini-box border-2 flex-col rounded-lg px-3 flex-1  gap-y-2 pb-2">
-                <View className="flex-row justify-between items-center ">
-                  <Text className="text-xs text-gray-700 font-semibold">Galon kosong</Text>
-                  <Icon
-                    name="more-2-fill"
-                    color="black"
-                    size={12}
-                  ></Icon>
-                </View>
-                <View className="flex-row justify-between items-center">
-                  <View>
-                    <Text className="stok text-2xl font-semibold text-gray-700">10</Text>
-                  </View>
-                  <Image
-                    source={images.galonKosong}
-                    resizeMode="contain"
-                    className="w-14 h-16"
-                  />
-                </View>
-                <View className="flex-row items-center opacity-50">
-                  <Text className="text-gray-700 text-xs font-normal font-inter">Ubah Saldo</Text>
-                  <Icon
-                    name="arrow-right-s-line"
-                    size={12}
-                    color="#374151"
-                  ></Icon>
-                </View>
-              </View>
+            <View className="stok-row-2 flex-row justify-between mb-4">
+            
+              <StockItem
+                image={images.galonKosong}
+                name="Galon Kosong"
+                stock={15}
+              />
             </View>
-            <View className="stok-row-3 flex-row justify-between gap-2 ">
-              <View className="mini-box border-2 flex-col rounded-lg px-3 flex-1  gap-y-2 pb-2">
-                <View className="flex-row justify-between items-center ">
-                  <Text className="text-xs text-gray-700 font-semibold">Gas 12 Kg</Text>
-                  <Icon
-                    name="more-2-fill"
-                    color="black"
-                    size={12}
-                  ></Icon>
-                </View>
-                <View className="flex-row justify-between ">
-                  <View>
-                    <Text className="stok text-2xl font-semibold text-gray-700">10</Text>
-                    <Text className="harga text-2xl font-semibold text-gray-700">/220K</Text>
-                  </View>
-                  <Image
-                    source={images.gas12Kg}
-                    resizeMode="contain"
-                    className="w-14 h-16"
-                  />
-                </View>
-                <View className="flex-row items-center opacity-50">
-                  <Text className="text-gray-700 text-xs font-normal">Ubah Saldo</Text>
-                  <Icon
-                    name="arrow-right-s-line"
-                    size={12}
-                    color="#374151"
-                  ></Icon>
-                </View>
-              </View>
-              <View className="mini-box border-2 flex-col rounded-lg px-3 flex-1  gap-y-2 pb-2">
-                <View className="flex-row justify-between items-center">
-                  <Text className="text-xs text-gray-700 font-semibold">Gas kosong</Text>
-                  <Icon
-                    name="more-2-fill"
-                    color="black"
-                    size={12}
-                  ></Icon>
-                </View>
-                <View className="flex-row justify-between items-center">
-                  <View>
-                    <Text className="stok text-2xl font-semibold text-gray-700">2</Text>
-                  </View>
-                  <Image
-                    source={images.gasKosong}
-                    resizeMode="contain"
-                    className="w-14 h-16"
-                  />
-                </View>
-                <View className="flex-row items-center opacity-50">
-                  <Text className="text-gray-700 text-xs font-normal">Ubah Saldo</Text>
-                  <Icon
-                    name="arrow-right-s-line"
-                    size={12}
-                    color="#374151"
-                  ></Icon>
-                </View>
-              </View>
+            <View className="stok-row-3 flex-row justify-between ">
+              
+              <StockItem
+                otherStyles="mr-2"
+                image={images.gas12Kg}
+                name="Gas 12 kg"
+                stock={7}
+                price={220}
+              />
+             
+              <StockItem
+                image={images.gasKosong}
+                name="Gas Kosong"
+                stock={1}
+              />
             </View>
           </View>
         </View>

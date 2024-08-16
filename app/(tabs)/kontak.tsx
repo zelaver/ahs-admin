@@ -17,15 +17,29 @@ import { addContact, getAllContacts } from "@/database/db";
 import ContactItem from "@/components/ContactItem";
 
 const Kontak = () => {
+  const [name, setName] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
+  const [address, setAddress] = useState<string>("");
+  const [status, setStatus] = useState<number>(0);
+  const [contacts, setContacts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ["55%"], []);
 
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
   }, []);
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log("handleSheetChanges", index);
-  }, []);
+  const handleSheetChanges = useCallback(
+    (index: number) => {
+      if (index == -1) {
+        setName("");
+        setPhone("");
+        setAddress("");
+        setStatus(0);
+      }
+    },
+    [name, phone, address, status]
+  );
   const handleClosePress = useCallback(() => {
     bottomSheetModalRef.current?.close();
   }, []);
@@ -42,13 +56,6 @@ const Kontak = () => {
     ),
     []
   );
-
-  const [name, setName] = useState<string>("");
-  const [phone, setPhone] = useState<string>("");
-  const [address, setAddress] = useState<string>("");
-  const [status, setStatus] = useState<number>(0);
-  const [contacts, setContacts] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const fetchContacts = async () => {
     try {
@@ -76,6 +83,7 @@ const Kontak = () => {
   const handleSave = async () => {
     if (!name || !phone || !address) {
       ToastAndroid.show("Form belum terisi semua!", ToastAndroid.SHORT);
+      return;
     }
     try {
       setIsLoading(true);
@@ -91,27 +99,31 @@ const Kontak = () => {
   };
 
   return (
-    <SafeAreaView>
-      <ScrollView>
-        <View className="main py-8">
-          <View className="section-1 px-5 py-2">
-            <Text className="text-2xl font-semibold">Kontak</Text>
-          </View>
-          <View className="section-2 px-5 flex-row items-center ">
-            <SearchInput
-              placeholder="cari kontak pelanggan"
-              otherStyles="border flex-1 mr-2"
+    <SafeAreaView className="py-8 bg-white">
+      <View className="Header pb-3">
+        <View className="section-1 px-5 py-2">
+          <Text className="text-2xl font-semibold">Kontak</Text>
+        </View>
+        <View className="section-2 px-5 flex-row items-center ">
+          <SearchInput
+            placeholder="cari kontak pelanggan"
+            otherStyles="border flex-1 mr-2"
+          />
+          <TouchableOpacity
+            activeOpacity={0.5}
+            onPress={handlePresentModalPress}
+            
+            className="bg-white rounded-full"
+          >
+            <Icon
+              name="add-fill"
+              size={32}
             />
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={handlePresentModalPress}
-            >
-              <Icon
-                name="add-fill"
-                size={32}
-              />
-            </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+      <ScrollView>
+        <View className="main pb-16">
           <View className="section-3 px-5 py-1.5 ">
             {contacts.map(({ id, name, address, phone, isSubscriber }, i) => {
               return (
@@ -134,10 +146,7 @@ const Kontak = () => {
         ref={bottomSheetModalRef}
         index={0}
         snapPoints={snapPoints}
-        // onChange={handleSheetChanges}
-        // enableDynamicSizing
-        // maxDynamicContentSize={800}
-
+        onChange={handleSheetChanges}
         backdropComponent={renderBackdrop}
         handleComponent={(props) => Handle({ ...props, HandleText: "Detail Kontak" })}
       >
@@ -210,7 +219,9 @@ const Kontak = () => {
             </View>
             <View className="action-button px-3">
               <TouchableOpacity
-                className={`rounded-lg ${isLoading ? 'bg-blue-900' : 'bg-blue-800'}  px-3 py-2 mb-2.5`}
+                className={`rounded-lg ${
+                  isLoading ? "bg-blue-900" : "bg-blue-800"
+                }  px-3 py-2 mb-2.5`}
                 activeOpacity={0.9}
                 onPress={handleSave}
                 disabled={isLoading}
