@@ -18,7 +18,7 @@ const Handle: React.FC<HandleProps> = ({ style, HandleText , animatedIndex }) =>
         <Animated.View style={[rightIndicatorStyle, rightIndicatorAnimatedStyle]} />
       </Animated.View> */}
       <View className="w-16 h-1.5 bg-gray-300 mx-auto mb-2.5 rounded-full"></View>
-      <Text className="text-center text-gray-100 text-2xl font-inter font-bold">
+      <Text className="text-center text-gray-100 text-base font-bold">
         {HandleText}
       </Text>
     </View>

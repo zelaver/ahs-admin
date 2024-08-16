@@ -10,22 +10,25 @@ export default function Home() {
   // let debugMode: boolean = true;
 
   const [debugMode, setDebugMode] = useState<boolean>();
-  const [stocks, setStocks] = useState();
+  const [stocks, setStocks] = useState<any>([]);
 
   const fetchStocks = async () => {
     try {
       const data: any = await getHistory()
-      setStocks(data)
+      setStocks(data[data.length - 1])
+      // console.log(JSON.stringify(stocks, 0 , 2))
+
     } catch(e) {
       if(e instanceof Error){
-        
+        console.log(e)    
       }
     }
   }
+  
 
   useEffect(() => {
     fetchStocks()
-    console.log(JSON.stringify(stocks, 0 , 2))
+
   }, [])
 
   if (debugMode) {
@@ -79,47 +82,22 @@ export default function Home() {
           <View className="section-3 px-5 flex-col gap-y-2 ">
             <Text className="text-sm font-bold text-gray-700 mb-2">Stok/Harga Galon</Text>
             <View className="stok-row-1 flex-row justify-between mb-4 ">
-              {/* <View className="mini-box border-2 flex-col rounded-lg px-3 flex-1 gap-y-2 pb-2">
-                <View className="flex-row justify-between items-center ">
-                  <Text className="text-xs text-gray-700 font-semibold">Aqua</Text>
-                  <Icon
-                    name="more-2-fill"
-                    color="black"
-                    size={12}
-                  ></Icon>
-                </View>
-                <View className="flex-row justify-between ">
-                  <View>
-                    <Text className="stok text-2xl font-semibold text-gray-700">28</Text>
-                    <Text className="harga text-2xl font-semibold text-gray-700">/20K</Text>
-                  </View>
-                  <Image
-                    source={images.aqua}
-                    resizeMode="contain"
-                    className="w-14 h-16"
-                  />
-                </View>
-                <View className="flex-row items-center opacity-50">
-                  <Text className="text-gray-700 text-xs font-normal">Tambah Stok</Text>
-                  <Icon
-                    name="arrow-right-s-line"
-                    size={12}
-                    color="#374151"
-                  ></Icon>
-                </View>
-              </View> */}
               <StockItem
                 otherStyles="mr-2"
                 image={images.aqua}
                 name="Aqua"
                 price={20}
-                stock={28}
+                stock={stocks.stock_aqua}
+                stocks={stocks}
+                fetchStocks={fetchStocks}
               />
               <StockItem
                 image={images.isiUlang}
                 name="Isi Ulang"
                 price={5}
-                stock={10}
+                stock={stocks.stock_isi_ulang}
+                stocks={stocks}
+                fetchStocks={fetchStocks}
               />
             </View>
 
@@ -128,7 +106,9 @@ export default function Home() {
               <StockItem
                 image={images.galonKosong}
                 name="Galon Kosong"
-                stock={15}
+                stock={stocks.stock_galon_kosong}
+                stocks={stocks}
+                fetchStocks={fetchStocks}
               />
             </View>
             <View className="stok-row-3 flex-row justify-between ">
@@ -137,14 +117,18 @@ export default function Home() {
                 otherStyles="mr-2"
                 image={images.gas12Kg}
                 name="Gas 12 kg"
-                stock={7}
+                stock={stocks.stock_gas_12kg}
                 price={220}
+                stocks={stocks}
+                fetchStocks={fetchStocks}
               />
              
               <StockItem
                 image={images.gasKosong}
                 name="Gas Kosong"
-                stock={1}
+                stock={stocks.stock_gas_kosong}
+                stocks={stocks}
+                fetchStocks={fetchStocks}
               />
             </View>
           </View>

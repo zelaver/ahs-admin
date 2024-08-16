@@ -204,6 +204,27 @@ const getHistory = async () => {
   }
 };
 
+const addHistory = async ({saldo, stock_aqua, stock_galon_kosong, stock_gas_12kg, stock_gas_kosong, stock_isi_ulang, transactionId}: any) => {
+  const db = await SQLite.openDatabaseAsync("ahs-admin", {
+    useNewConnection: true,
+  });
+  try {
+    const result = await db.runAsync(
+      `
+      insert into history (saldo, stock_aqua, stock_galon_kosong, stock_gas_12kg, stock_gas_kosong, stock_isi_ulang, transactionId)
+      values(?,?,?,?,?,?,?)
+      `,
+      [saldo, stock_aqua, stock_galon_kosong, stock_gas_12kg, stock_gas_kosong, stock_isi_ulang, transactionId]
+      // delete from transactions where id = 'trans001'
+    );
+    return result;
+  } catch (e) {
+    if (e instanceof Error) {
+      console.log(e);
+    }
+  }
+}
+
 export {
   initDB,
   getQuery,
@@ -213,5 +234,6 @@ export {
   getAllContacts,
   updateContact,
   deleteContact,
-  getHistory
+  getHistory,
+  addHistory
 };
