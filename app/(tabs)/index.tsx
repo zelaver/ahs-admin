@@ -1,13 +1,18 @@
 import { Image, Platform, SafeAreaView, ScrollView, Text, View } from "react-native";
 import Icon from "react-native-remix-icon";
 import images from "@/constants/images";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Redirect } from "expo-router";
 
 export default function Home() {
+  // let debugMode: boolean = true;
 
-  let debugMode: boolean = true;
-  if(debugMode) return <Redirect href={"/(tabs)/debug"}/>
+  const [debugMode, setDebugMode] = useState<boolean>(true);
+
+  
+  if (debugMode) {
+    return <Redirect href={"/(tabs)/debug"} />;
+  }
 
   return (
     <SafeAreaView>
@@ -211,4 +216,3 @@ export default function Home() {
     </SafeAreaView>
   );
 }
-

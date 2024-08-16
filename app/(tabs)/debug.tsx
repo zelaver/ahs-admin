@@ -1,6 +1,24 @@
-import { View, Text, TouchableOpacity, TextInput } from "react-native";
+import { View, Text, TouchableOpacity, TextInput, Alert } from "react-native";
 import React from "react";
 import { initDB, execQuery, getAllTables, getQuery } from "@/database/db";
+
+const showAlert = () => {
+  Alert.alert(
+    "Yakin ingin menghapus?",
+    "gak di balikin loh",
+    [
+      {
+        text: "batal",
+        onPress: () => console.log("Cancel Pressed"),
+        style: "cancel",
+      },
+      { text: "hapus", onPress: () => console.log("OK Pressed") },
+    ],
+    {
+      cancelable: true,
+    }
+  );
+};
 
 const debug = () => {
   return (
@@ -29,13 +47,20 @@ const debug = () => {
           get query
         </Text>
       </TouchableOpacity>
-
       <TouchableOpacity
         activeOpacity={0.9}
         onPress={() => execQuery()}
       >
         <Text className="bg-blue-800 py-2 px-4 text-white text-xl font-bold rounded-lg">
           exec query
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        activeOpacity={0.9}
+        onPress={showAlert}
+      >
+        <Text className="bg-blue-800 py-2 px-4 text-white text-xl font-bold rounded-lg">
+          show alert
         </Text>
       </TouchableOpacity>
     </View>

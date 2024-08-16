@@ -170,12 +170,12 @@ const getAllContacts = async () => {
   }
 };
 
-const getContact = async (id: number) => {
+const deleteContact = async (id: number) => {
   const db = await SQLite.openDatabaseAsync("ahs-admin", {
     useNewConnection: true,
   });
   try {
-    const result = await db.getFirstAsync(`select * from customers where id = ?`, id);
+    const result = await db.runAsync('DELETE FROM customers WHERE id = $id', { $id: id }); 
     // console.log(result[0])
     return result;
   } catch (e) {
@@ -185,4 +185,4 @@ const getContact = async (id: number) => {
   }
 }
 
-export { initDB, getQuery, getAllTables, execQuery, addContact, getAllContacts, updateContact, getContact };
+export { initDB, getQuery, getAllTables, execQuery, addContact, getAllContacts, updateContact, deleteContact };

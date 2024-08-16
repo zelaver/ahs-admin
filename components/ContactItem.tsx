@@ -1,10 +1,11 @@
-import { View, Text, TextInput, TouchableOpacity, ToastAndroid } from "react-native";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, ToastAndroid, Alert } from "react-native";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Icon from "react-native-remix-icon";
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import Handle from "@/components/CustomHandle";
 import CartItem from "@/components/CartItem";
-import { updateContact } from "@/database/db";
+import { deleteContact, updateContact } from "@/database/db";
+import { SQLiteRunResult } from "expo-sqlite";
 
 type ContactItem = {
   id: number;
@@ -13,7 +14,7 @@ type ContactItem = {
   address: string;
   phone: string;
   isSubscriber: number;
-  fetchContacts: () => void;
+  fetchContacts: () => Promise<void>;
 };
 
 const ContactItem = ({
@@ -38,6 +39,7 @@ const ContactItem = ({
         setEditPhone(phone);
         setEditAddress(address);
         setEditStatus(isSubscriber);
+        console.log(isSubscriber);
       }
     },
     [name, phone, address, isSubscriber]
@@ -60,28 +62,79 @@ const ContactItem = ({
     []
   );
 
-  const [editName, setEditName] = useState<string>(name);
-  const [editPhone, setEditPhone] = useState<string>(phone);
-  const [editAddress, setEditAddress] = useState<string>(address);
-  const [editStatus, setEditStatus] = useState<number>(isSubscriber);
+  const [editName, setEditName] = useState<string>();
+  const [editPhone, setEditPhone] = useState<string>();
+  const [editAddress, setEditAddress] = useState<string>();
+  const [editStatus, setEditStatus] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    setEditName(name);
+    setEditPhone(phone);
+    setEditAddress(address);
+    setEditStatus(isSubscriber);
+  }, [name, phone, address, isSubscriber]);
 
   const handleSave = async () => {
     if (!editName || !editPhone || !editAddress) {
       ToastAndroid.show("Form belum terisi semua", ToastAndroid.SHORT);
       return;
     }
+    try {
+      setIsLoading(true);
+      await updateContact(
+        {
+          name: editName,
+          address: editAddress,
+          phone: editPhone,
+          isSubscriber: editStatus,
+        },
+        id
+      );
+      await fetchContacts();
+      setIsLoading(false);
+      handleClosePress();
+    } catch (e) {
+      if (e instanceof Error) {
+        ToastAndroid.show(`Error: ${e}`, ToastAndroid.SHORT);
+      }
+    }
+  };
 
-    await updateContact(
-      {
-        name: editName,
-        address: editAddress,
-        phone: editPhone,
-        isSubscriber: editStatus,
-      },
-      id
-    );
-    fetchContacts();
-    handleClosePress();
+  const handleDelete = async () => {
+    try {
+      setIsLoading(true);
+      Alert.alert(
+        "Yakin ingin menghapus?",
+        "gak di balikin loh",
+        [
+          {
+            text: "batal",
+            onPress: () => false,
+            style: "cancel",
+          },
+          {
+            text: "hapus",
+            onPress: async () => {
+              await deleteContact(id);
+              await fetchContacts();
+              setIsLoading(false);
+              handleClosePress();
+            },
+          },
+        ],
+        {
+          cancelable: true,
+          onDismiss() {
+            setIsLoading(false);
+          },
+        }
+      );
+    } catch (e) {
+      if (e instanceof Error) {
+        ToastAndroid.show(`Error: ${e}`, ToastAndroid.SHORT);
+      }
+    }
   };
 
   return (
@@ -209,15 +262,20 @@ const ContactItem = ({
             </View>
             <View className="action-button px-3">
               <TouchableOpacity
-                className="rounded-lg bg-blue-800 px-3 py-2 mb-2.5"
+                className={`rounded-lg ${
+                  isLoading ? "bg-blue-900" : "bg-blue-800"
+                }  px-3 py-2 mb-2.5`}
                 activeOpacity={0.9}
                 onPress={handleSave}
+                disabled={isLoading}
               >
                 <Text className="text-center text-gray-100 text-xs font-semibold">Simpan</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                className="rounded-lg bg-red-500 px-3 py-2 border"
+                className={`rounded-lg ${isLoading ? "bg-red-600" : "bg-red-500"} px-3 py-2 border`}
                 activeOpacity={0.9}
+                onPress={handleDelete}
+                disabled={isLoading}
               >
                 <Text className="text-center text-gray-100 text-xs font-semibold">Hapus</Text>
               </TouchableOpacity>
@@ -226,6 +284,25 @@ const ContactItem = ({
         </BottomSheetScrollView>
       </BottomSheetModal>
     </View>
+  );
+};
+
+const showAlert = async (deteleThisContact: any) => {
+  Alert.alert(
+    "Yakin ingin menghapus?",
+    "gak di balikin loh",
+    [
+      {
+        text: "batal",
+        onPress: () => false,
+        style: "cancel",
+      },
+      { text: "hapus", onPress: async () => await deteleThisContact() },
+    ],
+    {
+      cancelable: true,
+      onDismiss() {},
+    }
   );
 };
 

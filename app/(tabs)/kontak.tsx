@@ -18,7 +18,7 @@ import ContactItem from "@/components/ContactItem";
 
 const Kontak = () => {
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-  const snapPoints = useMemo(() => ["60%"], []);
+  const snapPoints = useMemo(() => ["55%"], []);
 
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
@@ -48,6 +48,7 @@ const Kontak = () => {
   const [address, setAddress] = useState<string>("");
   const [status, setStatus] = useState<number>(0);
   const [contacts, setContacts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const fetchContacts = async () => {
     try {
@@ -76,9 +77,17 @@ const Kontak = () => {
     if (!name || !phone || !address) {
       ToastAndroid.show("Form belum terisi semua!", ToastAndroid.SHORT);
     }
-    await addContact({ name, phone, address, isSubscriber: status });
-    fetchContacts();
-    handleClosePress();
+    try {
+      setIsLoading(true);
+      await addContact({ name, phone, address, isSubscriber: status });
+      await fetchContacts();
+      setIsLoading(false);
+      handleClosePress();
+    } catch (e) {
+      if (e instanceof Error) {
+        ToastAndroid.show(`Error: ${e}`, ToastAndroid.SHORT);
+      }
+    }
   };
 
   return (
@@ -201,18 +210,19 @@ const Kontak = () => {
             </View>
             <View className="action-button px-3">
               <TouchableOpacity
-                className="rounded-lg bg-blue-800 px-3 py-2 mb-2.5"
+                className={`rounded-lg ${isLoading ? 'bg-blue-900' : 'bg-blue-800'}  px-3 py-2 mb-2.5`}
                 activeOpacity={0.9}
                 onPress={handleSave}
+                disabled={isLoading}
               >
                 <Text className="text-center text-gray-100 text-xs font-semibold">Simpan</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                className="rounded-lg bg-red-500 px-3 py-2 border"
+              {/* <TouchableOpacity
+                className={`rounded-lg ${isLoading ? "bg-red-600" : "bg-red-500"} px-3 py-2 border`}
                 activeOpacity={0.9}
               >
                 <Text className="text-center text-gray-100 text-xs font-semibold">Hapus</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
           </View>
         </BottomSheetScrollView>
