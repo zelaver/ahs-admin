@@ -6,6 +6,7 @@ import {
   TextInput,
   BackHandler,
   ToastAndroid,
+  RefreshControl,
 } from "react-native";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import SearchInput from "@/components/SearchInput";
@@ -23,6 +24,7 @@ const Kontak = () => {
   const [status, setStatus] = useState<number>(0);
   const [contacts, setContacts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [refreshing, setRefreshing] = useState(false);
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ["55%"], []);
 
@@ -98,6 +100,12 @@ const Kontak = () => {
     }
   };
 
+  const onRefresh = async () =>  {
+    setRefreshing(true)
+    await fetchContacts()
+    setRefreshing(false)
+  }
+
   return (
     <SafeAreaView className="py-8 bg-white">
       <View className="Header pb-3">
@@ -122,7 +130,7 @@ const Kontak = () => {
           </TouchableOpacity>
         </View>
       </View>
-      <ScrollView>
+      <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}>
         <View className="main pb-16">
           <View className="section-3 px-5 py-1.5 ">
             {contacts.map(({ id, name, address, phone, isSubscriber }, i) => {

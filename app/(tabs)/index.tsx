@@ -25,10 +25,11 @@ import {
 } from "@gorhom/bottom-sheet";
 import Handle from "@/components/CustomHandle";
 import CurrencyInput from "react-native-currency-input";
+import { RefreshControl } from "react-native-gesture-handler";
 
 export default function Home() {
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-  const snapPoints = useMemo(() => ["25%","40%"], []);
+  const snapPoints = useMemo(() => ["25%", "40%"], []);
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
     // console.log('kocak')
@@ -36,7 +37,7 @@ export default function Home() {
   const handleSheetChanges = useCallback((index: number) => {
     // console.log(index);
     if (index == -1) {
-      setSaldoInput(null)
+      setSaldoInput(null);
     }
   }, []);
   const handleSnapPress = useCallback((index: number) => {
@@ -72,7 +73,9 @@ export default function Home() {
   const [debugMode, setDebugMode] = useState<boolean>();
   const [stocks, setStocks] = useState<any>([]);
   const [keteranganSaldo, setkKteranganSaldo] = useState();
-  const [saldoInput, setSaldoInput] = useState<number | null>(null)
+  const [saldoInput, setSaldoInput] = useState<number | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+
   const fetchStocks = async () => {
     try {
       const data: any = await getHistory();
@@ -94,16 +97,30 @@ export default function Home() {
   }
 
   const handleSave = async () => {
-    if(!saldoInput) return ToastAndroid.show("Input saldo tidak boleh kosong", ToastAndroid.SHORT);
-    if(stocks.saldo + saldoInput < 0) return ToastAndroid.show("Saldo anda tidak cukup", ToastAndroid.SHORT);
-    await addHistory({...stocks, saldo: stocks.saldo + saldoInput})
-    await fetchStocks()
-    handleClosePress()
-  }
+    if (!saldoInput) return ToastAndroid.show("Input saldo tidak boleh kosong", ToastAndroid.SHORT);
+    if (stocks.saldo + saldoInput < 0)
+      return ToastAndroid.show("Saldo anda tidak cukup", ToastAndroid.SHORT);
+    await addHistory({ ...stocks, saldo: stocks.saldo + saldoInput });
+    await fetchStocks();
+    handleClosePress();
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchStocks();
+    setRefreshing(false);
+  };
 
   return (
     <SafeAreaView>
-      <ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }
+      >
         <View className="main py-8 ">
           <View className="section-1 px-5 py-2">
             <Text className="text-2xl font-semibold">Home</Text>
@@ -219,7 +236,7 @@ export default function Home() {
               <Text className="text-sm font-semibold mb-2.5">Jumlah Saldo:</Text>
               <View className="border-2 rounded-md px-3">
                 <CurrencyInput
-                  onFocus={()=> handleSnapPress(1)}
+                  onFocus={() => handleSnapPress(1)}
                   onBlur={() => handleSnapPress(0)}
                   placeholder="Masukan Jumlah Saldo"
                   keyboardType="number-pad"
@@ -233,7 +250,7 @@ export default function Home() {
                 />
               </View>
             </View>
-          
+
             <View className="action-button px-3">
               <TouchableOpacity
                 className={`rounded-lg ${false ? "bg-blue-900" : "bg-blue-800"}  px-3 py-2 mb-2.5`}

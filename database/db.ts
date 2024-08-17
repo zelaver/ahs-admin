@@ -50,7 +50,7 @@ const getQuery = async () => {
   });
 
   try {
-    const result: any = await db.getAllAsync("SELECT * FROM history;");
+    const result: any = await db.getAllAsync("SELECT * FROM customers;");
     console.log(JSON.stringify(result, 0, 2));
     // console.log(result[result.length - 1])
     // console.log(typeof JSON.parse(result[0].orderList)[0].productId);
@@ -85,19 +85,21 @@ const execQuery = async () => {
   // console.log(query)
 
   try {
+    const orderListJson = JSON.stringify([
+      { productid: 1, sum: 3 },
+      { productid: 2, sum: 5 },
+    ]);
+    
+    const customerId = 123;  // contoh nilai customerId
+    const status = 'lunas';  // contoh nilai status
+    const total_price = 100;  // contoh nilai total_price
     const result = await db.getAllAsync(
-      //   INSERT INTO transactions (id, orderList, customerId, status, total_price)
-      //   VALUES (
-      // 'trans001',
-      // '[{"productId": 1, "quantity": 3}, {"productId": 2, "quantity": 1}]',
-      // 'cust001',
-      // 'lunas',
-      // 50000.00);
-      // drop table if exists history;
+      
       `
-      insert into history (stock_aqua, stock_isi_ulang, stock_galon_kosong, stock_gas_12kg, stock_gas_kosong, saldo)
-      values(10, 10, 10, 10, 10, 200000)
+      insert into transactions (orderList, customerId, status, total_price)
+      values(?, ?, ?, ?)
       `
+      ,[orderListJson, customerId, status, total_price]
       // delete from customers where name = 'sigma skibid'
     );
     console.log(result);
@@ -225,6 +227,28 @@ const addHistory = async ({saldo, stock_aqua, stock_galon_kosong, stock_gas_12kg
   }
 }
 
+type products = {
+  id: number
+  name: string
+  price: number
+  subs_price: number
+}
+
+const getProducts = async () : Promise<products[] | undefined>  => {
+  const db = await SQLite.openDatabaseAsync("ahs-admin", {
+    useNewConnection: true,
+  });
+  try {
+    const result: products[] = await db.getAllAsync(`select * from products`);
+    // console.log(result[0])
+    return result;
+  } catch (e) {
+    if (e instanceof Error) {
+      console.log(e);
+    }
+  }
+}
+
 export {
   initDB,
   getQuery,
@@ -235,5 +259,6 @@ export {
   updateContact,
   deleteContact,
   getHistory,
-  addHistory
+  addHistory,
+  getProducts,
 };

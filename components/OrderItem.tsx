@@ -6,13 +6,8 @@ import Handle from "@/components/CustomHandle";
 import CartItem from "@/components/CartItem";
 
 const OrderItem = () => {
-  // ref
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-
-  // variables
   const snapPoints = useMemo(() => ["90%"], []);
-
-  // callbacks
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
   }, []);
@@ -22,7 +17,6 @@ const OrderItem = () => {
   const handleClosePress = useCallback(() => {
     bottomSheetModalRef.current?.close();
   }, []);
-
   const renderBackdrop = useCallback(
     (props: any) => (
       <BottomSheetBackdrop
