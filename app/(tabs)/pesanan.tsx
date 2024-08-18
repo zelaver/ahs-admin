@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TextInput,
   Touchable,
+  Easing,
 } from "react-native";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import SearchInput from "@/components/SearchInput";
@@ -17,6 +18,9 @@ import Handle from "@/components/CustomHandle";
 import { getAllContacts, getProducts } from "@/database/db";
 import { SelectList } from "react-native-dropdown-select-list";
 import { UnknownOutputParams } from "expo-router";
+import Popover from "react-native-popover-view/dist/Popover";
+import { PopoverPlacement } from "react-native-popover-view";
+import images from "@/constants/images";
 
 const Pesanan = () => {
   type products = {
@@ -33,8 +37,10 @@ const Pesanan = () => {
   const [gasVal, setGasVal] = useState(0);
   const [gasKosongVal, setGasKosongVal] = useState(0);
   const [products, setProducts] = useState<any[]>([]);
-  const [customers, setCustomers] = useState<any[]>([])
-  const [customerId, setCustomerId] = useState([])
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [customerId, setCustomerId] = useState([]);
+  const [isVisible, setIsVisible] = useState<boolean>();
+  const [total, setTotal] = useState();
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ["90%"], []);
@@ -42,8 +48,8 @@ const Pesanan = () => {
     bottomSheetModalRef.current?.present();
   }, []);
   const handleSheetChanges = useCallback((index: number) => {
-    console.log("handleSheetChanges", index);
-    console.log(products);
+    // console.log("handleSheetChanges", index);
+    // console.log(products);
   }, []);
   const handleClosePress = useCallback(() => {
     bottomSheetModalRef.current?.close();
@@ -69,7 +75,7 @@ const Pesanan = () => {
       //   return {key: i, value: item.name, }
       // })]);
       setProducts(data);
-      console.log(products);
+      // console.log(products);
     } catch (e) {
       if (e instanceof Error) {
         console.log(e);
@@ -80,7 +86,7 @@ const Pesanan = () => {
     try {
       const data: any[] | any = await getAllContacts();
       setCustomers(data);
-      console.log(products);
+      // console.log(products);
     } catch (e) {
       if (e instanceof Error) {
         console.log(e);
@@ -90,7 +96,7 @@ const Pesanan = () => {
 
   useEffect(() => {
     fetchProducts();
-    fetchCustomers()
+    fetchCustomers();
   }, []);
 
   return (
@@ -159,10 +165,10 @@ const Pesanan = () => {
                 <SelectList
                   data={[
                     ...customers.map((item, i) => {
-                      return {key: item.id, value: item.name};
-                    })
+                      return { key: item.id, value: item.name };
+                    }),
                   ]}
-                  setSelected={(val) => setCustomerId(val)}
+                  setSelected={(val: any) => setCustomerId(val)}
                   // setSelected={val => console.log(val)}
                   placeholder="pilih pelanggan"
                   searchPlaceholder="cari pelanggan"
@@ -170,18 +176,113 @@ const Pesanan = () => {
               </View>
             </View>
             <View className="cart border-t border-b py-4">
-              <CartItem />
-              <CartItem />
-              <View className="px-5 hidden">
-                <View className="py-4 items-center">
-                  <Icon
-                    name="add-circle-line"
-                    size={32}
-                  />
-                </View>
+              <CartItem
+                name="Aqua"
+                image={images.aqua}
+                price={products[0]?.price}
+                val={aquaVal}
+                setVal={setAquaVal}
+              />
+              <CartItem
+                name="Isi Ulang"
+                image={images.isiUlang}
+                price={products[1]?.price}
+                val={isiUlangVal}
+                setVal={setIsiUlangVal}
+              />
+              <CartItem
+                name="Gas 12 kg"
+                image={images.gas12Kg}
+                price={products[2]?.price}
+                val={gasVal}
+                setVal={setGasVal}
+              />
+              <CartItem
+                name="Galon Kosong"
+                image={images.galonKosong}
+                val={galonKosongVal}
+                setVal={setGalonKosongVal}
+              />
+              <CartItem
+                name="Gas Kosong"
+                image={images.gasKosong}
+                val={gasKosongVal}
+                setVal={setGasKosongVal}
+              />
+              <View className="px-5 add ">
+                <Popover
+                  animationConfig={{ duration: 200 }}
+                  arrowSize={{ width: 0, height: 0 }}
+                  backgroundStyle={{ opacity: 0 }}
+                  offset={-10}
+                  // isVisible={isVisible}
+                  popoverStyle={{
+                    width: 200,
+                    borderWidth: 1,
+                    borderRadius: 12,
+                    backgroundColor: "#1943b4",
+                    // display: aquaVal && isiUlangVal && gasVal ? "none" : "flex"
+                  }}
+                  from={
+                    <TouchableOpacity
+                      className={`py-4 items-center ${aquaVal && isiUlangVal && gasVal && "hidden"}
+                        ${galonKosongVal && gasKosongVal && "hidden"}
+                      `}
+                    >
+                      <Icon
+                        name="add-circle-line"
+                        size={32}
+                      />
+                    </TouchableOpacity>
+                  }
+                >
+                  <TouchableOpacity
+                    onPress={() => setAquaVal(1)}
+                    className={`border px-4 py-2 ${aquaVal && "hidden"} ${status == 1 && "hidden"}`}
+                  >
+                    <Text className="text-gray-50 font-semibold">aqua</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => setIsiUlangVal(1)}
+                    className={`border px-4 py-2 ${isiUlangVal && "hidden"} ${
+                      status == 1 && "hidden"
+                    }`}
+                  >
+                    <Text className="text-gray-50 font-semibold">Isi Ulang</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => setGasVal(1)}
+                    className={`border px-4 py-2 ${gasVal && "hidden"} ${status == 1 && "hidden"}`}
+                  >
+                    <Text className="text-gray-50 font-semibold">Gas 12 Kg</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => setGalonKosongVal(1)}
+                    className={`border px-4 py-2 ${galonKosongVal && "hidden"} ${
+                      status != 1 && "hidden"
+                    }`}
+                    disabled={status != 1}
+                  >
+                    <Text className="text-gray-50 font-semibold">Galon Kosong</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => setGasKosongVal(1)}
+                    className={`border px-4 py-2 ${gasKosongVal && "hidden"} ${
+                      status != 1 && "hidden"
+                    }`}
+                    disabled={status != 1}
+                  >
+                    <Text className="text-gray-50 font-semibold">Gas Kosong</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    className={`border px-4 py-2 hidden ${aquaVal && isiUlangVal && gasVal && "flex"}`}
+                  >
+                    <Text className="text-gray-200 font-semibold">Tekan Di luar untuk Tutup</Text>
+                  </TouchableOpacity>
+                </Popover>
               </View>
             </View>
-            <View className="total px-3">
+            <View className={`total px-3 ${status == 1 && 'hidden'}`}>
               <View className="py-2 px-3 flex-row justify-between items-center bg-blue-800 rounded-lg">
                 <Text className="text-base font-bold text-gray-50">Total pembayaran</Text>
                 <Text className="text-sm font-bold text-gray-50">25.000</Text>
@@ -191,7 +292,11 @@ const Pesanan = () => {
               <Text className="text-sm font-semibold mb-2.5">Status:</Text>
               <View className="status-boxes self-center flex-row gap-x-3">
                 <TouchableOpacity
-                  onPress={() => setStatus(0)}
+                  onPress={() => {
+                    setStatus(0);
+                    setGalonKosongVal(0);
+                    setGasKosongVal(0);
+                  }}
                   activeOpacity={1}
                 >
                   <Text
@@ -202,7 +307,12 @@ const Pesanan = () => {
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() => setStatus(1)}
+                  onPress={() => {
+                    setStatus(1);
+                    setAquaVal(0);
+                    setIsiUlangVal(0);
+                    setGasVal(0);
+                  }}
                   activeOpacity={1}
                 >
                   <Text
@@ -213,7 +323,11 @@ const Pesanan = () => {
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() => setStatus(2)}
+                  onPress={() => {
+                    setStatus(2);
+                    setGalonKosongVal(0);
+                    setGasKosongVal(0);
+                  }}
                   activeOpacity={1}
                 >
                   <Text

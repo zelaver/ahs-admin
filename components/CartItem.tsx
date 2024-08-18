@@ -2,40 +2,57 @@ import { View, Text, Image } from "react-native";
 import React from "react";
 import images from "@/constants/images";
 import Icon from "react-native-remix-icon";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
+type CartItem = {
+  image: any
+  name: string
+  price?: number
+  val: number
+  setVal: any
+}
 
-const CartItem = () => {
+const CartItem = ({image, name, price, val, setVal} : CartItem) => {
   return (
-    <View className="aqua px-5 mb-4">
+    <View className={`cart-item px-5 mb-4 ${!val && 'hidden'}`}>
       <View className="py-4 flex-row justify-between border-b border-gray-500">
         <View className="nama-harga">
-          <Text className="text-base font-semibold text-gray-700">Aqua</Text>
-          <Text className="text-sm font-light">20.000</Text>
+          <Text className="text-base font-semibold text-gray-700">{name}</Text>
+          <Text className="text-sm font-light">{price?.toLocaleString()}</Text>
         </View>
         <View className="gambarBarang-jumlah w-[108px] justify-center">
           <View className="items-center mb-2">
             <Image
-              source={images.aqua}
+              source={image}
               resizeMode="contain"
               className="w-14 h-16"
             />
           </View>
           <View className="jumlah justify-between flex-row items-center">
-            <View className="border-blue-800 rounded-full border">
+            <TouchableOpacity className="border-blue-800 rounded-full border"
+              activeOpacity={0.8}
+              onPress={() =>{ 
+                if(!val) return;
+                setVal(val - 1)
+              }}
+            >
               <Icon
                 name="subtract-line"
                 size={24}
                 color="#1e40af"
               />
-            </View>
-            <Text className="text-sm font-semibold text-blue-800">1</Text>
-            <View className="border-blue-800 rounded-full border">
+            </TouchableOpacity>
+            <Text className="text-sm font-semibold text-blue-800">{val}</Text>
+            <TouchableOpacity className="border-blue-800 rounded-full border"
+              activeOpacity={0.8}
+              onPress={() => setVal(val + 1)}
+            >
               <Icon
                 name="add-line"
                 size={24}
                 color="#1e40af"
               />
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
