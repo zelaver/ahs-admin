@@ -50,8 +50,8 @@ const getQuery = async () => {
   });
 
   try {
-    const result: any = await db.getAllAsync("SELECT * FROM customers;");
-    console.log(JSON.stringify(result, 0, 2));
+    const result: any = await db.getAllAsync("SELECT * FROM transactions;");
+    console.log(JSON.stringify(result, null, 2));
     // console.log(result[result.length - 1])
     // console.log(typeof JSON.parse(result[0].orderList)[0].productId);
     // return result

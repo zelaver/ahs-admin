@@ -40,7 +40,7 @@ const Pesanan = () => {
   const [customers, setCustomers] = useState<any[]>([]);
   const [customerId, setCustomerId] = useState([]);
   const [isVisible, setIsVisible] = useState<boolean>();
-  const [total, setTotal] = useState();
+  const [total, setTotal] = useState<number>(0);
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ["90%"], []);
@@ -98,6 +98,10 @@ const Pesanan = () => {
     fetchProducts();
     fetchCustomers();
   }, []);
+
+  const handleSave = () => {
+    setTotal(0);
+  };
 
   return (
     <SafeAreaView className="py-8">
@@ -182,6 +186,8 @@ const Pesanan = () => {
                 price={products[0]?.price}
                 val={aquaVal}
                 setVal={setAquaVal}
+                setTotal={setTotal}
+                total={total}
               />
               <CartItem
                 name="Isi Ulang"
@@ -189,6 +195,8 @@ const Pesanan = () => {
                 price={products[1]?.price}
                 val={isiUlangVal}
                 setVal={setIsiUlangVal}
+                setTotal={setTotal}
+                total={total}
               />
               <CartItem
                 name="Gas 12 kg"
@@ -196,18 +204,24 @@ const Pesanan = () => {
                 price={products[2]?.price}
                 val={gasVal}
                 setVal={setGasVal}
+                setTotal={setTotal}
+                total={total}
               />
               <CartItem
                 name="Galon Kosong"
                 image={images.galonKosong}
                 val={galonKosongVal}
                 setVal={setGalonKosongVal}
+                setTotal={setTotal}
+                total={total}
               />
               <CartItem
                 name="Gas Kosong"
                 image={images.gasKosong}
                 val={gasKosongVal}
                 setVal={setGasKosongVal}
+                setTotal={setTotal}
+                total={total}
               />
               <View className="px-5 add ">
                 <Popover
@@ -215,6 +229,7 @@ const Pesanan = () => {
                   arrowSize={{ width: 0, height: 0 }}
                   backgroundStyle={{ opacity: 0 }}
                   offset={-10}
+                  // debug
                   // isVisible={isVisible}
                   popoverStyle={{
                     width: 200,
@@ -237,13 +252,19 @@ const Pesanan = () => {
                   }
                 >
                   <TouchableOpacity
-                    onPress={() => setAquaVal(1)}
+                    onPress={() => {
+                      setAquaVal(1);
+                      setTotal(total + products[0]?.price);
+                    }}
                     className={`border px-4 py-2 ${aquaVal && "hidden"} ${status == 1 && "hidden"}`}
                   >
                     <Text className="text-gray-50 font-semibold">aqua</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    onPress={() => setIsiUlangVal(1)}
+                    onPress={() => {
+                      setIsiUlangVal(1);
+                      setTotal(total + products[1]?.price);
+                    }}
                     className={`border px-4 py-2 ${isiUlangVal && "hidden"} ${
                       status == 1 && "hidden"
                     }`}
@@ -251,7 +272,10 @@ const Pesanan = () => {
                     <Text className="text-gray-50 font-semibold">Isi Ulang</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    onPress={() => setGasVal(1)}
+                    onPress={() => {
+                      setGasVal(1);
+                      setTotal(total + products[2]?.price);
+                    }}
                     className={`border px-4 py-2 ${gasVal && "hidden"} ${status == 1 && "hidden"}`}
                   >
                     <Text className="text-gray-50 font-semibold">Gas 12 Kg</Text>
@@ -275,17 +299,21 @@ const Pesanan = () => {
                     <Text className="text-gray-50 font-semibold">Gas Kosong</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    className={`border px-4 py-2 hidden ${aquaVal && isiUlangVal && gasVal && "flex"}`}
+                    className={`border px-4 py-2 hidden ${
+                      aquaVal && isiUlangVal && gasVal && "flex"
+                    }
+                    ${galonKosongVal && gasKosongVal && "flex"}
+                    `}
                   >
                     <Text className="text-gray-200 font-semibold">Tekan Di luar untuk Tutup</Text>
                   </TouchableOpacity>
                 </Popover>
               </View>
             </View>
-            <View className={`total px-3 ${status == 1 && 'hidden'}`}>
+            <View className={`total px-3 ${status == 1 && "hidden"}`}>
               <View className="py-2 px-3 flex-row justify-between items-center bg-blue-800 rounded-lg">
                 <Text className="text-base font-bold text-gray-50">Total pembayaran</Text>
-                <Text className="text-sm font-bold text-gray-50">25.000</Text>
+                <Text className="text-sm font-bold text-gray-50">{total.toLocaleString()}</Text>
               </View>
             </View>
             <View className="status px-3">
@@ -312,6 +340,7 @@ const Pesanan = () => {
                     setAquaVal(0);
                     setIsiUlangVal(0);
                     setGasVal(0);
+                    setTotal(0);
                   }}
                   activeOpacity={1}
                 >
@@ -343,7 +372,48 @@ const Pesanan = () => {
               <TouchableOpacity
                 className="rounded-lg bg-blue-800 px-3 py-2 mb-2.5"
                 activeOpacity={0.9}
-                onPress={handleClosePress}
+                onPress={() => {
+                  let statusString;
+                  switch(status){
+                    case 0:
+                      statusString = "hutang"
+                      break;
+                    case 1:
+                      statusString = "pinjam"
+                      break;
+                    case 2:
+                      statusString = "lunas"
+                      break;
+                  }
+                  let orderList;
+                  orderList = [
+                    (aquaVal ? {
+                      productid: products[0].id,
+                      sum: aquaVal 
+                    } : []),
+                    (isiUlangVal ? {
+                      productid: products[1].id,
+                      sum: isiUlangVal 
+                    } : []),
+                    (gasVal ? {
+                      productid: products[2].id,
+                      sum: gasVal 
+                    } : []),
+                    (galonKosongVal ? {
+                      productid: products[3].id,
+                      sum: galonKosongVal 
+                    } : []),
+                    (gasKosongVal ? {
+                      productid: products[4].id,
+                      sum: gasKosongVal 
+                    } : []),
+                  ]
+                  console.log("id customer:", customerId)
+                  console.log("status:", statusString)
+                  console.log(JSON.stringify(orderList, null, 2))
+                  console.log("total:", total)
+                  // handleSave();
+                }}
               >
                 <Text className="text-center text-gray-100 text-xs font-semibold">Simpan</Text>
               </TouchableOpacity>
