@@ -26,6 +26,7 @@ import {
 import Handle from "@/components/CustomHandle";
 import CurrencyInput from "react-native-currency-input";
 import { RefreshControl } from "react-native-gesture-handler";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 export default function Home() {
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -71,25 +72,27 @@ export default function Home() {
   );
 
   const [debugMode, setDebugMode] = useState<boolean>();
-  const [stocks, setStocks] = useState<any>([]);
+  // const [stocks, setStocks] = useState<any>([]);
+  const {lastHistory: stocks, setHistory: setStocks, fetchHistory: fetchStocks } = useGlobalContext()
   const [keteranganSaldo, setkKteranganSaldo] = useState();
   const [saldoInput, setSaldoInput] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  const fetchStocks = async () => {
-    try {
-      const data: any = await getHistory();
-      setStocks(data[data.length - 1]);
-      // console.log(JSON.stringify(stocks, 0 , 2))
-    } catch (e) {
-      if (e instanceof Error) {
-        console.log(e);
-      }
-    }
-  };
+  // const fetchStocks = async () => {
+  //   try {
+  //     const data: any = await getHistory();
+  //     setStocks(data[data.length - 1]);
+  //     // console.log(JSON.stringify(stocks, 0 , 2))
+  //   } catch (e) {
+  //     if (e instanceof Error) {
+  //       console.log(e);
+  //     }
+  //   }
+  // };
 
   useEffect(() => {
     fetchStocks();
+    console.log(stocks)
   }, []);
 
   if (debugMode) {

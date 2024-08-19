@@ -1,4 +1,4 @@
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, ToastAndroid } from "react-native";
 import React from "react";
 import images from "@/constants/images";
 import Icon from "react-native-remix-icon";
@@ -12,15 +12,18 @@ type CartItem = {
   setVal: any;
   total: number;
   setTotal: React.Dispatch<React.SetStateAction<number>>;
+  stok: number | any;
 };
 
-const CartItem = ({ image, name, price = 0, val, setVal, setTotal, total }: CartItem) => {
+const CartItem = ({ image, name, price = 0, val, setVal, setTotal, total, stok }: CartItem) => {
   return (
     <View className={`cart-item px-5 mb-4 ${!val && "hidden"}`}>
       <View className="py-4 flex-row justify-between border-b border-gray-500">
         <View className="nama-harga">
           <Text className="text-base font-semibold text-gray-700">{name}</Text>
-          <Text className={`text-sm font-light ${!price && 'hidden'}`}>{price?.toLocaleString()}</Text>
+          <Text className={`text-sm font-light ${!price && "hidden"}`}>
+            {price?.toLocaleString()}
+          </Text>
         </View>
         <View className="gambarBarang-jumlah w-[108px] justify-center">
           <View className="items-center mb-2">
@@ -37,7 +40,7 @@ const CartItem = ({ image, name, price = 0, val, setVal, setTotal, total }: Cart
               onPress={() => {
                 if (!val) return;
                 setVal(val - 1);
-                setTotal(total - price)
+                setTotal(total - price);
               }}
             >
               <Icon
@@ -46,13 +49,14 @@ const CartItem = ({ image, name, price = 0, val, setVal, setTotal, total }: Cart
                 color="#1e40af"
               />
             </TouchableOpacity>
-            <Text className="text-sm font-semibold text-blue-800">{val}</Text>
+            <Text className="text-sm font-semibold text-blue-800">{val}/{stok}</Text>
             <TouchableOpacity
               className="border-blue-800 rounded-full border"
               activeOpacity={0.8}
               onPress={() => {
+                if(val == stok) return ToastAndroid.show("Stok tidak Cukup", ToastAndroid.SHORT);;
                 setVal(val + 1);
-                setTotal(total + price)
+                setTotal(total + price);
               }}
             >
               <Icon

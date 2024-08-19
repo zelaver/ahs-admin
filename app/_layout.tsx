@@ -1,3 +1,4 @@
+import GlobalProvider from "@/context/GlobalProvider";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -9,7 +10,7 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-    Inter: require("@/assets/fonts/Inter-VariableFont_opsz,wght.ttf")
+    Inter: require("@/assets/fonts/Inter-VariableFont_opsz,wght.ttf"),
   });
 
   useEffect(() => {
@@ -23,12 +24,14 @@ export default function RootLayout() {
   }
 
   return (
+    <GlobalProvider>
       <Stack>
         <Stack.Screen
           name="(tabs)"
-          options={{ headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen name="+not-found" />
       </Stack>
+    </GlobalProvider>
   );
 }

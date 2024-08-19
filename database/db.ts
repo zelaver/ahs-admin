@@ -50,7 +50,8 @@ const getQuery = async () => {
   });
 
   try {
-    const result: any = await db.getAllAsync("SELECT * FROM transactions;");
+    // const result: any = await db.getAllAsync("SELECT * FROM transactions;");
+    const result: any = await db.getAllAsync("SELECT * FROM history;");
     console.log(JSON.stringify(result, null, 2));
     // console.log(result[result.length - 1])
     // console.log(typeof JSON.parse(result[0].orderList)[0].productId);
@@ -89,17 +90,16 @@ const execQuery = async () => {
       { productid: 1, sum: 3 },
       { productid: 2, sum: 5 },
     ]);
-    
-    const customerId = 123;  // contoh nilai customerId
-    const status = 'lunas';  // contoh nilai status
-    const total_price = 100;  // contoh nilai total_price
+
+    const customerId = 123; // contoh nilai customerId
+    const status = "lunas"; // contoh nilai status
+    const total_price = 100; // contoh nilai total_price
     const result = await db.getAllAsync(
-      
       `
       insert into transactions (orderList, customerId, status, total_price)
       values(?, ?, ?, ?)
-      `
-      ,[orderListJson, customerId, status, total_price]
+      `,
+      [orderListJson, customerId, status, total_price]
       // delete from customers where name = 'sigma skibid'
     );
     console.log(result);
@@ -206,7 +206,15 @@ const getHistory = async () => {
   }
 };
 
-const addHistory = async ({saldo, stock_aqua, stock_galon_kosong, stock_gas_12kg, stock_gas_kosong, stock_isi_ulang, transactionId}: any) => {
+const addHistory = async ({
+  saldo,
+  stock_aqua,
+  stock_galon_kosong,
+  stock_gas_12kg,
+  stock_gas_kosong,
+  stock_isi_ulang,
+  transactionId,
+}: any) => {
   const db = await SQLite.openDatabaseAsync("ahs-admin", {
     useNewConnection: true,
   });
@@ -216,7 +224,15 @@ const addHistory = async ({saldo, stock_aqua, stock_galon_kosong, stock_gas_12kg
       insert into history (saldo, stock_aqua, stock_galon_kosong, stock_gas_12kg, stock_gas_kosong, stock_isi_ulang, transactionId)
       values(?,?,?,?,?,?,?)
       `,
-      [saldo, stock_aqua, stock_galon_kosong, stock_gas_12kg, stock_gas_kosong, stock_isi_ulang, transactionId]
+      [
+        saldo,
+        stock_aqua,
+        stock_galon_kosong,
+        stock_gas_12kg,
+        stock_gas_kosong,
+        stock_isi_ulang,
+        transactionId,
+      ]
       // delete from transactions where id = 'trans001'
     );
     return result;
@@ -225,16 +241,16 @@ const addHistory = async ({saldo, stock_aqua, stock_galon_kosong, stock_gas_12kg
       console.log(e);
     }
   }
-}
+};
 
 type products = {
-  id: number
-  name: string
-  price: number
-  subs_price: number
-}
+  id: number;
+  name: string;
+  price: number;
+  subs_price: number;
+};
 
-const getProducts = async () : Promise<products[] | undefined>  => {
+const getProducts = async (): Promise<products[] | undefined> => {
   const db = await SQLite.openDatabaseAsync("ahs-admin", {
     useNewConnection: true,
   });
@@ -247,7 +263,55 @@ const getProducts = async () : Promise<products[] | undefined>  => {
       console.log(e);
     }
   }
-}
+};
+
+type orderList = {
+  productid: number;
+  sum: number;
+};
+
+type Transaction = {
+  orderList: orderList[];
+  customerId: number;
+  status: string;
+  total_price: number;
+};
+
+const addTransaction = async ({ orderList, customerId, status, total_price }: Transaction) => {
+  const db = await SQLite.openDatabaseAsync("ahs-admin", {
+    useNewConnection: true,
+  });
+  try {
+    const result = await db.runAsync(
+      `
+      insert into transactions (orderList, customerId, status, total_price)
+      values(?,?,?,?)
+      `,
+      [JSON.stringify(orderList), customerId, status, total_price]
+      // delete from transactions where id = 'trans001'
+    );
+    return result;
+  } catch (e) {
+    if (e instanceof Error) {
+      console.log(e);
+    }
+  }
+};
+
+const getTransactions = async () => {
+  const db = await SQLite.openDatabaseAsync("ahs-admin", {
+    useNewConnection: true,
+  });
+  try {
+    const result: any[] = await db.getAllAsync(`select * from transactions`);
+    // console.log(result[0])
+    return result;
+  } catch (e) {
+    if (e instanceof Error) {
+      console.log(e);
+    }
+  }
+};
 
 export {
   initDB,
@@ -261,4 +325,6 @@ export {
   getHistory,
   addHistory,
   getProducts,
+  addTransaction,
+  getTransactions,
 };

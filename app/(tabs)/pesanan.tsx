@@ -7,6 +7,7 @@ import {
   TextInput,
   Touchable,
   Easing,
+  ToastAndroid,
 } from "react-native";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import SearchInput from "@/components/SearchInput";
@@ -15,12 +16,20 @@ import OrderItem from "@/components/OrderItem";
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import CartItem from "@/components/CartItem";
 import Handle from "@/components/CustomHandle";
-import { getAllContacts, getProducts } from "@/database/db";
+import {
+  addHistory,
+  addTransaction,
+  getAllContacts,
+  getHistory,
+  getProducts,
+  getTransactions,
+} from "@/database/db";
 import { SelectList } from "react-native-dropdown-select-list";
 import { UnknownOutputParams } from "expo-router";
 import Popover from "react-native-popover-view/dist/Popover";
 import { PopoverPlacement } from "react-native-popover-view";
 import images from "@/constants/images";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 const Pesanan = () => {
   type products = {
@@ -36,11 +45,13 @@ const Pesanan = () => {
   const [galonKosongVal, setGalonKosongVal] = useState(0);
   const [gasVal, setGasVal] = useState(0);
   const [gasKosongVal, setGasKosongVal] = useState(0);
+
   const [products, setProducts] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
-  const [customerId, setCustomerId] = useState([]);
-  const [isVisible, setIsVisible] = useState<boolean>();
+  const [customerId, setCustomerId] = useState(null);
   const [total, setTotal] = useState<number>(0);
+  // const [history, setHistory] = useState<any>();
+  const {lastHistory: history, setHistory, fetchHistory} = useGlobalContext()
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ["90%"], []);
@@ -94,13 +105,106 @@ const Pesanan = () => {
     }
   };
 
+  // const fetchHistory = async () => {
+  //   try {
+  //     const data: any = await getHistory();
+  //     setHistory(data[data.length - 1]);
+  //   } catch (e) {
+  //     if (e instanceof Error) {
+  //       console.log(history);
+  //     }
+  //   }
+  // };
+
   useEffect(() => {
     fetchProducts();
     fetchCustomers();
+    // fetchHistory();
   }, []);
 
-  const handleSave = () => {
-    setTotal(0);
+  const handleSave = async () => {
+    // console.log(aquaVal || isiUlangVal || gasVal || galonKosongVal || gasKosongVal)
+    if (!aquaVal && !isiUlangVal && !gasVal && !galonKosongVal && !gasKosongVal)
+      return ToastAndroid.show("Isi Cart!", ToastAndroid.SHORT);
+    if (!customerId) {
+      ToastAndroid.show("Pilih Customer!", ToastAndroid.SHORT);
+      return;
+    }
+    type orderList = {
+      productid: number;
+      sum: number;
+    };
+
+    type Transaction = {
+      orderList: orderList[];
+      customerId: number;
+      status: string;
+      total_price: number;
+    };
+    let statusString: string = "";
+    switch (status) {
+      case 0:
+        statusString = "hutang";
+        break;
+      case 1:
+        statusString = "pinjam";
+        break;
+      case 2:
+        statusString = "lunas";
+        break;
+    }
+
+    let orderList: orderList[];
+    orderList = [
+      {
+        productid: 1,
+        sum: aquaVal,
+      },
+      {
+        productid: 2,
+        sum: isiUlangVal,
+      },
+      {
+        productid: 3,
+        sum: gasVal,
+      },
+      {
+        productid: 4,
+        sum: galonKosongVal,
+      },
+      {
+        productid: 5,
+        sum: gasKosongVal,
+      },
+    ];
+
+    // INPUT DATA KE TRANSACTION DULU BIAR DAPET ID DARI TRANSACTION
+    await addTransaction({
+      orderList: orderList,
+      customerId: customerId,
+      status: statusString,
+      total_price: total,
+    });
+    const transaction: any[] = await getTransactions();
+    const transactionId = transaction[transaction?.length - 1].id;
+    console.log(transactionId);
+    // INPUT DATA KE HISTORY
+    await addHistory({
+      saldo: history.saldo + total,
+      stock_aqua: history.stock_aqua - aquaVal,
+      stock_galon_kosong: history.stock_galon_kosong - galonKosongVal,
+      stock_gas_12kg: history.stock_gas_12kg - gasVal,
+      stock_gas_kosong: history.stock_gas_kosong - gasKosongVal,
+      stock_isi_ulang: history.stock_isi_ulang - isiUlangVal,
+      transactionId: 0,
+    });
+    fetchHistory()
+    handleClosePress()
+    // console.log("id customer:", customerId);
+    // console.log("status:", statusString);
+    // console.log(JSON.stringify(orderList, null, 2));
+    // console.log("total:", total);
+    // console.log(JSON.stringify(history[history.length - 1], null, 2));
   };
 
   return (
@@ -164,7 +268,7 @@ const Pesanan = () => {
           <View className="main py-3 gap-y-4">
             <View className="customer px-3">
               <Text className="text-sm font-semibold mb-2.5">Customer:</Text>
-              <View className=" rounded-md px-3">
+              <View className="rounded-md px-3">
                 {/* <TextInput placeholder="isi nama Customer" /> */}
                 <SelectList
                   data={[
@@ -188,6 +292,7 @@ const Pesanan = () => {
                 setVal={setAquaVal}
                 setTotal={setTotal}
                 total={total}
+                stok={history?.stock_aqua}
               />
               <CartItem
                 name="Isi Ulang"
@@ -197,6 +302,7 @@ const Pesanan = () => {
                 setVal={setIsiUlangVal}
                 setTotal={setTotal}
                 total={total}
+                stok={history?.stock_isi_ulang}
               />
               <CartItem
                 name="Gas 12 kg"
@@ -206,6 +312,7 @@ const Pesanan = () => {
                 setVal={setGasVal}
                 setTotal={setTotal}
                 total={total}
+                stok={history?.stock_gas_12kg}
               />
               <CartItem
                 name="Galon Kosong"
@@ -214,6 +321,7 @@ const Pesanan = () => {
                 setVal={setGalonKosongVal}
                 setTotal={setTotal}
                 total={total}
+                stok={history?.stock_galon_kosong}
               />
               <CartItem
                 name="Gas Kosong"
@@ -222,6 +330,7 @@ const Pesanan = () => {
                 setVal={setGasKosongVal}
                 setTotal={setTotal}
                 total={total}
+                stok={history?.stock_gas_kosong}
               />
               <View className="px-5 add ">
                 <Popover
@@ -373,46 +482,7 @@ const Pesanan = () => {
                 className="rounded-lg bg-blue-800 px-3 py-2 mb-2.5"
                 activeOpacity={0.9}
                 onPress={() => {
-                  let statusString;
-                  switch(status){
-                    case 0:
-                      statusString = "hutang"
-                      break;
-                    case 1:
-                      statusString = "pinjam"
-                      break;
-                    case 2:
-                      statusString = "lunas"
-                      break;
-                  }
-                  let orderList;
-                  orderList = [
-                    (aquaVal ? {
-                      productid: products[0].id,
-                      sum: aquaVal 
-                    } : []),
-                    (isiUlangVal ? {
-                      productid: products[1].id,
-                      sum: isiUlangVal 
-                    } : []),
-                    (gasVal ? {
-                      productid: products[2].id,
-                      sum: gasVal 
-                    } : []),
-                    (galonKosongVal ? {
-                      productid: products[3].id,
-                      sum: galonKosongVal 
-                    } : []),
-                    (gasKosongVal ? {
-                      productid: products[4].id,
-                      sum: gasKosongVal 
-                    } : []),
-                  ]
-                  console.log("id customer:", customerId)
-                  console.log("status:", statusString)
-                  console.log(JSON.stringify(orderList, null, 2))
-                  console.log("total:", total)
-                  // handleSave();
+                  handleSave();
                 }}
               >
                 <Text className="text-center text-gray-100 text-xs font-semibold">Simpan</Text>
