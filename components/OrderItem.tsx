@@ -5,7 +5,13 @@ import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@g
 import Handle from "@/components/CustomHandle";
 import CartItem from "@/components/CartItem";
 import { useGlobalContext } from "@/context/GlobalProvider";
-import { getAllContacts, getContact, getProducts, updateTransaction } from "@/database/db";
+import {
+  addHistory,
+  getAllContacts,
+  getContact,
+  getProducts,
+  updateTransaction,
+} from "@/database/db";
 import Popover from "react-native-popover-view";
 import images from "@/constants/images";
 import { SelectList } from "react-native-dropdown-select-list";
@@ -14,7 +20,7 @@ type OrderItem = {
   id: number;
   orderList: any[];
   curCustomerId: number;
-  curStatus: number;
+  curStatus: string;
   total_price: number;
   date: string;
 };
@@ -97,7 +103,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
     fetchProducts();
     fetchCustomers();
     fetchCustomer();
-    fetchTransactions()
+    fetchTransactions();
     // fetchHistory();
   }, [orderList, curCustomerId, curStatus, total_price, status]);
 
@@ -105,13 +111,14 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
   const snapPoints = useMemo(() => ["90%"], []);
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
-
   }, []);
-  const handleSheetChanges = useCallback((index: number) => {
-    // console.log("handleSheetChanges", index);
-    fetchOrderList();
-    
-  }, [orderList, curCustomerId, curStatus, total_price ]);
+  const handleSheetChanges = useCallback(
+    (index: number) => {
+      // console.log("handleSheetChanges", index);
+      fetchOrderList();
+    },
+    [orderList, curCustomerId, curStatus, total_price]
+  );
   const handleClosePress = useCallback(() => {
     bottomSheetModalRef.current?.close();
   }, []);
@@ -153,8 +160,8 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
       total_price: number;
     };
 
-    let orderList: orderList[];
-    orderList = [
+    let newOrderList: orderList[];
+    newOrderList = [
       {
         productid: 1,
         sum: aquaVal,
@@ -177,9 +184,162 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
       },
     ];
 
-    await updateTransaction({ orderList, customerId, status, total_price: total }, id);
+    await updateTransaction(
+      { orderList: newOrderList, customerId, status, total_price: total },
+      id
+    );
     await fetchTransactions();
-    handleClosePress()
+
+    // console.log("curStatus", curStatus);
+    // console.log("status", status);
+    let parsedList = JSON.parse(orderList);
+    // console.log(typeof orderList)
+    if (curStatus == "lunas" && status == "hutang") {
+      await addHistory({
+        saldo: history.saldo - total,
+        stock_aqua: history.stock_aqua - (aquaVal - parsedList[0].sum),
+        stock_galon_kosong:
+          history.stock_galon_kosong -
+          galonKosongVal +
+          (aquaVal - parsedList[0].sum) +
+          (isiUlangVal - parsedList[1].sum),
+        stock_gas_12kg: history.stock_gas_12kg - (gasVal - parsedList[2].sum),
+        stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + (gasVal - parsedList[3].sum),
+        stock_isi_ulang: history.stock_isi_ulang - (isiUlangVal - parsedList[1].sum),
+        transactionId: id,
+      });
+    }
+
+    if (curStatus == "lunas" && status == "pinjam") {
+      await addHistory({
+        saldo: history.saldo - total_price,
+        stock_aqua: history.stock_aqua + parsedList[0].sum,
+        stock_galon_kosong:
+          history.stock_galon_kosong -
+          galonKosongVal +
+          parsedList[0].sum +
+          parsedList[1].sum,
+        stock_gas_12kg: history.stock_gas_12kg + parsedList[2].sum,
+        stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + parsedList[3].sum,
+        stock_isi_ulang: history.stock_isi_ulang + parsedList[1].sum,
+        transactionId: id,
+      });
+    }
+
+    if (curStatus == "lunas" && status == "lunas") {
+      await addHistory({
+        saldo: history.saldo - (total_price - total),
+        stock_aqua: history.stock_aqua - (aquaVal - parsedList[0].sum),
+        stock_galon_kosong:
+          history.stock_galon_kosong -
+          galonKosongVal +
+          (aquaVal - parsedList[0].sum) +
+          (isiUlangVal - parsedList[1].sum),
+        stock_gas_12kg: history.stock_gas_12kg - (gasVal - parsedList[2].sum),
+        stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + (gasVal - parsedList[3].sum),
+        stock_isi_ulang: history.stock_isi_ulang - (isiUlangVal - parsedList[1].sum),
+        transactionId: id,
+      });
+    }
+
+    if (curStatus == "hutang" && status == "lunas") {
+      await addHistory({
+        saldo: history.saldo + total,
+        stock_aqua: history.stock_aqua - (aquaVal - parsedList[0].sum),
+        stock_galon_kosong:
+          history.stock_galon_kosong -
+          galonKosongVal +
+          (aquaVal - parsedList[0].sum) +
+          (isiUlangVal - parsedList[1].sum),
+        stock_gas_12kg: history.stock_gas_12kg - (gasVal - parsedList[2].sum),
+        stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + (gasVal - parsedList[3].sum),
+        stock_isi_ulang: history.stock_isi_ulang - (isiUlangVal - parsedList[1].sum),
+        transactionId: id,
+      });
+    }
+
+    if (curStatus == "hutang" && status == "pinjam") {
+      await addHistory({
+        saldo: history.saldo - total_price,
+        stock_aqua: history.stock_aqua + parsedList[0].sum,
+        stock_galon_kosong:
+          history.stock_galon_kosong -
+          galonKosongVal +
+          parsedList[0].sum +
+          parsedList[1].sum,
+        stock_gas_12kg: history.stock_gas_12kg + parsedList[2].sum,
+        stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + parsedList[3].sum,
+        stock_isi_ulang: history.stock_isi_ulang + parsedList[1].sum,
+        transactionId: id,
+      });
+    }
+
+    if (curStatus == "hutang" && status == "hutang") {
+      await addHistory({
+        saldo: history.saldo + (total_price - total),
+        stock_aqua: history.stock_aqua - (aquaVal - parsedList[0].sum),
+        stock_galon_kosong:
+          history.stock_galon_kosong -
+          galonKosongVal +
+          (aquaVal - parsedList[0].sum) +
+          (isiUlangVal - parsedList[1].sum),
+        stock_gas_12kg: history.stock_gas_12kg - (gasVal - parsedList[2].sum),
+        stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + (gasVal - parsedList[3].sum),
+        stock_isi_ulang: history.stock_isi_ulang - (isiUlangVal - parsedList[1].sum),
+        transactionId: id,
+      });
+    }
+
+    if (curStatus == "pinjam" && status == "lunas") {
+      await addHistory({
+        saldo: history.saldo + total,
+        stock_aqua: history.stock_aqua - aquaVal ,
+        stock_galon_kosong:
+          history.stock_galon_kosong +
+          parsedList[3].sum +
+          aquaVal +
+          isiUlangVal,
+        stock_gas_12kg: history.stock_gas_12kg - gasVal ,
+        stock_gas_kosong: history.stock_gas_kosong + parsedList[4].sum + gasVal ,
+        stock_isi_ulang: history.stock_isi_ulang - isiUlangVal,
+        transactionId: id,
+      });
+    }
+
+    if (curStatus == "pinjam" && status == "hutang") {
+      await addHistory({
+        saldo: history.saldo - total,
+        stock_aqua: history.stock_aqua - aquaVal ,
+        stock_galon_kosong:
+          history.stock_galon_kosong +
+          parsedList[3].sum +
+          aquaVal +
+          isiUlangVal,
+        stock_gas_12kg: history.stock_gas_12kg - gasVal ,
+        stock_gas_kosong: history.stock_gas_kosong + parsedList[4].sum + gasVal ,
+        stock_isi_ulang: history.stock_isi_ulang - isiUlangVal,
+        transactionId: id,
+      });
+    }
+    
+    if (curStatus == "pinjam" && status == "pinjam") {
+      await addHistory({
+        saldo: history.saldo,
+        stock_aqua: history.stock_aqua,
+        stock_galon_kosong:
+          history.stock_galon_kosong -
+          (galonKosongVal - parsedList[3].sum) +
+          aquaVal +
+          isiUlangVal,
+        stock_gas_12kg: history.stock_gas_12kg ,
+        stock_gas_kosong: history.stock_gas_kosong - (gasKosongVal - parsedList[4].sum) + gasVal ,
+        stock_isi_ulang: history.stock_isi_ulang,
+        transactionId: id,
+      });
+    }
+
+    fetchHistory();
+    handleClosePress();
   };
 
   return (
@@ -341,7 +501,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                       setAquaVal(1);
                       setTotal(total + products[0]?.price);
                     }}
-                    className={`border px-4 py-2 ${aquaVal && "hidden"} ${status == 1 && "hidden"}`}
+                    className={`border px-4 py-2 ${aquaVal && "hidden"} ${status == "pinjam" && "hidden"}`}
                   >
                     <Text className="text-gray-50 font-semibold">aqua</Text>
                   </TouchableOpacity>
@@ -353,7 +513,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                       setTotal(total + products[1]?.price);
                     }}
                     className={`border px-4 py-2 ${isiUlangVal && "hidden"} ${
-                      status == 1 && "hidden"
+                      status == "pinjam" && "hidden"
                     }`}
                   >
                     <Text className="text-gray-50 font-semibold">Isi Ulang</Text>
@@ -365,7 +525,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                       setGasVal(1);
                       setTotal(total + products[2]?.price);
                     }}
-                    className={`border px-4 py-2 ${gasVal && "hidden"} ${status == 1 && "hidden"}`}
+                    className={`border px-4 py-2 ${gasVal && "hidden"} ${status == "pinjam" && "hidden"}`}
                   >
                     <Text className="text-gray-50 font-semibold">Gas 12 Kg</Text>
                   </TouchableOpacity>
@@ -376,9 +536,9 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                       setGalonKosongVal(1);
                     }}
                     className={`border px-4 py-2 ${galonKosongVal && "hidden"} ${
-                      status != 1 && "hidden"
+                      status != "pinjam" && "hidden"
                     }`}
-                    disabled={status != 1}
+                    disabled={status != "pinjam"}
                   >
                     <Text className="text-gray-50 font-semibold">Galon Kosong</Text>
                   </TouchableOpacity>
@@ -389,9 +549,9 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                       setGasKosongVal(1);
                     }}
                     className={`border px-4 py-2 ${gasKosongVal && "hidden"} ${
-                      status != 1 && "hidden"
+                      status != "pinjam" && "hidden"
                     }`}
-                    disabled={status != 1}
+                    disabled={status != "pinjam"}
                   >
                     <Text className="text-gray-50 font-semibold">Gas Kosong</Text>
                   </TouchableOpacity>
@@ -450,6 +610,10 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => {
+                    if(curStatus == "pinjam"){
+                      setStatus("lunas");
+                      return
+                    }
                     setStatus("lunas");
                     setGalonKosongVal(0);
                     setGasKosongVal(0);
