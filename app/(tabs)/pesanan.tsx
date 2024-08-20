@@ -8,6 +8,7 @@ import {
   Touchable,
   Easing,
   ToastAndroid,
+  RefreshControl,
 } from "react-native";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import SearchInput from "@/components/SearchInput";
@@ -50,8 +51,12 @@ const Pesanan = () => {
   const [customers, setCustomers] = useState<any[]>([]);
   const [customerId, setCustomerId] = useState(null);
   const [total, setTotal] = useState<number>(0);
-  // const [history, setHistory] = useState<any>();
-  const {lastHistory: history, setHistory, fetchHistory} = useGlobalContext()
+  const {
+    lastHistory: history,
+    transactions,
+    fetchHistory,
+    fetchTransactions,
+  } = useGlobalContext();
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ["90%"], []);
@@ -61,6 +66,16 @@ const Pesanan = () => {
   const handleSheetChanges = useCallback((index: number) => {
     // console.log("handleSheetChanges", index);
     // console.log(products);
+    if (index == -1) {
+    }
+    setStatus(2);
+    setAquaVal(0);
+    setIsiUlangVal(0);
+    setGalonKosongVal(0);
+    setGasVal(0);
+    setGasKosongVal(0);
+    setCustomerId(null);
+    setTotal(0);
   }, []);
   const handleClosePress = useCallback(() => {
     bottomSheetModalRef.current?.close();
@@ -120,7 +135,7 @@ const Pesanan = () => {
     fetchProducts();
     fetchCustomers();
     // fetchHistory();
-  }, []);
+  }, [transactions]);
 
   const handleSave = async () => {
     // console.log(aquaVal || isiUlangVal || gasVal || galonKosongVal || gasKosongVal)
@@ -187,25 +202,34 @@ const Pesanan = () => {
     });
     const transaction: any[] = await getTransactions();
     const transactionId = transaction[transaction?.length - 1].id;
-    console.log(transactionId);
+    // console.log(transactionId);
     // INPUT DATA KE HISTORY
     await addHistory({
-      saldo: history.saldo + total,
+      saldo: history.saldo + (status == 0 ? 0 : total),
       stock_aqua: history.stock_aqua - aquaVal,
-      stock_galon_kosong: history.stock_galon_kosong - galonKosongVal,
+      stock_galon_kosong: history.stock_galon_kosong - galonKosongVal + aquaVal + isiUlangVal,
       stock_gas_12kg: history.stock_gas_12kg - gasVal,
-      stock_gas_kosong: history.stock_gas_kosong - gasKosongVal,
+      stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + gasVal,
       stock_isi_ulang: history.stock_isi_ulang - isiUlangVal,
-      transactionId: 0,
+      transactionId: transactionId,
     });
-    fetchHistory()
-    handleClosePress()
+    fetchHistory();
+    fetchTransactions();
+    handleClosePress();
     // console.log("id customer:", customerId);
     // console.log("status:", statusString);
     // console.log(JSON.stringify(orderList, null, 2));
     // console.log("total:", total);
     // console.log(JSON.stringify(history[history.length - 1], null, 2));
   };
+
+  const [refreshing, setRefreshing] = useState(false)
+  const onRefresh = () => {
+    setRefreshing(true)
+    fetchTransactions()
+    // fetchHistory()
+    setRefreshing(false)
+  }
 
   return (
     <SafeAreaView className="py-8">
@@ -226,7 +250,14 @@ const Pesanan = () => {
           </TouchableOpacity>
         </View>
       </View>
-      <ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }
+      >
         <View className="main pb-16">
           <View className="section-3 px-5 py-3 ">
             {/* <View className="pesanan-item border rounded-lg p-2.5 flex-row justify-between items-center mb-4">
@@ -252,7 +283,18 @@ const Pesanan = () => {
                 ></Icon>
               </View>
             </View> */}
-            <OrderItem />
+            {/* <OrderItem /> */}
+            {transactions.map((item: any, i: any) => (
+              <OrderItem
+                key={i}
+                curCustomerId={item.customerId}
+                curStatus={item.status}
+                date={item.date}
+                total_price={item.total_price}
+                id={item.id}
+                orderList={item.orderList}
+              />
+            ))}
           </View>
         </View>
       </ScrollView>
@@ -362,6 +404,8 @@ const Pesanan = () => {
                 >
                   <TouchableOpacity
                     onPress={() => {
+                      if (!history.stock_aqua)
+                        return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                       setAquaVal(1);
                       setTotal(total + products[0]?.price);
                     }}
@@ -371,6 +415,8 @@ const Pesanan = () => {
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => {
+                      if (!history.stock_isi_ulang)
+                        return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                       setIsiUlangVal(1);
                       setTotal(total + products[1]?.price);
                     }}
@@ -382,6 +428,8 @@ const Pesanan = () => {
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => {
+                      if (!history.stock_gas_12kg)
+                        return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                       setGasVal(1);
                       setTotal(total + products[2]?.price);
                     }}
@@ -390,7 +438,11 @@ const Pesanan = () => {
                     <Text className="text-gray-50 font-semibold">Gas 12 Kg</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    onPress={() => setGalonKosongVal(1)}
+                    onPress={() => {
+                      if (!history.stock_galon_kosong)
+                        return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
+                      setGalonKosongVal(1);
+                    }}
                     className={`border px-4 py-2 ${galonKosongVal && "hidden"} ${
                       status != 1 && "hidden"
                     }`}
@@ -399,7 +451,11 @@ const Pesanan = () => {
                     <Text className="text-gray-50 font-semibold">Galon Kosong</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    onPress={() => setGasKosongVal(1)}
+                    onPress={() => {
+                      if (!history.stock_gas_kosong)
+                        return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
+                      setGasKosongVal(1);
+                    }}
                     className={`border px-4 py-2 ${gasKosongVal && "hidden"} ${
                       status != 1 && "hidden"
                     }`}

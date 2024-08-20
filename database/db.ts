@@ -50,8 +50,8 @@ const getQuery = async () => {
   });
 
   try {
-    // const result: any = await db.getAllAsync("SELECT * FROM transactions;");
-    const result: any = await db.getAllAsync("SELECT * FROM history;");
+    const result: any = await db.getAllAsync("SELECT * FROM transactions");
+    // const result: any = await db.getAllAsync("SELECT * FROM history;");
     console.log(JSON.stringify(result, null, 2));
     // console.log(result[result.length - 1])
     // console.log(typeof JSON.parse(result[0].orderList)[0].productId);
@@ -96,10 +96,11 @@ const execQuery = async () => {
     const total_price = 100; // contoh nilai total_price
     const result = await db.getAllAsync(
       `
-      insert into transactions (orderList, customerId, status, total_price)
-      values(?, ?, ?, ?)
-      `,
-      [orderListJson, customerId, status, total_price]
+      DELETE FROM transactions;
+      VACUUM;
+      
+      `
+      // [orderListJson, customerId, status, total_price]
       // delete from customers where name = 'sigma skibid'
     );
     console.log(result);
@@ -167,6 +168,21 @@ const getAllContacts = async () => {
   });
   try {
     const result = await db.getAllAsync(`select * from customers`);
+    // console.log(result[0])
+    return result;
+  } catch (e) {
+    if (e instanceof Error) {
+      console.log(e);
+    }
+  }
+};
+
+const getContact = async (id: number) => {
+  const db = await SQLite.openDatabaseAsync("ahs-admin", {
+    useNewConnection: true,
+  });
+  try {
+    const result = await db.getFirstAsync(`select * from customers where id = ?`, id);
     // console.log(result[0])
     return result;
   } catch (e) {
@@ -313,6 +329,32 @@ const getTransactions = async () => {
   }
 };
 
+const updateTransaction = async ({ orderList, customerId, status, total_price}: Transaction, id: number) => {
+  const db = await SQLite.openDatabaseAsync("ahs-admin", {
+    useNewConnection: true,
+  });
+  try {
+    // orderList
+    // customerId
+    // status
+    // total_price
+    const result = await db.runAsync(
+      `
+      UPDATE transactions 
+      SET orderList = ?, customerId = ?, status = ?, total_price = ? 
+      WHERE id = ?;
+      `,
+      [JSON.stringify(orderList), customerId, status, total_price, id]
+      // delete from transactions where id = 'trans001'
+    );
+    return result;
+  } catch (e) {
+    if (e instanceof Error) {
+      console.log("error di backend", e);
+    }
+  }
+};
+
 export {
   initDB,
   getQuery,
@@ -322,9 +364,11 @@ export {
   getAllContacts,
   updateContact,
   deleteContact,
+  getContact,
   getHistory,
   addHistory,
   getProducts,
   addTransaction,
   getTransactions,
+  updateTransaction
 };

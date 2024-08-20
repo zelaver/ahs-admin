@@ -92,7 +92,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchStocks();
-    console.log(stocks)
+    // console.log(stocks)
   }, []);
 
   if (debugMode) {

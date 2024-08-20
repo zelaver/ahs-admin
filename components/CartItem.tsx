@@ -54,7 +54,7 @@ const CartItem = ({ image, name, price = 0, val, setVal, setTotal, total, stok }
               className="border-blue-800 rounded-full border"
               activeOpacity={0.8}
               onPress={() => {
-                if(val == stok) return ToastAndroid.show("Stok tidak Cukup", ToastAndroid.SHORT);;
+                if(val >= stok) return ToastAndroid.show("Stok tidak Cukup", ToastAndroid.SHORT);;
                 setVal(val + 1);
                 setTotal(total + price);
               }}

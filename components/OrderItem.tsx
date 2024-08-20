@@ -1,19 +1,117 @@
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
-import React, { useCallback, useMemo, useRef } from "react";
+import { View, Text, TextInput, TouchableOpacity, ToastAndroid } from "react-native";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Icon from "react-native-remix-icon";
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import Handle from "@/components/CustomHandle";
 import CartItem from "@/components/CartItem";
+import { useGlobalContext } from "@/context/GlobalProvider";
+import { getAllContacts, getContact, getProducts, updateTransaction } from "@/database/db";
+import Popover from "react-native-popover-view";
+import images from "@/constants/images";
+import { SelectList } from "react-native-dropdown-select-list";
 
-const OrderItem = () => {
+type OrderItem = {
+  id: number;
+  orderList: any[];
+  curCustomerId: number;
+  curStatus: number;
+  total_price: number;
+  date: string;
+};
+
+const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date }: OrderItem) => {
+  type products = {
+    id: number;
+    name: string;
+    price: number;
+    subs_price: number;
+  };
+
+  const [status, setStatus] = useState<any>(curStatus);
+  const [aquaVal, setAquaVal] = useState(0);
+  const [isiUlangVal, setIsiUlangVal] = useState(0);
+  const [galonKosongVal, setGalonKosongVal] = useState(0);
+  const [gasVal, setGasVal] = useState(0);
+  const [gasKosongVal, setGasKosongVal] = useState(0);
+
+  const [products, setProducts] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [customerId, setCustomerId] = useState(curCustomerId);
+  const [total, setTotal] = useState<number>(total_price);
+  const { lastHistory: history, setHistory, fetchHistory, fetchTransactions } = useGlobalContext();
+
+  const [customerName, setCustomerName] = useState();
+  const [customerType, setCustomerType] = useState();
+
+  const fetchProducts = async () => {
+    try {
+      const data: products[] | any = await getProducts();
+      // setProducts([products?.map((item, i) => {
+      //   return {key: i, value: item.name, }
+      // })]);
+      setProducts(data);
+      // console.log(products);
+    } catch (e) {
+      if (e instanceof Error) {
+        console.log(e);
+      }
+    }
+  };
+  const fetchCustomers = async () => {
+    try {
+      const data: any[] | any = await getAllContacts();
+      setCustomers(data);
+      // console.log(products);
+    } catch (e) {
+      if (e instanceof Error) {
+        console.log(e);
+      }
+    }
+  };
+  const fetchCustomer = async () => {
+    try {
+      const data: any = await getContact(customerId);
+      // console.log(data);
+      setCustomerName(data.name);
+      setCustomerType(data.isSubscriber);
+    } catch (e) {
+      if (e instanceof Error) {
+        console.log("error", e);
+      }
+    }
+  };
+
+  const fetchOrderList = () => {
+    let parsedList = JSON.parse(orderList);
+    // console.log(parsedList[1].sum);
+    setAquaVal(parsedList[0].sum);
+    setIsiUlangVal(parsedList[1].sum);
+    setGasVal(parsedList[2].sum);
+    setGalonKosongVal(parsedList[3].sum);
+    setGasKosongVal(parsedList[4].sum);
+    setTotal(total_price);
+    setStatus(curStatus);
+  };
+
+  useEffect(() => {
+    fetchProducts();
+    fetchCustomers();
+    fetchCustomer();
+    fetchTransactions()
+    // fetchHistory();
+  }, [orderList, curCustomerId, curStatus, total_price, status]);
+
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ["90%"], []);
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
+
   }, []);
   const handleSheetChanges = useCallback((index: number) => {
-    console.log("handleSheetChanges", index);
-  }, []);
+    // console.log("handleSheetChanges", index);
+    fetchOrderList();
+    
+  }, [orderList, curCustomerId, curStatus, total_price ]);
   const handleClosePress = useCallback(() => {
     bottomSheetModalRef.current?.close();
   }, []);
@@ -31,26 +129,95 @@ const OrderItem = () => {
     []
   );
 
+  const handleEdit = async () => {
+    // console.log(curStatus)
+    handlePresentModalPress();
+  };
+
+  const handleSave = async () => {
+    if (!aquaVal && !isiUlangVal && !gasVal && !galonKosongVal && !gasKosongVal)
+      return ToastAndroid.show("Isi Cart!", ToastAndroid.SHORT);
+    if (!customerId) {
+      ToastAndroid.show("Pilih Customer!", ToastAndroid.SHORT);
+      return;
+    }
+    type orderList = {
+      productid: number;
+      sum: number;
+    };
+
+    type Transaction = {
+      orderList: orderList[];
+      customerId: number;
+      status: string;
+      total_price: number;
+    };
+
+    let orderList: orderList[];
+    orderList = [
+      {
+        productid: 1,
+        sum: aquaVal,
+      },
+      {
+        productid: 2,
+        sum: isiUlangVal,
+      },
+      {
+        productid: 3,
+        sum: gasVal,
+      },
+      {
+        productid: 4,
+        sum: galonKosongVal,
+      },
+      {
+        productid: 5,
+        sum: gasKosongVal,
+      },
+    ];
+
+    await updateTransaction({ orderList, customerId, status, total_price: total }, id);
+    await fetchTransactions();
+    handleClosePress()
+  };
+
   return (
     <View className="pesanan-item border rounded-lg p-2.5 flex-row justify-between items-center mb-4">
       <View className="flex-row">
         <View className="bg-gray-200 rounded-full w-10 h-10 items-center justify-center">
           <Icon
-            name="home-smile-2-line"
+            name={`${customerType ? "home-smile-2-line" : "user-3-line"}`}
             size={24}
-          ></Icon>
+          />
         </View>
         <View className="ml-4">
-          <Text className="text-sm font-medium">Warung Madura</Text>
-          <Text className="text-xs font-normal text-gray-400">6 januari, 2024</Text>
+          <Text className="text-sm font-medium">{customerName}</Text>
+          <Text className="text-xs font-normal text-gray-400">{formatDate(date)}</Text>
         </View>
       </View>
       <View className="flex-row items-center">
-        <Text className="bg-yellow-500 text-gray-50 text-xs font-semibold px-3 py-1 rounded-md mr-2">
+        {status == "hutang" && (
+          <Text className="bg-red-500 text-gray-50 text-xs font-semibold px-3 py-1 rounded-md mr-2 w-[67px] text-center">
+            Hutang
+          </Text>
+        )}
+        {status == "pinjam" && (
+          <Text className="bg-yellow-500 text-gray-50 text-xs font-semibold px-3 py-1 rounded-md mr-2 w-[67px] text-center">
+            Pinjam
+          </Text>
+        )}
+        {status == "lunas" && (
+          <Text className="bg-green-500 text-gray-50 text-xs font-semibold px-3 py-1 rounded-md mr-2 w-[67px] text-center">
+            Lunas
+          </Text>
+        )}
+
+        {/* <Text className="bg-yellow-500 text-gray-50 text-xs font-semibold px-3 py-1 rounded-md mr-2">
           Pinjam
-        </Text>
+        </Text> */}
         <TouchableOpacity
-          onPress={handlePresentModalPress}
+          onPress={handleEdit}
           activeOpacity={0.9}
         >
           <Icon
@@ -65,67 +232,246 @@ const OrderItem = () => {
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
         backdropComponent={renderBackdrop}
-        handleComponent={(props) => Handle({...props, HandleText: 'Detail Pesanan'})}
+        handleComponent={(props) => Handle({ ...props, HandleText: "Detail Pesanan" })}
       >
         <BottomSheetScrollView>
           <View className="main py-3 gap-y-4">
             <View className="customer px-3">
               <Text className="text-sm font-semibold mb-2.5">Customer:</Text>
-              <View className="border-2 rounded-md px-3">
-                <TextInput placeholder="isi nama Customer" />
-              </View>
-            </View>
-            <View className="tanggal px-3 ">
-              <Text className="text-sm font-semibold mb-2.5">Tanggal:</Text>
-              <View className="border-2 rounded-md px-3 flex-row items-center">
-                <Icon
-                  name="calendar-2-fill"
-                  size={16}
-                  color="#374151"
-                />
-                <TextInput
-                  placeholder="Masukan tanggal"
-                  className="ml-1"
+              <View className="rounded-md px-3">
+                {/* <TextInput placeholder="isi nama Customer" /> */}
+                <SelectList
+                  data={[
+                    ...customers.map((item, i) => {
+                      return { key: item.id, value: item.name };
+                    }),
+                  ]}
+                  setSelected={(val: any) => {
+                    setCustomerId(val);
+                  }}
+                  defaultOption={{ key: curCustomerId, value: customerName }}
+                  // setSelected={val => console.log(val)}
+
+                  placeholder="pilih pelanggan"
+                  searchPlaceholder="cari pelanggan"
                 />
               </View>
             </View>
             <View className="cart border-t border-b py-4">
-              <CartItem />
-              <CartItem />
-              <View className="px-5">
-                <View className="py-4 items-center">
-                  <Icon
-                    name="add-circle-line"
-                    size={32}
-                  />
-                </View>
+              <CartItem
+                name="Aqua"
+                image={images.aqua}
+                price={products[0]?.price}
+                val={aquaVal}
+                setVal={setAquaVal}
+                setTotal={setTotal}
+                total={total}
+                stok={history?.stock_aqua}
+              />
+              <CartItem
+                name="Isi Ulang"
+                image={images.isiUlang}
+                price={products[1]?.price}
+                val={isiUlangVal}
+                setVal={setIsiUlangVal}
+                setTotal={setTotal}
+                total={total}
+                stok={history?.stock_isi_ulang}
+              />
+              <CartItem
+                name="Gas 12 kg"
+                image={images.gas12Kg}
+                price={products[2]?.price}
+                val={gasVal}
+                setVal={setGasVal}
+                setTotal={setTotal}
+                total={total}
+                stok={history?.stock_gas_12kg}
+              />
+              <CartItem
+                name="Galon Kosong"
+                image={images.galonKosong}
+                val={galonKosongVal}
+                setVal={setGalonKosongVal}
+                setTotal={setTotal}
+                total={total}
+                stok={history?.stock_galon_kosong}
+              />
+              <CartItem
+                name="Gas Kosong"
+                image={images.gasKosong}
+                val={gasKosongVal}
+                setVal={setGasKosongVal}
+                setTotal={setTotal}
+                total={total}
+                stok={history?.stock_gas_kosong}
+              />
+              <View className="px-5 add ">
+                <Popover
+                  animationConfig={{ duration: 200 }}
+                  arrowSize={{ width: 0, height: 0 }}
+                  backgroundStyle={{ opacity: 0 }}
+                  offset={-10}
+                  // debug
+                  // isVisible={isVisible}
+                  popoverStyle={{
+                    width: 200,
+                    borderWidth: 1,
+                    borderRadius: 12,
+                    backgroundColor: "#1943b4",
+                    // display: aquaVal && isiUlangVal && gasVal ? "none" : "flex"
+                  }}
+                  from={
+                    <TouchableOpacity
+                      className={`py-4 items-center ${aquaVal && isiUlangVal && gasVal && "hidden"}
+                        ${galonKosongVal && gasKosongVal && "hidden"}
+                      `}
+                    >
+                      <Icon
+                        name="add-circle-line"
+                        size={32}
+                      />
+                    </TouchableOpacity>
+                  }
+                >
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (!history.stock_aqua)
+                        return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
+                      setAquaVal(1);
+                      setTotal(total + products[0]?.price);
+                    }}
+                    className={`border px-4 py-2 ${aquaVal && "hidden"} ${status == 1 && "hidden"}`}
+                  >
+                    <Text className="text-gray-50 font-semibold">aqua</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (!history.stock_isi_ulang)
+                        return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
+                      setIsiUlangVal(1);
+                      setTotal(total + products[1]?.price);
+                    }}
+                    className={`border px-4 py-2 ${isiUlangVal && "hidden"} ${
+                      status == 1 && "hidden"
+                    }`}
+                  >
+                    <Text className="text-gray-50 font-semibold">Isi Ulang</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (!history.stock_gas_12kg)
+                        return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
+                      setGasVal(1);
+                      setTotal(total + products[2]?.price);
+                    }}
+                    className={`border px-4 py-2 ${gasVal && "hidden"} ${status == 1 && "hidden"}`}
+                  >
+                    <Text className="text-gray-50 font-semibold">Gas 12 Kg</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (!history.stock_galon_kosong)
+                        return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
+                      setGalonKosongVal(1);
+                    }}
+                    className={`border px-4 py-2 ${galonKosongVal && "hidden"} ${
+                      status != 1 && "hidden"
+                    }`}
+                    disabled={status != 1}
+                  >
+                    <Text className="text-gray-50 font-semibold">Galon Kosong</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (!history.stock_gas_kosong)
+                        return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
+                      setGasKosongVal(1);
+                    }}
+                    className={`border px-4 py-2 ${gasKosongVal && "hidden"} ${
+                      status != 1 && "hidden"
+                    }`}
+                    disabled={status != 1}
+                  >
+                    <Text className="text-gray-50 font-semibold">Gas Kosong</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    className={`border px-4 py-2 hidden ${
+                      aquaVal && isiUlangVal && gasVal && "flex"
+                    }
+                    ${galonKosongVal && gasKosongVal && "flex"}
+                    `}
+                  >
+                    <Text className="text-gray-200 font-semibold">Tekan Di luar untuk Tutup</Text>
+                  </TouchableOpacity>
+                </Popover>
               </View>
             </View>
-            <View className="total px-3">
+            <View className={`total px-3 ${status == 1 && "hidden"}`}>
               <View className="py-2 px-3 flex-row justify-between items-center bg-blue-800 rounded-lg">
                 <Text className="text-base font-bold text-gray-50">Total pembayaran</Text>
-                <Text className="text-sm font-bold text-gray-50">25.000</Text>
+                <Text className="text-sm font-bold text-gray-50">{total.toLocaleString()}</Text>
               </View>
             </View>
             <View className="status px-3">
               <Text className="text-sm font-semibold mb-2.5">Status:</Text>
               <View className="status-boxes self-center flex-row gap-x-3">
-                <Text className="px-3 py-1 border rounded-md w-[67px] text-center text-xs border-red-500 text-red-500 font-semibold">
-                  Hutang
-                </Text>
-                <Text className="px-3 py-1 border rounded-md w-[67px] text-center text-xs border-yellow-500 text-yellow-500 font-semibold">
-                  Pinjam
-                </Text>
-                <Text className="px-3 py-1  rounded-md w-[67px] text-center text-xs bg-green-500  font-semibold text-white">
-                  Lunas
-                </Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    setStatus("hutang");
+                    setGalonKosongVal(0);
+                    setGasKosongVal(0);
+                  }}
+                  activeOpacity={1}
+                >
+                  <Text
+                    className={`px-3 py-1 border font-semibold rounded-md w-[67px] text-center text-xs border-red-500 
+                    ${status == "hutang" ? "text-white bg-red-500" : "text-red-500"} `}
+                  >
+                    Hutang
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    setStatus("pinjam");
+                    setAquaVal(0);
+                    setIsiUlangVal(0);
+                    setGasVal(0);
+                    setTotal(0);
+                  }}
+                  activeOpacity={1}
+                >
+                  <Text
+                    className={`px-3 py-1 border rounded-md w-[67px] text-center text-xs border-yellow-500 font-semibold
+                    ${status == "pinjam" ? "text-white bg-yellow-500" : "text-yellow-500"}`}
+                  >
+                    Pinjam
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    setStatus("lunas");
+                    setGalonKosongVal(0);
+                    setGasKosongVal(0);
+                  }}
+                  activeOpacity={1}
+                >
+                  <Text
+                    className={`px-3 py-1 border rounded-md w-[67px] text-center text-xs border-green-500 font-semibold
+                    ${status == "lunas" ? "text-white bg-green-500" : "text-green-500"}`}
+                  >
+                    Lunas
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
             <View className="action-button px-3">
               <TouchableOpacity
                 className="rounded-lg bg-blue-800 px-3 py-2 mb-2.5"
                 activeOpacity={0.9}
-                onPress={handleClosePress}
+                onPress={() => {
+                  handleSave();
+                }}
               >
                 <Text className="text-center text-gray-100 text-xs font-semibold">Simpan</Text>
               </TouchableOpacity>
@@ -141,6 +487,37 @@ const OrderItem = () => {
       </BottomSheetModal>
     </View>
   );
+};
+
+const formatDate = (timestamp) => {
+  // const timestamp = '2024-08-17 08:19:03';
+  const date = new Date(timestamp);
+
+  // Membuat array bulan dalam bahasa Indonesia
+  const months = [
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
+  ];
+
+  // Mendapatkan hari, bulan, dan tahun
+  const day = date.getDate();
+  const month = months[date.getMonth()];
+  const year = date.getFullYear();
+
+  // Menggabungkan dalam format yang diinginkan
+  const formattedDate = `${day} ${month}, ${year}`;
+
+  return formattedDate;
 };
 
 export default OrderItem;
