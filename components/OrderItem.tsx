@@ -499,6 +499,8 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                       if (!history.stock_aqua)
                         return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                       setAquaVal(1);
+                      setGalonKosongVal(0)
+                      setGasKosongVal(0)
                       setTotal(total + products[0]?.price);
                     }}
                     className={`border px-4 py-2 ${aquaVal && "hidden"} ${status == "pinjam" && "hidden"}`}
@@ -510,6 +512,8 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                       if (!history.stock_isi_ulang)
                         return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                       setIsiUlangVal(1);
+                      setGalonKosongVal(0)
+                      setGasKosongVal(0)
                       setTotal(total + products[1]?.price);
                     }}
                     className={`border px-4 py-2 ${isiUlangVal && "hidden"} ${
@@ -523,6 +527,8 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                       if (!history.stock_gas_12kg)
                         return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                       setGasVal(1);
+                      setGalonKosongVal(0)
+                      setGasKosongVal(0)
                       setTotal(total + products[2]?.price);
                     }}
                     className={`border px-4 py-2 ${gasVal && "hidden"} ${status == "pinjam" && "hidden"}`}

@@ -21,6 +21,7 @@ import {
   addHistory,
   addTransaction,
   getAllContacts,
+  getContact,
   getHistory,
   getProducts,
   getTransactions,
@@ -49,7 +50,8 @@ const Pesanan = () => {
 
   const [products, setProducts] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
-  const [customerId, setCustomerId] = useState(null);
+  const [customerId, setCustomerId] = useState<number | null>(null);
+  const [isSubscriber, setIsSubscriber] = useState(0);
   const [total, setTotal] = useState<number>(0);
   const {
     lastHistory: history,
@@ -76,6 +78,7 @@ const Pesanan = () => {
     setGasKosongVal(0);
     setCustomerId(null);
     setTotal(0);
+    setIsSubscriber(0)
   }, []);
   const handleClosePress = useCallback(() => {
     bottomSheetModalRef.current?.close();
@@ -223,13 +226,32 @@ const Pesanan = () => {
     // console.log(JSON.stringify(history[history.length - 1], null, 2));
   };
 
-  const [refreshing, setRefreshing] = useState(false)
+  const [refreshing, setRefreshing] = useState(false);
   const onRefresh = () => {
-    setRefreshing(true)
-    fetchTransactions()
+    setRefreshing(true);
+    fetchTransactions();
     // fetchHistory()
-    setRefreshing(false)
-  }
+    setRefreshing(false);
+  };
+
+  const handleSelected = async (id: number) => {
+    setCustomerId(id);
+    const getCustomer: any = await getContact(id);
+    setIsSubscriber(getCustomer.isSubscriber);
+    if (getCustomer.isSubscriber == 0) {
+      setTotal(
+        aquaVal * products[0]?.price +
+          isiUlangVal * products[1]?.price +
+          gasVal * products[2]?.price
+      );
+    } else {
+      setTotal(
+        aquaVal * products[0]?.subs_price +
+          isiUlangVal * products[1]?.subs_price +
+          gasVal * products[2]?.price
+      );
+    }
+  };
 
   return (
     <SafeAreaView className="py-8">
@@ -318,8 +340,7 @@ const Pesanan = () => {
                       return { key: item.id, value: item.name };
                     }),
                   ]}
-                  setSelected={(val: any) => setCustomerId(val)}
-                  // setSelected={val => console.log(val)}
+                  setSelected={(val: any) => handleSelected(val)}
                   placeholder="pilih pelanggan"
                   searchPlaceholder="cari pelanggan"
                 />
@@ -329,7 +350,7 @@ const Pesanan = () => {
               <CartItem
                 name="Aqua"
                 image={images.aqua}
-                price={products[0]?.price}
+                price={isSubscriber == 0 ? products[0]?.price : products[0]?.subs_price}
                 val={aquaVal}
                 setVal={setAquaVal}
                 setTotal={setTotal}
