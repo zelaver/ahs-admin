@@ -1,6 +1,7 @@
+import { getHistory, initDB, initHistory } from "@/database/db";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { Tabs } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Image, Text } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Icon from "react-native-remix-icon";

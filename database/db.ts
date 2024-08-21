@@ -44,14 +44,34 @@ const initDB = async () => {
   `);
 };
 
+const initHistory = async () => {
+  const db = await SQLite.openDatabaseAsync("ahs-admin", {
+    useNewConnection: true,
+  });
+  try {
+    const result = await db.execAsync(
+      `
+      insert into history (saldo, stock_aqua, stock_galon_kosong, stock_gas_12kg, stock_gas_kosong, stock_isi_ulang, transactionId)
+      values(0,0,0,0,0,0,null)
+      `,
+      // delete from transactions where id = 'trans001'
+    );
+    return result;
+  } catch (e) {
+    if (e instanceof Error) {
+      console.log(e);
+    }
+  }
+}
+
 const getQuery = async () => {
   const db = await SQLite.openDatabaseAsync("ahs-admin", {
     useNewConnection: true,
   });
 
   try {
-    const result: any = await db.getAllAsync("SELECT * FROM products");
-    // const result: any = await db.getAllAsync("SELECT * FROM history;");
+    // const result: any = await db.getAllAsync("SELECT * FROM products");
+    const result: any = await db.getAllAsync("SELECT * FROM history;");
     console.log(JSON.stringify(result, null, 2));
     // console.log(result[result.length - 1])
     // console.log(typeof JSON.parse(result[0].orderList)[0].productId);
@@ -94,12 +114,14 @@ const execQuery = async () => {
     const customerId = 123; // contoh nilai customerId
     const status = "lunas"; // contoh nilai status
     const total_price = 100; // contoh nilai total_price
-    const result = await db.getAllAsync(
+    const result = await db.execAsync(
       `
-      DELETE FROM transactions;
+      DELETE FROM history;
       VACUUM;
       
       `
+      // insert into history (saldo, stock_aqua, stock_galon_kosong, stock_gas_12kg, stock_gas_kosong, stock_isi_ulang, transactionId)
+      // values(200000,0,300,0,20,0,null)
       // [orderListJson, customerId, status, total_price]
       // delete from customers where name = 'sigma skibid'
     );
@@ -357,6 +379,7 @@ const updateTransaction = async ({ orderList, customerId, status, total_price}: 
 
 export {
   initDB,
+  initHistory,
   getQuery,
   getAllTables,
   execQuery,

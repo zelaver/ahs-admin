@@ -1,4 +1,5 @@
 import GlobalProvider from "@/context/GlobalProvider";
+import { getHistory, initDB, initHistory } from "@/database/db";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -12,6 +13,8 @@ export default function RootLayout() {
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     Inter: require("@/assets/fonts/Inter-VariableFont_opsz,wght.ttf"),
   });
+
+  
 
   useEffect(() => {
     if (loaded) {

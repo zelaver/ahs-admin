@@ -71,7 +71,7 @@ export default function Home() {
     []
   );
 
-  const [debugMode, setDebugMode] = useState<boolean>();
+  const [debugMode, setDebugMode] = useState<boolean>(false);
   // const [stocks, setStocks] = useState<any>([]);
   const {lastHistory: stocks, setHistory: setStocks, fetchHistory: fetchStocks } = useGlobalContext()
   const [keteranganSaldo, setkKteranganSaldo] = useState();
@@ -101,9 +101,9 @@ export default function Home() {
 
   const handleSave = async () => {
     if (!saldoInput) return ToastAndroid.show("Input saldo tidak boleh kosong", ToastAndroid.SHORT);
-    if (stocks.saldo + saldoInput < 0)
+    if (stocks?.saldo + saldoInput < 0)
       return ToastAndroid.show("Saldo anda tidak cukup", ToastAndroid.SHORT);
-    await addHistory({ ...stocks, saldo: stocks.saldo + saldoInput });
+    await addHistory({ ...stocks, saldo: stocks?.saldo + saldoInput });
     await fetchStocks();
     handleClosePress();
   };
@@ -154,7 +154,7 @@ export default function Home() {
               <View className="flex-row mb-1">
                 <Text className="text-xs font-bold text-white">Rp</Text>
                 <Text className="text-xl font-bold text-white">
-                  {stocks.saldo?.toLocaleString("id-ID")},00
+                  {stocks?.saldo?.toLocaleString("id-ID")},00
                 </Text>
               </View>
               <TouchableOpacity
@@ -178,7 +178,7 @@ export default function Home() {
                 image={images.aqua}
                 name="Aqua"
                 price={20}
-                stock={stocks.stock_aqua}
+                stock={stocks?.stock_aqua}
                 stocks={stocks}
                 fetchStocks={fetchStocks}
               />
@@ -186,7 +186,7 @@ export default function Home() {
                 image={images.isiUlang}
                 name="Isi Ulang"
                 price={5}
-                stock={stocks.stock_isi_ulang}
+                stock={stocks?.stock_isi_ulang}
                 stocks={stocks}
                 fetchStocks={fetchStocks}
               />
@@ -196,7 +196,7 @@ export default function Home() {
               <StockItem
                 image={images.galonKosong}
                 name="Galon Kosong"
-                stock={stocks.stock_galon_kosong}
+                stock={stocks?.stock_galon_kosong}
                 stocks={stocks}
                 fetchStocks={fetchStocks}
               />
@@ -206,7 +206,7 @@ export default function Home() {
                 otherStyles="mr-2"
                 image={images.gas12Kg}
                 name="Gas 12 kg"
-                stock={stocks.stock_gas_12kg}
+                stock={stocks?.stock_gas_12kg}
                 price={220}
                 stocks={stocks}
                 fetchStocks={fetchStocks}
@@ -215,7 +215,7 @@ export default function Home() {
               <StockItem
                 image={images.gasKosong}
                 name="Gas Kosong"
-                stock={stocks.stock_gas_kosong}
+                stock={stocks?.stock_gas_kosong}
                 stocks={stocks}
                 fetchStocks={fetchStocks}
               />

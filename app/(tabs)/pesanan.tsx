@@ -49,7 +49,7 @@ const Pesanan = () => {
   const [gasKosongVal, setGasKosongVal] = useState(0);
 
   const [products, setProducts] = useState<any[]>([]);
-  const [customers, setCustomers] = useState<any[]>([]);
+  // const [customers, setCustomers] = useState<any[]>([]);
   const [customerId, setCustomerId] = useState<number | null>(null);
   const [isSubscriber, setIsSubscriber] = useState(0);
   const [total, setTotal] = useState<number>(0);
@@ -58,6 +58,7 @@ const Pesanan = () => {
     transactions,
     fetchHistory,
     fetchTransactions,
+    customers
   } = useGlobalContext();
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -111,17 +112,17 @@ const Pesanan = () => {
       }
     }
   };
-  const fetchCustomers = async () => {
-    try {
-      const data: any[] | any = await getAllContacts();
-      setCustomers(data);
-      // console.log(products);
-    } catch (e) {
-      if (e instanceof Error) {
-        console.log(e);
-      }
-    }
-  };
+  // const fetchCustomers = async () => {
+  //   try {
+  //     const data: any[] | any = await getAllContacts();
+  //     setCustomers(data);
+  //     // console.log(products);
+  //   } catch (e) {
+  //     if (e instanceof Error) {
+  //       console.log(e);
+  //     }
+  //   }
+  // };
 
   // const fetchHistory = async () => {
   //   try {
@@ -136,7 +137,7 @@ const Pesanan = () => {
 
   useEffect(() => {
     fetchProducts();
-    fetchCustomers();
+    // fetchCustomers();
     // fetchHistory();
   }, [transactions]);
 

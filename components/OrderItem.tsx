@@ -41,10 +41,10 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
   const [gasKosongVal, setGasKosongVal] = useState(0);
 
   const [products, setProducts] = useState<any[]>([]);
-  const [customers, setCustomers] = useState<any[]>([]);
+  // const [customers, setCustomers] = useState<any[]>([]);
   const [customerId, setCustomerId] = useState(curCustomerId);
   const [total, setTotal] = useState<number>(total_price);
-  const { lastHistory: history, setHistory, fetchHistory, fetchTransactions } = useGlobalContext();
+  const { lastHistory: history, setHistory, fetchHistory, fetchTransactions, customers } = useGlobalContext();
 
   const [customerName, setCustomerName] = useState();
   const [customerType, setCustomerType] = useState();
@@ -63,17 +63,17 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
       }
     }
   };
-  const fetchCustomers = async () => {
-    try {
-      const data: any[] | any = await getAllContacts();
-      setCustomers(data);
-      // console.log(products);
-    } catch (e) {
-      if (e instanceof Error) {
-        console.log(e);
-      }
-    }
-  };
+  // const fetchCustomers = async () => {
+  //   try {
+  //     const data: any[] | any = await getAllContacts();
+  //     setCustomers(data);
+  //     // console.log(products);
+  //   } catch (e) {
+  //     if (e instanceof Error) {
+  //       console.log(e);
+  //     }
+  //   }
+  // };
   const fetchCustomer = async () => {
     try {
       const data: any = await getContact(customerId);
@@ -101,11 +101,11 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
 
   useEffect(() => {
     fetchProducts();
-    fetchCustomers();
+    // fetchCustomers();
     fetchCustomer();
     fetchTransactions();
     // fetchHistory();
-  }, [orderList, curCustomerId, curStatus, total_price, status]);
+  }, [orderList, curCustomerId, curStatus, total_price, status, customers]);
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ["90%"], []);

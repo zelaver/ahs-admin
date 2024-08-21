@@ -1,4 +1,4 @@
-import { getHistory, getTransactions } from "@/database/db";
+import { getAllContacts, getHistory, getTransactions, initDB, initHistory } from "@/database/db";
 import { createContext, useContext, useEffect, useState } from "react";
 
 type context = {
@@ -7,6 +7,10 @@ type context = {
   setHistory: any;
   fetchHistory: () => Promise<void>;
   transactions: any;
+  isLoading: boolean;
+  setIsLoading: any;
+  customers: any
+  fetchCustomers: any
 };
 
 const GlobalContext = createContext<any>({});
@@ -16,6 +20,8 @@ const GlobalProvider = ({ children }: any) => {
   const [history, setHistory] = useState<[]>([]);
   const [lastHistory, setLastHistory] = useState<[]>([]);
   const [transactions, setTransactions] = useState<[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [customers, setCustomers] = useState<any[]>([]);
   const fetchHistory = async () => {
     try {
       const data: any = await getHistory();
@@ -27,6 +33,17 @@ const GlobalProvider = ({ children }: any) => {
       }
     }
   };
+
+  const fetchCustomers = async () => {
+    try {
+      const data: any = await getAllContacts();
+      // console.log(data);
+      setCustomers(data);
+    } catch (error) {
+      console.error("Error fetching contacts:", error);
+    }
+  };
+
   const fetchTransactions = async () => {
     try {
       const data: any = await getTransactions();
@@ -38,9 +55,22 @@ const GlobalProvider = ({ children }: any) => {
     }
   };
 
+  const initDatabase = async () => {
+    await initDB();
+    const currentHistory = await getHistory();
+    // console.log(currentHistory.length);
+    if (!currentHistory.length) {
+      await initHistory();
+      console.log("masuk sini");
+    }
+    await fetchHistory()
+  };
+
   useEffect(() => {
+    initDatabase();
+    fetchTransactions();
     fetchHistory();
-    fetchTransactions()
+    fetchCustomers()
   }, []);
 
   return (
@@ -50,7 +80,11 @@ const GlobalProvider = ({ children }: any) => {
         lastHistory,
         fetchHistory,
         transactions,
-        fetchTransactions
+        fetchTransactions,
+        isLoading,
+        setIsLoading,
+        customers,
+        fetchCustomers
       }}
     >
       {children}

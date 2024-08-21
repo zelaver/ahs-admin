@@ -69,13 +69,14 @@ const StockItem = ({ otherStyles, stock, price, name, image, stocks, fetchStocks
 
   const handleSave = async () => {
     // console.log(name)
-    if(addStock == 0) {
+    if (addStock == 0 || !addStock) {
       ToastAndroid.show("Masukan jumlah stok", ToastAndroid.SHORT);
-      return
+      return;
     }
     try {
       if (name == "Aqua") {
-        if(stocks.stock_galon_kosong - addStock < 0) return ToastAndroid.show("Galon Kosong tidak Cukup", ToastAndroid.SHORT);
+        if (stocks.stock_galon_kosong - addStock < 0)
+          return ToastAndroid.show("Galon Kosong tidak Cukup", ToastAndroid.SHORT);
         const newStocks = {
           ...stocks,
           stock_aqua: stock + addStock,
@@ -86,7 +87,8 @@ const StockItem = ({ otherStyles, stock, price, name, image, stocks, fetchStocks
         await fetchStocks();
         handleClosePress();
       } else if (name == "Isi Ulang") {
-        if(stocks.stock_galon_kosong - addStock < 0) return ToastAndroid.show("Galon Kosong tidak Cukup", ToastAndroid.SHORT);
+        if (stocks.stock_galon_kosong - addStock < 0)
+          return ToastAndroid.show("Galon Kosong tidak Cukup", ToastAndroid.SHORT);
 
         const newStocks = {
           ...stocks,
@@ -108,7 +110,8 @@ const StockItem = ({ otherStyles, stock, price, name, image, stocks, fetchStocks
         await fetchStocks();
         handleClosePress();
       } else if (name == "Gas 12 kg") {
-        if(stocks.stock_gas_kosong - addStock < 0) return ToastAndroid.show("Gas Kosong tidak Cukup", ToastAndroid.SHORT);
+        if (stocks.stock_gas_kosong - addStock < 0)
+          return ToastAndroid.show("Gas Kosong tidak Cukup", ToastAndroid.SHORT);
 
         const newStocks = {
           ...stocks,
@@ -194,7 +197,18 @@ const StockItem = ({ otherStyles, stock, price, name, image, stocks, fetchStocks
                     color="#1e40af"
                   />
                 </TouchableOpacity>
-                <Text className="text-2xl font-semibold text-blue-800">{addStock}</Text>
+                <TextInput
+                  className="text-2xl font-semibold text-blue-800"
+                  keyboardType="number-pad"
+                  defaultValue={addStock.toString()}
+                  onChangeText={(input) => {
+                    // console.log(input == "-")
+                    if (input == "-") return;
+                    if (!input) return setAddStock(0);
+                    setAddStock(parseInt(input));
+                  }}
+                ></TextInput>
+                {/* <Text className="text-2xl font-semibold text-blue-800">{addStock}</Text> */}
                 <TouchableOpacity
                   className="border-blue-800 rounded-full border"
                   onPress={() => setAddStock(addStock + 1)}

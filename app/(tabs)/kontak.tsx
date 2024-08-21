@@ -16,13 +16,15 @@ import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@g
 import Handle from "@/components/CustomHandle";
 import { addContact, getAllContacts } from "@/database/db";
 import ContactItem from "@/components/ContactItem";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 const Kontak = () => {
   const [name, setName] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [address, setAddress] = useState<string>("");
   const [status, setStatus] = useState<number>(0);
-  const [contacts, setContacts] = useState<any[]>([]);
+  // const [contacts, setContacts] = useState<any[]>([]);
+  const { customers: contacts, fetchCustomers: fetchContacts } = useGlobalContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState(false);
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -59,18 +61,18 @@ const Kontak = () => {
     []
   );
 
-  const fetchContacts = async () => {
-    try {
-      const data: any = await getAllContacts();
-      // console.log(data);
-      setContacts(data);
-    } catch (error) {
-      console.error("Error fetching contacts:", error);
-    }
-  };
+  // const fetchContacts = async () => {
+  //   try {
+  //     const data: any = await getAllContacts();
+  //     // console.log(data);
+  //     setContacts(data);
+  //   } catch (error) {
+  //     console.error("Error fetching contacts:", error);
+  //   }
+  // };
 
   useEffect(() => {
-    fetchContacts();
+    // fetchContacts();
 
     const backAction = () => {
       bottomSheetModalRef.current?.close();
@@ -100,11 +102,11 @@ const Kontak = () => {
     }
   };
 
-  const onRefresh = async () =>  {
-    setRefreshing(true)
-    await fetchContacts()
-    setRefreshing(false)
-  }
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchContacts();
+    setRefreshing(false);
+  };
 
   return (
     <SafeAreaView className="py-8 bg-white">
@@ -120,7 +122,6 @@ const Kontak = () => {
           <TouchableOpacity
             activeOpacity={0.5}
             onPress={handlePresentModalPress}
-            
             className="bg-white rounded-full"
           >
             <Icon
@@ -130,7 +131,14 @@ const Kontak = () => {
           </TouchableOpacity>
         </View>
       </View>
-      <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }
+      >
         <View className="main pb-16">
           <View className="section-3 px-5 py-1.5 ">
             {contacts.map(({ id, name, address, phone, isSubscriber }, i) => {
