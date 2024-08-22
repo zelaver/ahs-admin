@@ -101,7 +101,7 @@ export default function TabLayout() {
               ),
             }}
           />
-          <Tabs.Screen
+          {/* <Tabs.Screen
             name="debug"
             options={{
               title: "debug",
@@ -110,6 +110,20 @@ export default function TabLayout() {
                   icon={"bug-2"}
                   color={color}
                   name="Debug"
+                  focused={focused}
+                />
+              ),
+            }}
+          /> */}
+          <Tabs.Screen
+            name="backup"
+            options={{
+              title: "backup",
+              tabBarIcon: ({ color, focused }) => (
+                <TabIcon
+                  icon={"upload"}
+                  color={color}
+                  name="Backup"
                   focused={focused}
                 />
               ),

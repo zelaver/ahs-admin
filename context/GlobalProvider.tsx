@@ -5,12 +5,13 @@ type context = {
   history: [];
   lastHistory: any;
   setHistory: any;
-  fetchHistory: () => Promise<void>;
   transactions: any;
   isLoading: boolean;
   setIsLoading: any;
-  customers: any
-  fetchCustomers: any
+  customers: any;
+  fetchHistory: () => Promise<void>;
+  fetchCustomers: any;
+  fetchTransactions: any;
 };
 
 const GlobalContext = createContext<any>({});
@@ -63,14 +64,14 @@ const GlobalProvider = ({ children }: any) => {
       await initHistory();
       console.log("masuk sini");
     }
-    await fetchHistory()
+    await fetchHistory();
   };
 
   useEffect(() => {
     initDatabase();
     fetchTransactions();
     fetchHistory();
-    fetchCustomers()
+    fetchCustomers();
   }, []);
 
   return (
@@ -78,13 +79,13 @@ const GlobalProvider = ({ children }: any) => {
       value={{
         history,
         lastHistory,
-        fetchHistory,
         transactions,
-        fetchTransactions,
         isLoading,
         setIsLoading,
         customers,
-        fetchCustomers
+        fetchHistory,
+        fetchTransactions,
+        fetchCustomers,
       }}
     >
       {children}

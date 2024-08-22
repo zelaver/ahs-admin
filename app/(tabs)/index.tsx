@@ -96,7 +96,7 @@ export default function Home() {
   }, []);
 
   if (debugMode) {
-    return <Redirect href={"/(tabs)/debug"} />;
+    return <Redirect href={"/(tabs)/backup"} />;
   }
 
   const handleSave = async () => {

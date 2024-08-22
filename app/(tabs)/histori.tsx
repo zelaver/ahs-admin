@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   ScrollView,
   TouchableOpacity,
+  RefreshControl,
 } from "react-native";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import Icon from "react-native-remix-icon";
@@ -21,13 +22,17 @@ const Histori = () => {
       return a - b;
     }
   };
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchHistory();
+    setRefreshing(false);
+  };
   return (
     <SafeAreaView className="py-8">
       <View className="section-1 px-5 py-2 flex-row items-center">
         <Text className="text-2xl font-semibold mr-3">Histori</Text>
-        <TouchableOpacity
-          onPress={() => setAscending(!ascending)}
-        >
+        <TouchableOpacity onPress={() => setAscending(!ascending)}>
           <Icon
             name={`${ascending ? "sort-desc" : "sort-asc"}`}
             size={24}
@@ -46,7 +51,15 @@ const Histori = () => {
                 <Text className="text-sm text-white flex-1 font-semibold">Gas Kosong</Text>
               </View>
             </View>
-            <ScrollView className="h-96">
+            <ScrollView
+              className="h-96"
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={onRefresh}
+                />
+              }
+            >
               {[...history]
                 .sort((a, b) => sort(b.id, a.id))
                 .map((item, i) => (

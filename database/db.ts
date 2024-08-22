@@ -1,7 +1,7 @@
 import * as SQLite from "expo-sqlite";
 
 const initDB = async () => {
-  const db = await SQLite.openDatabaseAsync("ahs-admin", {
+const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
     useNewConnection: true,
   });
 
@@ -45,7 +45,7 @@ const initDB = async () => {
 };
 
 const initHistory = async () => {
-  const db = await SQLite.openDatabaseAsync("ahs-admin", {
+  const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
     useNewConnection: true,
   });
   try {
@@ -65,7 +65,7 @@ const initHistory = async () => {
 }
 
 const getQuery = async () => {
-  const db = await SQLite.openDatabaseAsync("ahs-admin", {
+  const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
     useNewConnection: true,
   });
 
@@ -84,7 +84,7 @@ const getQuery = async () => {
 };
 
 const getAllTables = async () => {
-  const db = await SQLite.openDatabaseAsync("ahs-admin", {
+  const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
     useNewConnection: true,
   });
 
@@ -100,7 +100,7 @@ const getAllTables = async () => {
 };
 
 const execQuery = async () => {
-  const db = await SQLite.openDatabaseAsync("ahs-admin", {
+  const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
     useNewConnection: true,
   });
   // console.log(query)
@@ -142,7 +142,7 @@ type contact = {
 };
 
 const addContact = async ({ name, address, phone, isSubscriber }: contact) => {
-  const db = await SQLite.openDatabaseAsync("ahs-admin", {
+  const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
     useNewConnection: true,
   });
   try {
@@ -163,7 +163,7 @@ const addContact = async ({ name, address, phone, isSubscriber }: contact) => {
 };
 
 const updateContact = async ({ name, address, phone, isSubscriber }: contact, id: number) => {
-  const db = await SQLite.openDatabaseAsync("ahs-admin", {
+  const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
     useNewConnection: true,
   });
   try {
@@ -185,7 +185,7 @@ const updateContact = async ({ name, address, phone, isSubscriber }: contact, id
 };
 
 const getAllContacts = async () => {
-  const db = await SQLite.openDatabaseAsync("ahs-admin", {
+  const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
     useNewConnection: true,
   });
   try {
@@ -200,7 +200,7 @@ const getAllContacts = async () => {
 };
 
 const getContact = async (id: number) => {
-  const db = await SQLite.openDatabaseAsync("ahs-admin", {
+  const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
     useNewConnection: true,
   });
   try {
@@ -215,7 +215,7 @@ const getContact = async (id: number) => {
 };
 
 const deleteContact = async (id: number) => {
-  const db = await SQLite.openDatabaseAsync("ahs-admin", {
+  const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
     useNewConnection: true,
   });
   try {
@@ -230,7 +230,7 @@ const deleteContact = async (id: number) => {
 };
 
 const getHistory = async () => {
-  const db = await SQLite.openDatabaseAsync("ahs-admin", {
+  const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
     useNewConnection: true,
   });
   try {
@@ -253,7 +253,7 @@ const addHistory = async ({
   stock_isi_ulang,
   transactionId,
 }: any) => {
-  const db = await SQLite.openDatabaseAsync("ahs-admin", {
+  const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
     useNewConnection: true,
   });
   try {
@@ -289,7 +289,7 @@ type products = {
 };
 
 const getProducts = async (): Promise<products[] | undefined> => {
-  const db = await SQLite.openDatabaseAsync("ahs-admin", {
+  const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
     useNewConnection: true,
   });
   try {
@@ -316,7 +316,7 @@ type Transaction = {
 };
 
 const addTransaction = async ({ orderList, customerId, status, total_price }: Transaction) => {
-  const db = await SQLite.openDatabaseAsync("ahs-admin", {
+  const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
     useNewConnection: true,
   });
   try {
@@ -337,7 +337,7 @@ const addTransaction = async ({ orderList, customerId, status, total_price }: Tr
 };
 
 const getTransactions = async () => {
-  const db = await SQLite.openDatabaseAsync("ahs-admin", {
+  const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
     useNewConnection: true,
   });
   try {
@@ -352,7 +352,7 @@ const getTransactions = async () => {
 };
 
 const updateTransaction = async ({ orderList, customerId, status, total_price}: Transaction, id: number) => {
-  const db = await SQLite.openDatabaseAsync("ahs-admin", {
+  const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
     useNewConnection: true,
   });
   try {
