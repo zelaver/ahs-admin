@@ -78,6 +78,7 @@ export default function Home() {
     setHistory: setStocks,
     products,
     fetchHistory: fetchStocks,
+    isLoading
   } = useGlobalContext();
   const [keteranganSaldo, setkKteranganSaldo] = useState();
   const [saldoInput, setSaldoInput] = useState<number | null>(null);

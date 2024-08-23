@@ -284,7 +284,7 @@ const StockItem = ({
                   value={subPrice}
                   onChangeValue={setSubPrice}
                   prefix="Rp"
-                  onChangeText={() => console.log(price)}
+                  // onChangeText={() => console.log(price)}
                   precision={0}
                   showPositiveSign
                   // minValue={0}

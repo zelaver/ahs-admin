@@ -9,7 +9,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Icon from "react-native-remix-icon";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+// SplashScreen.preventAutoHideAsync();
 
 const TabIcon = ({ icon, color, name, focused }: any) => {
   return (
@@ -33,21 +33,20 @@ const TabIcon = ({ icon, color, name, focused }: any) => {
 };
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-    // Inter: require("@/assets/fonts/Inter-VariableFont_opsz,wght.ttf"),
-  });
+  // const [loaded, error] = useFonts({
+  //   SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+  //   // Inter: require("@/assets/fonts/Inter-VariableFont_opsz,wght.ttf"),
+  // });
 
-  useEffect(() => {
-    if (error) throw error;
-    if (loaded) SplashScreen.hideAsync();
-  }, [loaded, error]);
-  if (!loaded && !error) return null;
-
+  // useEffect(() => {
+  //   if (error) throw error;
+  //   if (loaded) SplashScreen.hideAsync();
+  // }, [loaded, error]);
+  // if (!loaded && !error) return null;
 
   return (
-    <GlobalProvider>
-      <GestureHandlerRootView>
+    <GestureHandlerRootView className="flex-1">
+      <GlobalProvider>
         <BottomSheetModalProvider>
           <Tabs
             screenOptions={{
@@ -149,7 +148,7 @@ export default function RootLayout() {
             />
           </Tabs>
         </BottomSheetModalProvider>
-      </GestureHandlerRootView>
-    </GlobalProvider>
+      </GlobalProvider>
+    </GestureHandlerRootView>
   );
 }
