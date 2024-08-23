@@ -1,8 +1,7 @@
 import GlobalProvider, { useGlobalContext } from "@/context/GlobalProvider";
 import { getHistory, initDB, initHistory } from "@/database/db";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
+import { SplashScreen } from "expo-router";
 import { useEffect } from "react";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { Tabs } from "expo-router";
@@ -11,7 +10,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Icon from "react-native-remix-icon";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
-// SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync();
 
 const TabIcon = ({ icon, color, name, focused }: any) => {
   return (
@@ -35,35 +34,18 @@ const TabIcon = ({ icon, color, name, focused }: any) => {
 };
 
 export default function RootLayout() {
-  // const [loaded, error] = useFonts({
-  //   SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-  //   // Inter: require("@/assets/fonts/Inter-VariableFont_opsz,wght.ttf"),
-  // });
+  const [loaded, error] = useFonts({
+    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    // Inter: require("@/assets/fonts/Inter-VariableFont_opsz,wght.ttf"),
+  });
 
-  // useEffect(() => {
-  //   if (loaded) {
-  //     SplashScreen.hideAsync();
-  //   }
-  // }, [loaded]);
+  useEffect(() => {
+    if (error) throw error;
+    if (loaded) SplashScreen.hideAsync();
+  }, [loaded, error]);
+  if (!loaded && !error) return null;
 
-  // if (!loaded) {
-  //   return (
-  //     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-  //       <ActivityIndicator
-  //         size="large"
-  //         color="#60a5fa"
-  //       />
-  //     </View>
-  //   );
-  // }
 
-  // if (error) {
-  //   return (
-  //     <View className="flex-1 justify-center items-center">
-  //       <Text>Error kang</Text>
-  //     </View>
-  //   );
-  // }
   return (
     <GlobalProvider>
       <GestureHandlerRootView>
