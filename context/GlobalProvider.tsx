@@ -22,7 +22,7 @@ const GlobalProvider = ({ children }: any) => {
   const [history, setHistory] = useState<[]>([]);
   const [lastHistory, setLastHistory] = useState<[]>([]);
   const [transactions, setTransactions] = useState<[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [customers, setCustomers] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
 
