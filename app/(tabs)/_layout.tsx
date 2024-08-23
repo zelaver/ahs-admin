@@ -1,3 +1,4 @@
+import { useGlobalContext } from "@/context/GlobalProvider";
 import { getHistory, initDB, initHistory } from "@/database/db";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { Tabs } from "expo-router";
@@ -28,6 +29,15 @@ const TabIcon = ({ icon, color, name, focused }: any) => {
 };
 
 export default function TabLayout() {
+  const { isLoading } = useGlobalContext();
+  if (isLoading) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <Text>Sedang Loading rek</Text>
+      </View>
+    );
+  }
+
   return (
     <GestureHandlerRootView>
       <BottomSheetModalProvider>

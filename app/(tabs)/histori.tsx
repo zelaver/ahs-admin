@@ -8,12 +8,13 @@ import {
   TouchableOpacity,
   RefreshControl,
 } from "react-native";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Icon from "react-native-remix-icon";
 import { useGlobalContext } from "@/context/GlobalProvider";
+
 const Histori = () => {
   const { history, fetchHistory } = useGlobalContext();
-  const [ascending, setAscending] = useState(true);
+  const [ascending, setAscending] = useState(false);
 
   const sort = (a, b) => {
     if (ascending) {
@@ -28,6 +29,15 @@ const Histori = () => {
     await fetchHistory();
     setRefreshing(false);
   };
+
+  // const scrollViewRef = useRef(null);
+  // useEffect(() => {
+  //   // Scroll to bottom when component is mounted
+  //   if (scrollViewRef.current) {
+  //     scrollViewRef.current.scrollToEnd({ animated: true });
+  //   }
+  // }, []);
+
   return (
     <SafeAreaView className="py-8">
       <View className="section-1 px-5 py-2 flex-row items-center">
@@ -52,6 +62,7 @@ const Histori = () => {
               </View>
             </View>
             <ScrollView
+              // ref={scrollViewRef}
               className="h-96"
               refreshControl={
                 <RefreshControl

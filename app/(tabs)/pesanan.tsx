@@ -17,15 +17,7 @@ import OrderItem from "@/components/OrderItem";
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import CartItem from "@/components/CartItem";
 import Handle from "@/components/CustomHandle";
-import {
-  addHistory,
-  addTransaction,
-  getAllContacts,
-  getContact,
-  getHistory,
-  getProducts,
-  getTransactions,
-} from "@/database/db";
+import { addHistory, addTransaction, getContact, getTransactions } from "@/database/db";
 import { SelectList } from "react-native-dropdown-select-list";
 import { UnknownOutputParams } from "expo-router";
 import Popover from "react-native-popover-view/dist/Popover";
@@ -34,12 +26,6 @@ import images from "@/constants/images";
 import { useGlobalContext } from "@/context/GlobalProvider";
 
 const Pesanan = () => {
-  type products = {
-    id: number;
-    name: string;
-    price: number;
-    subs_price: number;
-  };
   const [query, setQuery] = useState<string>();
   const [status, setStatus] = useState<number>(2);
   const [aquaVal, setAquaVal] = useState(0);
@@ -48,7 +34,6 @@ const Pesanan = () => {
   const [gasVal, setGasVal] = useState(0);
   const [gasKosongVal, setGasKosongVal] = useState(0);
 
-  const [products, setProducts] = useState<any[]>([]);
   // const [customers, setCustomers] = useState<any[]>([]);
   const [customerId, setCustomerId] = useState<number | null>(null);
   const [isSubscriber, setIsSubscriber] = useState(0);
@@ -58,19 +43,13 @@ const Pesanan = () => {
     transactions,
     fetchHistory,
     fetchTransactions,
-    customers
+    customers,
+    products,
   } = useGlobalContext();
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ["90%"], []);
   const handlePresentModalPress = useCallback(() => {
-    bottomSheetModalRef.current?.present();
-  }, []);
-  const handleSheetChanges = useCallback((index: number) => {
-    // console.log("handleSheetChanges", index);
-    // console.log(products);
-    if (index == -1) {
-    }
     setStatus(2);
     setAquaVal(0);
     setIsiUlangVal(0);
@@ -79,8 +58,10 @@ const Pesanan = () => {
     setGasKosongVal(0);
     setCustomerId(null);
     setTotal(0);
-    setIsSubscriber(0)
+    setIsSubscriber(0);
+    bottomSheetModalRef.current?.present();
   }, []);
+  const handleSheetChanges = useCallback((index: number) => {}, []);
   const handleClosePress = useCallback(() => {
     bottomSheetModalRef.current?.close();
   }, []);
@@ -97,49 +78,6 @@ const Pesanan = () => {
     ),
     []
   );
-
-  const fetchProducts = async () => {
-    try {
-      const data: products[] | any = await getProducts();
-      // setProducts([products?.map((item, i) => {
-      //   return {key: i, value: item.name, }
-      // })]);
-      setProducts(data);
-      // console.log(products);
-    } catch (e) {
-      if (e instanceof Error) {
-        console.log(e);
-      }
-    }
-  };
-  // const fetchCustomers = async () => {
-  //   try {
-  //     const data: any[] | any = await getAllContacts();
-  //     setCustomers(data);
-  //     // console.log(products);
-  //   } catch (e) {
-  //     if (e instanceof Error) {
-  //       console.log(e);
-  //     }
-  //   }
-  // };
-
-  // const fetchHistory = async () => {
-  //   try {
-  //     const data: any = await getHistory();
-  //     setHistory(data[data.length - 1]);
-  //   } catch (e) {
-  //     if (e instanceof Error) {
-  //       console.log(history);
-  //     }
-  //   }
-  // };
-
-  useEffect(() => {
-    fetchProducts();
-    // fetchCustomers();
-    // fetchHistory();
-  }, [transactions]);
 
   const handleSave = async () => {
     // console.log(aquaVal || isiUlangVal || gasVal || galonKosongVal || gasKosongVal)
@@ -231,7 +169,6 @@ const Pesanan = () => {
   const onRefresh = () => {
     setRefreshing(true);
     fetchTransactions();
-    // fetchHistory()
     setRefreshing(false);
   };
 
@@ -239,7 +176,7 @@ const Pesanan = () => {
     setCustomerId(id);
     const getCustomer: any = await getContact(id);
     setIsSubscriber(getCustomer.isSubscriber);
-    console.log(getCustomer.isSubscriber)
+    console.log(getCustomer.isSubscriber);
     if (getCustomer.isSubscriber == 0) {
       setTotal(
         aquaVal * products[0]?.price +
@@ -262,7 +199,7 @@ const Pesanan = () => {
           <Text className="text-2xl font-semibold">Pesanan</Text>
         </View>
         <View className="section-2 px-5 flex-row items-center ">
-        <View className={`flex-row py-1 flex-1 px-2 mr-2 rounded-md items-center border`}>
+          <View className={`flex-row py-1 flex-1 px-2 mr-2 rounded-md items-center border`}>
             <TextInput
               className=" text-xs flex-1 font-normal mr-2 justify-center items-center"
               value={query}
@@ -444,8 +381,10 @@ const Pesanan = () => {
                       if (!history.stock_aqua)
                         return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                       setAquaVal(1);
-                      console.log(isSubscriber)
-                      setTotal(total + (!isSubscriber ? products[0]?.price : products[0]?.subs_price));
+                      console.log(isSubscriber);
+                      setTotal(
+                        total + (!isSubscriber ? products[0]?.price : products[0]?.subs_price)
+                      );
                     }}
                     className={`border px-4 py-2 ${aquaVal && "hidden"} ${status == 1 && "hidden"}`}
                   >
@@ -456,8 +395,9 @@ const Pesanan = () => {
                       if (!history.stock_isi_ulang)
                         return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                       setIsiUlangVal(1);
-                      setTotal(total + (!isSubscriber ? products[1]?.price : products[1]?.subs_price));
-
+                      setTotal(
+                        total + (!isSubscriber ? products[1]?.price : products[1]?.subs_price)
+                      );
                     }}
                     className={`border px-4 py-2 ${isiUlangVal && "hidden"} ${
                       status == 1 && "hidden"
@@ -470,8 +410,9 @@ const Pesanan = () => {
                       if (!history.stock_gas_12kg)
                         return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                       setGasVal(1);
-                      setTotal(total + (!isSubscriber ? products[2]?.price : products[2]?.subs_price));
-
+                      setTotal(
+                        total + (!isSubscriber ? products[2]?.price : products[2]?.subs_price)
+                      );
                     }}
                     className={`border px-4 py-2 ${gasVal && "hidden"} ${status == 1 && "hidden"}`}
                   >

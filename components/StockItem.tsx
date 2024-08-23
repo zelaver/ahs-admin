@@ -15,27 +15,47 @@ import Icon from "react-native-remix-icon";
 // import images from "@/constants/images";
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import Handle from "./CustomHandle";
-import { addHistory } from "@/database/db";
+import { addHistory, updateProductPrice } from "@/database/db";
+import CurrencyInput from "react-native-currency-input";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 type StockItem = {
+  id?: number;
   name: string;
   stock: number;
-  price?: number;
+  prodPrice?: number;
+  prodSubPrice?: number;
   image: any;
   otherStyles?: string;
   stocks: any;
   fetchStocks: () => Promise<void>;
 };
 
-const StockItem = ({ otherStyles, stock, price, name, image, stocks, fetchStocks }: StockItem) => {
+const StockItem = ({
+  id = 0,
+  otherStyles,
+  stock,
+  prodPrice = 0,
+  prodSubPrice = 0,
+  name,
+  image,
+  stocks,
+  fetchStocks,
+}: StockItem) => {
+  const [price, setPrice] = useState<number | null>(0);
+  const [subPrice, setSubPrice] = useState<number | null>(0);
+  const { fetchProducts } = useGlobalContext();
+
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-  const snapPoints = useMemo(() => ["40%"], []);
+  const snapPoints = useMemo(() => [!id ? "40%" : "60%"], [id]);
   const handlePresentModalPress = useCallback(() => {
+    setPrice(prodPrice);
+    setSubPrice(prodSubPrice);
+    setAddStock(0);
     bottomSheetModalRef.current?.present();
-  }, []);
+  }, [prodPrice, prodSubPrice]);
   const handleSheetChanges = useCallback((index: number) => {
     if (index == -1) {
-      setAddStock(1);
     }
   }, []);
   const handleClosePress = useCallback(() => {
@@ -65,16 +85,23 @@ const StockItem = ({ otherStyles, stock, price, name, image, stocks, fetchStocks
     []
   );
 
-  const [addStock, setAddStock] = useState<number>(1);
+  const [addStock, setAddStock] = useState<number>(0);
 
   const handleSave = async () => {
     // console.log(name)
-    if (addStock == 0 || !addStock) {
-      ToastAndroid.show("Masukan jumlah stok", ToastAndroid.SHORT);
+    if (addStock == 0 && !addStock && price == prodPrice && subPrice == prodSubPrice) {
+      ToastAndroid.show("Masukan jumlah stok!", ToastAndroid.SHORT);
       return;
     }
+    if (id && (price != prodPrice || subPrice != prodSubPrice)) {
+      await updateProductPrice(id, price, subPrice);
+      fetchProducts();
+      ToastAndroid.show("Harga Berhasil Di ubah!", ToastAndroid.SHORT);
+    }
     try {
-      if (name == "Aqua") {
+      if (!addStock) {
+        return;
+      } else if (name == "Aqua") {
         if (stocks.stock_galon_kosong - addStock < 0)
           return ToastAndroid.show("Galon Kosong tidak Cukup", ToastAndroid.SHORT);
         const newStocks = {
@@ -135,6 +162,13 @@ const StockItem = ({ otherStyles, stock, price, name, image, stocks, fetchStocks
     }
   };
 
+  function formatNumber(num: number) {
+    if (num >= 1000) {
+      return (num / 1000).toFixed(num % 1000 === 0 ? 0 : 1) + "k";
+    }
+    return num.toString();
+  }
+
   return (
     <View
       className={`mini-box border-2 flex-col rounded-lg px-3 flex-1 gap-y-2 pb-2 ${otherStyles} `}
@@ -150,7 +184,7 @@ const StockItem = ({ otherStyles, stock, price, name, image, stocks, fetchStocks
       <View className="flex-row justify-between ">
         <View className="justify-center">
           <Text className="stok text-2xl font-semibold text-gray-700">{stock}</Text>
-          {price && <Text className="harga text-2xl font-semibold text-gray-700">/{price}K</Text>}
+          {/* {price && <Text className="harga text-2xl font-semibold text-gray-700">/{price}K</Text>} */}
         </View>
         <Image
           source={image}
@@ -219,6 +253,42 @@ const StockItem = ({ otherStyles, stock, price, name, image, stocks, fetchStocks
                     color="#1e40af"
                   />
                 </TouchableOpacity>
+              </View>
+            </View>
+            <View className={`px-3 ${!id && "hidden"}`}>
+              <Text className="text-sm font-semibold mb-2.5">Harga customer:</Text>
+              <View className="border-2 rounded-md px-3">
+                <CurrencyInput
+                  // onFocus={() => handleSnapPress(1)}
+                  // onBlur={() => handleSnapPress(0)}
+                  placeholder="Masukan Harga"
+                  keyboardType="number-pad"
+                  value={price}
+                  onChangeValue={setPrice}
+                  prefix="Rp"
+                  // onChangeText={() => console.log()}
+                  precision={0}
+                  showPositiveSign
+                  // minValue={0}
+                />
+              </View>
+            </View>
+            <View className={`px-3 ${!id && "hidden"}`}>
+              <Text className="text-sm font-semibold mb-2.5">Harga Warung:</Text>
+              <View className="border-2 rounded-md px-3">
+                <CurrencyInput
+                  // onFocus={() => handleSnapPress(1)}
+                  // onBlur={() => handleSnapPress(0)}
+                  placeholder="Masukan harga"
+                  keyboardType="number-pad"
+                  value={subPrice}
+                  onChangeValue={setSubPrice}
+                  prefix="Rp"
+                  onChangeText={() => console.log(price)}
+                  precision={0}
+                  showPositiveSign
+                  // minValue={0}
+                />
               </View>
             </View>
             <View className="action-button px-3">

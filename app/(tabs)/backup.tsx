@@ -1,6 +1,6 @@
 import { View, Text, SafeAreaView, TouchableOpacity, ToastAndroid } from "react-native";
 import React from "react";
-import { initDB, execQuery, getAllTables, getQuery, getProducts } from "@/database/db";
+import { getQuery,  } from "@/database/db";
 import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system";
 import * as DocumentPicker from "expo-document-picker";
@@ -9,7 +9,7 @@ import JSZip from "jszip";
 import { useGlobalContext } from "@/context/GlobalProvider";
 
 const backup = () => {
-  const { fetchHistory, fetchCustomers, fetchTransactions } = useGlobalContext();
+  const { fetchHistory, fetchCustomers, fetchTransactions, fetchProducts } = useGlobalContext();
   const exportDatabase = async () => {
     try {
       const dir = FileSystem.documentDirectory + "SQLite/";
@@ -89,6 +89,7 @@ const backup = () => {
         fetchHistory();
         fetchCustomers();
         fetchTransactions();
+        fetchProducts()
       } else {
         console.log("No file selected.");
         ToastAndroid.show("file tidak terpilih!", ToastAndroid.SHORT);
@@ -124,13 +125,13 @@ const backup = () => {
           >
             <Text className="text-xl text-blue-800 font-semibold">Import</Text>
           </TouchableOpacity>
-          {/* <TouchableOpacity
+          <TouchableOpacity
             className="border px-4 py-2 border-blue-800 rounded-md border-dashed"
             activeOpacity={0.9}
             onPress={() => debug()}
           >
             <Text className="text-xl text-blue-800 font-semibold">Debug</Text>
-          </TouchableOpacity> */}
+          </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>

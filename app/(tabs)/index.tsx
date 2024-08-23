@@ -16,7 +16,7 @@ import images from "@/constants/images";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Redirect } from "expo-router";
 import StockItem from "@/components/StockItem";
-import { addHistory, getHistory } from "@/database/db";
+import { addHistory } from "@/database/db";
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
@@ -73,28 +73,17 @@ export default function Home() {
 
   const [debugMode, setDebugMode] = useState<boolean>(false);
   // const [stocks, setStocks] = useState<any>([]);
-  const {lastHistory: stocks, setHistory: setStocks, fetchHistory: fetchStocks } = useGlobalContext()
+  const {
+    lastHistory: stocks,
+    setHistory: setStocks,
+    products,
+    fetchHistory: fetchStocks,
+  } = useGlobalContext();
   const [keteranganSaldo, setkKteranganSaldo] = useState();
   const [saldoInput, setSaldoInput] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  // const fetchStocks = async () => {
-  //   try {
-  //     const data: any = await getHistory();
-  //     setStocks(data[data.length - 1]);
-  //     // console.log(JSON.stringify(stocks, 0 , 2))
-  //   } catch (e) {
-  //     if (e instanceof Error) {
-  //       console.log(e);
-  //     }
-  //   }
-  // };
-
-  useEffect(() => {
-    fetchStocks();
-    // console.log(stocks)
-  }, []);
-
+ 
   if (debugMode) {
     return <Redirect href={"/(tabs)/backup"} />;
   }
@@ -174,18 +163,22 @@ export default function Home() {
             <Text className="text-sm font-bold text-gray-700 mb-2">Stok/Harga Galon</Text>
             <View className="stok-row-1 flex-row justify-between mb-4 ">
               <StockItem
+                id={products[0]?.id}
                 otherStyles="mr-2"
                 image={images.aqua}
                 name="Aqua"
-                price={20}
+                prodPrice={products[0]?.price}
+                prodSubPrice={products[0]?.subs_price}
                 stock={stocks?.stock_aqua}
                 stocks={stocks}
                 fetchStocks={fetchStocks}
               />
               <StockItem
+                id={products[1]?.id}
                 image={images.isiUlang}
                 name="Isi Ulang"
-                price={5}
+                prodPrice={products[1]?.price}
+                prodSubPrice={products[1]?.subs_price}
                 stock={stocks?.stock_isi_ulang}
                 stocks={stocks}
                 fetchStocks={fetchStocks}
@@ -203,11 +196,13 @@ export default function Home() {
             </View>
             <View className="stok-row-3 flex-row justify-between ">
               <StockItem
+                id={products[0]?.id}
                 otherStyles="mr-2"
                 image={images.gas12Kg}
                 name="Gas 12 kg"
                 stock={stocks?.stock_gas_12kg}
-                price={220}
+                prodPrice={products[2]?.price}
+                prodSubPrice={products[2]?.subs_price}
                 stocks={stocks}
                 fetchStocks={fetchStocks}
               />

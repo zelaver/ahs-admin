@@ -1,4 +1,4 @@
-import { getAllContacts, getHistory, getTransactions, initDB, initHistory } from "@/database/db";
+import { getAllContacts, getHistory, getProducts, getTransactions, initDB, initHistory } from "@/database/db";
 import { createContext, useContext, useEffect, useState } from "react";
 
 type context = {
@@ -12,6 +12,7 @@ type context = {
   fetchHistory: () => Promise<void>;
   fetchCustomers: any;
   fetchTransactions: any;
+  fetchProducts: any;
 };
 
 const GlobalContext = createContext<any>({});
@@ -21,8 +22,32 @@ const GlobalProvider = ({ children }: any) => {
   const [history, setHistory] = useState<[]>([]);
   const [lastHistory, setLastHistory] = useState<[]>([]);
   const [transactions, setTransactions] = useState<[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [customers, setCustomers] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
+
+  type products = {
+    id: number;
+    name: string;
+    price: number;
+    subs_price: number;
+  };
+
+  const fetchProducts = async () => {
+    try {
+      const data: products[] | any = await getProducts();
+      // setProducts([products?.map((item, i) => {
+      //   return {key: i, value: item.name, }
+      // })]);
+      setProducts(data);
+      // console.log(products);
+    } catch (e) {
+      if (e instanceof Error) {
+        console.log(e);
+      }
+    }
+  };
+
   const fetchHistory = async () => {
     try {
       const data: any = await getHistory();
@@ -43,6 +68,7 @@ const GlobalProvider = ({ children }: any) => {
     } catch (error) {
       console.error("Error fetching contacts:", error);
     }
+    
   };
 
   const fetchTransactions = async () => {
@@ -72,12 +98,15 @@ const GlobalProvider = ({ children }: any) => {
     fetchTransactions();
     fetchHistory();
     fetchCustomers();
+    fetchProducts();
+    setIsLoading(false)
   }, []);
 
   return (
     <GlobalContext.Provider
       value={{
         history,
+        products,
         lastHistory,
         transactions,
         isLoading,
@@ -86,6 +115,7 @@ const GlobalProvider = ({ children }: any) => {
         fetchHistory,
         fetchTransactions,
         fetchCustomers,
+        fetchProducts
       }}
     >
       {children}

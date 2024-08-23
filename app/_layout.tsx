@@ -1,9 +1,10 @@
-import GlobalProvider from "@/context/GlobalProvider";
+import GlobalProvider, { useGlobalContext } from "@/context/GlobalProvider";
 import { getHistory, initDB, initHistory } from "@/database/db";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
+import { View } from "react-native-reanimated/lib/typescript/Animated";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -14,7 +15,6 @@ export default function RootLayout() {
     Inter: require("@/assets/fonts/Inter-VariableFont_opsz,wght.ttf"),
   });
 
-  
 
   useEffect(() => {
     if (loaded) {

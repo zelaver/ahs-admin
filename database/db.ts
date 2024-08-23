@@ -385,6 +385,28 @@ const updateTransaction = async (
   }
 };
 
+const updateProductPrice = async (id: number, price: number, subs_price: number) => {
+  const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
+    useNewConnection: true,
+  });
+  try {
+    const result = await db.runAsync(
+      `
+      UPDATE products 
+      SET price = ?, subs_price = ?
+      WHERE id = ?;
+      `,
+      [price, subs_price, id]
+    );
+
+    return true;
+  } catch (e) {
+    if (e instanceof Error) {
+      return e;
+    }
+  }
+};
+
 export {
   initDB,
   initHistory,
@@ -402,4 +424,5 @@ export {
   addTransaction,
   getTransactions,
   updateTransaction,
+  updateProductPrice,
 };

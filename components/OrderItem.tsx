@@ -40,29 +40,14 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
   const [gasVal, setGasVal] = useState(0);
   const [gasKosongVal, setGasKosongVal] = useState(0);
 
-  const [products, setProducts] = useState<any[]>([]);
   // const [customers, setCustomers] = useState<any[]>([]);
   const [customerId, setCustomerId] = useState(curCustomerId);
   const [total, setTotal] = useState<number>(total_price);
-  const { lastHistory: history, setHistory, fetchHistory, fetchTransactions, customers } = useGlobalContext();
+  const { lastHistory: history, setHistory, fetchHistory, fetchTransactions, customers, products, } = useGlobalContext();
 
   const [customerName, setCustomerName] = useState();
   const [customerType, setCustomerType] = useState();
 
-  const fetchProducts = async () => {
-    try {
-      const data: products[] | any = await getProducts();
-      // setProducts([products?.map((item, i) => {
-      //   return {key: i, value: item.name, }
-      // })]);
-      setProducts(data);
-      // console.log(products);
-    } catch (e) {
-      if (e instanceof Error) {
-        console.log(e);
-      }
-    }
-  };
 
   const fetchCustomer = async () => {
     try {
@@ -90,11 +75,8 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
   };
 
   useEffect(() => {
-    fetchProducts();
-    // fetchCustomers();
     fetchCustomer();
-    fetchTransactions();
-    // fetchHistory();
+    // fetchTransactions();
   }, [orderList, curCustomerId, curStatus, total_price, status, customers]);
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -105,7 +87,9 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
   const handleSheetChanges = useCallback(
     (index: number) => {
       // console.log("handleSheetChanges", index);
-      fetchOrderList();
+      if(index == 0) {
+        fetchOrderList();
+      }
     },
     [orderList, curCustomerId, curStatus, total_price]
   );
