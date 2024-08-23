@@ -63,17 +63,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
       }
     }
   };
-  // const fetchCustomers = async () => {
-  //   try {
-  //     const data: any[] | any = await getAllContacts();
-  //     setCustomers(data);
-  //     // console.log(products);
-  //   } catch (e) {
-  //     if (e instanceof Error) {
-  //       console.log(e);
-  //     }
-  //   }
-  // };
+
   const fetchCustomer = async () => {
     try {
       const data: any = await getContact(customerId);
@@ -342,6 +332,27 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
     handleClosePress();
   };
 
+  const handleSelected = async (id: number) => {
+    // console.log(customerType)
+    setCustomerId(id);
+    const getCustomer: any = await getContact(id);
+    setCustomerType(getCustomer.isSubscriber);
+    console.log(getCustomer.isSubscriber)
+    if (getCustomer.isSubscriber == 0) {
+      setTotal(
+        aquaVal * products[0]?.price +
+          isiUlangVal * products[1]?.price +
+          gasVal * products[2]?.price
+      );
+    } else {
+      setTotal(
+        aquaVal * products[0]?.subs_price +
+          isiUlangVal * products[1]?.subs_price +
+          gasVal * products[2]?.price
+      );
+    }
+  };
+
   return (
     <View className="pesanan-item border rounded-lg p-2.5 flex-row justify-between items-center mb-4">
       <View className="flex-row">
@@ -407,7 +418,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                     }),
                   ]}
                   setSelected={(val: any) => {
-                    setCustomerId(val);
+                    handleSelected(val)
                   }}
                   defaultOption={{ key: curCustomerId, value: customerName }}
                   // setSelected={val => console.log(val)}
@@ -418,10 +429,10 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
               </View>
             </View>
             <View className="cart border-t border-b py-4">
-              <CartItem
+            <CartItem
                 name="Aqua"
                 image={images.aqua}
-                price={products[0]?.price}
+                price={customerType == 0 ? products[0]?.price : products[0]?.subs_price}
                 val={aquaVal}
                 setVal={setAquaVal}
                 setTotal={setTotal}
@@ -431,7 +442,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
               <CartItem
                 name="Isi Ulang"
                 image={images.isiUlang}
-                price={products[1]?.price}
+                price={customerType == 0 ? products[1]?.price : products[1]?.subs_price}
                 val={isiUlangVal}
                 setVal={setIsiUlangVal}
                 setTotal={setTotal}
@@ -441,7 +452,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
               <CartItem
                 name="Gas 12 kg"
                 image={images.gas12Kg}
-                price={products[2]?.price}
+                price={customerType == 0 ? products[2]?.price : products[2]?.subs_price}
                 val={gasVal}
                 setVal={setGasVal}
                 setTotal={setTotal}
@@ -499,11 +510,10 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                       if (!history.stock_aqua)
                         return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                       setAquaVal(1);
-                      setGalonKosongVal(0)
-                      setGasKosongVal(0)
-                      setTotal(total + products[0]?.price);
+                      console.log(customerType)
+                      setTotal(total + (!customerType ? products[0]?.price : products[0]?.subs_price));
                     }}
-                    className={`border px-4 py-2 ${aquaVal && "hidden"} ${status == "pinjam" && "hidden"}`}
+                    className={`border px-4 py-2 ${aquaVal && "hidden"} ${status == 1 && "hidden"}`}
                   >
                     <Text className="text-gray-50 font-semibold">aqua</Text>
                   </TouchableOpacity>
@@ -512,12 +522,11 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                       if (!history.stock_isi_ulang)
                         return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                       setIsiUlangVal(1);
-                      setGalonKosongVal(0)
-                      setGasKosongVal(0)
-                      setTotal(total + products[1]?.price);
+                      setTotal(total + (!customerType ? products[1]?.price : products[1]?.subs_price));
+
                     }}
                     className={`border px-4 py-2 ${isiUlangVal && "hidden"} ${
-                      status == "pinjam" && "hidden"
+                      status == 1 && "hidden"
                     }`}
                   >
                     <Text className="text-gray-50 font-semibold">Isi Ulang</Text>
@@ -527,11 +536,10 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                       if (!history.stock_gas_12kg)
                         return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                       setGasVal(1);
-                      setGalonKosongVal(0)
-                      setGasKosongVal(0)
-                      setTotal(total + products[2]?.price);
+                      setTotal(total + (!customerType ? products[2]?.price : products[2]?.subs_price));
+
                     }}
-                    className={`border px-4 py-2 ${gasVal && "hidden"} ${status == "pinjam" && "hidden"}`}
+                    className={`border px-4 py-2 ${gasVal && "hidden"} ${status == 1 && "hidden"}`}
                   >
                     <Text className="text-gray-50 font-semibold">Gas 12 Kg</Text>
                   </TouchableOpacity>
@@ -542,9 +550,9 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                       setGalonKosongVal(1);
                     }}
                     className={`border px-4 py-2 ${galonKosongVal && "hidden"} ${
-                      status != "pinjam" && "hidden"
+                      status != 1 && "hidden"
                     }`}
-                    disabled={status != "pinjam"}
+                    disabled={status != 1}
                   >
                     <Text className="text-gray-50 font-semibold">Galon Kosong</Text>
                   </TouchableOpacity>
@@ -555,9 +563,9 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                       setGasKosongVal(1);
                     }}
                     className={`border px-4 py-2 ${gasKosongVal && "hidden"} ${
-                      status != "pinjam" && "hidden"
+                      status != 1 && "hidden"
                     }`}
-                    disabled={status != "pinjam"}
+                    disabled={status != 1}
                   >
                     <Text className="text-gray-50 font-semibold">Gas Kosong</Text>
                   </TouchableOpacity>

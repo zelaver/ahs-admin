@@ -1,7 +1,7 @@
 import * as SQLite from "expo-sqlite";
 
 const initDB = async () => {
-const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
+  const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
     useNewConnection: true,
   });
 
@@ -41,6 +41,11 @@ const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
       date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (transactionId) REFERENCES transactions(id)
     );
+    INSERT OR IGNORE INTO products (id, name, price, subs_price) VALUES 
+      (1, 'Aqua', 20000, 18000),
+      (3, 'Isi Ulang', 5000, 4500),
+      (4, 'Gas 12 kg', 220000, 220000
+    );
   `);
 };
 
@@ -52,8 +57,8 @@ const initHistory = async () => {
     const result = await db.execAsync(
       `
       insert into history (saldo, stock_aqua, stock_galon_kosong, stock_gas_12kg, stock_gas_kosong, stock_isi_ulang, transactionId)
-      values(0,0,0,0,0,0,null)
-      `,
+      values(0,0,0,0,0,0,null);
+      `
       // delete from transactions where id = 'trans001'
     );
     return result;
@@ -62,7 +67,7 @@ const initHistory = async () => {
       console.log(e);
     }
   }
-}
+};
 
 const getQuery = async () => {
   const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
@@ -71,7 +76,7 @@ const getQuery = async () => {
 
   try {
     // const result: any = await db.getAllAsync("SELECT * FROM products");
-    const result: any = await db.getAllAsync("SELECT * FROM history;");
+    const result: any = await db.getAllAsync("SELECT * FROM products;");
     console.log(JSON.stringify(result, null, 2));
     // console.log(result[result.length - 1])
     // console.log(typeof JSON.parse(result[0].orderList)[0].productId);
@@ -92,6 +97,7 @@ const getAllTables = async () => {
     const result: any = await db.getAllAsync("SELECT name FROM sqlite_master WHERE type='table'; ");
     console.log(result);
     // console.log(JSON.stringify(result, 0, 2));
+    // return result
   } catch (e) {
     if (e instanceof Error) {
       console.log(e);
@@ -116,10 +122,9 @@ const execQuery = async () => {
     const total_price = 100; // contoh nilai total_price
     const result = await db.execAsync(
       `
-      DELETE FROM history;
-      VACUUM;
-      
+      insert into products (name, price, subs_price) values("Gas 12 kg", 220000, 220000);
       `
+      // delete from products where id = 2
       // insert into history (saldo, stock_aqua, stock_galon_kosong, stock_gas_12kg, stock_gas_kosong, stock_isi_ulang, transactionId)
       // values(200000,0,300,0,20,0,null)
       // [orderListJson, customerId, status, total_price]
@@ -351,7 +356,10 @@ const getTransactions = async () => {
   }
 };
 
-const updateTransaction = async ({ orderList, customerId, status, total_price}: Transaction, id: number) => {
+const updateTransaction = async (
+  { orderList, customerId, status, total_price }: Transaction,
+  id: number
+) => {
   const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
     useNewConnection: true,
   });
@@ -393,5 +401,5 @@ export {
   getProducts,
   addTransaction,
   getTransactions,
-  updateTransaction
+  updateTransaction,
 };

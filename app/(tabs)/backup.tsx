@@ -1,6 +1,6 @@
 import { View, Text, SafeAreaView, TouchableOpacity, ToastAndroid } from "react-native";
 import React from "react";
-import { initDB, execQuery, getAllTables, getQuery } from "@/database/db";
+import { initDB, execQuery, getAllTables, getQuery, getProducts } from "@/database/db";
 import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system";
 import * as DocumentPicker from "expo-document-picker";
@@ -98,6 +98,11 @@ const backup = () => {
     }
   };
 
+  const debug = async () => {
+    const data = await getQuery()
+    // console.log(data)
+  }
+
   return (
     <SafeAreaView>
       <View className="main py-8">
@@ -119,6 +124,13 @@ const backup = () => {
           >
             <Text className="text-xl text-blue-800 font-semibold">Import</Text>
           </TouchableOpacity>
+          {/* <TouchableOpacity
+            className="border px-4 py-2 border-blue-800 rounded-md border-dashed"
+            activeOpacity={0.9}
+            onPress={() => debug()}
+          >
+            <Text className="text-xl text-blue-800 font-semibold">Debug</Text>
+          </TouchableOpacity> */}
         </View>
       </View>
     </SafeAreaView>

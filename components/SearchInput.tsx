@@ -33,22 +33,7 @@ const SearchInput = ({
         placeholderTextColor={"#CDCDE0"}
         onChangeText={(e) => setQuery(e)}
       />
-      <TouchableOpacity
-        onPress={() => {
-          if (!query) {
-            return Alert.alert(
-              "Missing query",
-              "Please input somthing to search results across database"
-            );
-          }
-
-          if (pathname.startsWith("/search")) {
-            router.setParams({ query });
-          } else {
-            router.push(`/search/${query}`);
-          }
-        }}
-      >
+      <TouchableOpacity>
         <Icon
           name="search-2-line"
           size={16}

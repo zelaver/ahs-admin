@@ -23,12 +23,12 @@ const Kontak = () => {
   const [phone, setPhone] = useState<string>("");
   const [address, setAddress] = useState<string>("");
   const [status, setStatus] = useState<number>(0);
-  // const [contacts, setContacts] = useState<any[]>([]);
   const { customers: contacts, fetchCustomers: fetchContacts } = useGlobalContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState(false);
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ["55%"], []);
+  const [query, setQuery] = useState<string>();
 
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
@@ -61,19 +61,7 @@ const Kontak = () => {
     []
   );
 
-  // const fetchContacts = async () => {
-  //   try {
-  //     const data: any = await getAllContacts();
-  //     // console.log(data);
-  //     setContacts(data);
-  //   } catch (error) {
-  //     console.error("Error fetching contacts:", error);
-  //   }
-  // };
-
   useEffect(() => {
-    // fetchContacts();
-
     const backAction = () => {
       bottomSheetModalRef.current?.close();
       return true;
@@ -114,15 +102,29 @@ const Kontak = () => {
         <View className="section-1 px-5 py-2">
           <Text className="text-2xl font-semibold">Kontak</Text>
         </View>
-        <View className="section-2 px-5 flex-row items-center ">
-          <SearchInput
-            placeholder="cari kontak pelanggan"
-            otherStyles="border flex-1 mr-2"
-          />
+        <View className="section-2 px-5 flex-row items-center justify-between">
+          <View className={`flex-row py-1 flex-1 px-2 mr-2 rounded-md items-center border`}>
+            <TextInput
+              className=" text-xs flex-1 font-normal mr-2 justify-center items-center"
+              value={query}
+              placeholder={"Cari Kontak"}
+              placeholderTextColor={"#CDCDE0"}
+              onChangeText={(e) => {
+                setQuery(e);
+                console.log(query);
+              }}
+            />
+            <TouchableOpacity>
+              <Icon
+                name="search-2-line"
+                size={16}
+              ></Icon>
+            </TouchableOpacity>
+          </View>
           <TouchableOpacity
             activeOpacity={0.5}
             onPress={handlePresentModalPress}
-            className="bg-white rounded-full"
+            className="bg-white rounded-full "
           >
             <Icon
               name="add-fill"
@@ -141,20 +143,27 @@ const Kontak = () => {
       >
         <View className="main pb-16">
           <View className="section-3 px-5 py-1.5 ">
-            {contacts.map(({ id, name, address, phone, isSubscriber }, i) => {
-              return (
-                <ContactItem
-                  key={id}
-                  address={address}
-                  index={i}
-                  name={name}
-                  phone={phone}
-                  isSubscriber={isSubscriber}
-                  id={id}
-                  fetchContacts={fetchContacts}
-                />
-              );
-            })}
+            {[...contacts]
+              .filter((item) =>
+                query
+                  ? item.name.toLowerCase().includes(query.toLowerCase()) ||
+                    item.address.toLowerCase().includes(query.toLowerCase())
+                  : item
+              )
+              .map(({ id, name, address, phone, isSubscriber }, i) => {
+                return (
+                  <ContactItem
+                    key={id}
+                    address={address}
+                    index={i}
+                    name={name}
+                    phone={phone}
+                    isSubscriber={isSubscriber}
+                    id={id}
+                    fetchContacts={fetchContacts}
+                  />
+                );
+              })}
           </View>
         </View>
       </ScrollView>

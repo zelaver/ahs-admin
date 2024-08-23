@@ -40,7 +40,7 @@ const Pesanan = () => {
     price: number;
     subs_price: number;
   };
-
+  const [query, setQuery] = useState<string>();
   const [status, setStatus] = useState<number>(2);
   const [aquaVal, setAquaVal] = useState(0);
   const [isiUlangVal, setIsiUlangVal] = useState(0);
@@ -239,6 +239,7 @@ const Pesanan = () => {
     setCustomerId(id);
     const getCustomer: any = await getContact(id);
     setIsSubscriber(getCustomer.isSubscriber);
+    console.log(getCustomer.isSubscriber)
     if (getCustomer.isSubscriber == 0) {
       setTotal(
         aquaVal * products[0]?.price +
@@ -261,10 +262,24 @@ const Pesanan = () => {
           <Text className="text-2xl font-semibold">Pesanan</Text>
         </View>
         <View className="section-2 px-5 flex-row items-center ">
-          <SearchInput
-            placeholder="cari pesanan"
-            otherStyles="border flex-1 mr-2"
-          />
+        <View className={`flex-row py-1 flex-1 px-2 mr-2 rounded-md items-center border`}>
+            <TextInput
+              className=" text-xs flex-1 font-normal mr-2 justify-center items-center"
+              value={query}
+              placeholder={"Cari Kontak"}
+              placeholderTextColor={"#CDCDE0"}
+              onChangeText={(e) => {
+                setQuery(e);
+                console.log(query);
+              }}
+            />
+            <TouchableOpacity>
+              <Icon
+                name="search-2-line"
+                size={16}
+              ></Icon>
+            </TouchableOpacity>
+          </View>
           <TouchableOpacity onPress={handlePresentModalPress}>
             <Icon
               name="add-fill"
@@ -361,7 +376,7 @@ const Pesanan = () => {
               <CartItem
                 name="Isi Ulang"
                 image={images.isiUlang}
-                price={products[1]?.price}
+                price={isSubscriber == 0 ? products[1]?.price : products[1]?.subs_price}
                 val={isiUlangVal}
                 setVal={setIsiUlangVal}
                 setTotal={setTotal}
@@ -371,7 +386,7 @@ const Pesanan = () => {
               <CartItem
                 name="Gas 12 kg"
                 image={images.gas12Kg}
-                price={products[2]?.price}
+                price={isSubscriber == 0 ? products[2]?.price : products[2]?.subs_price}
                 val={gasVal}
                 setVal={setGasVal}
                 setTotal={setTotal}
@@ -429,7 +444,8 @@ const Pesanan = () => {
                       if (!history.stock_aqua)
                         return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                       setAquaVal(1);
-                      setTotal(total + products[0]?.price);
+                      console.log(isSubscriber)
+                      setTotal(total + (!isSubscriber ? products[0]?.price : products[0]?.subs_price));
                     }}
                     className={`border px-4 py-2 ${aquaVal && "hidden"} ${status == 1 && "hidden"}`}
                   >
@@ -440,7 +456,8 @@ const Pesanan = () => {
                       if (!history.stock_isi_ulang)
                         return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                       setIsiUlangVal(1);
-                      setTotal(total + products[1]?.price);
+                      setTotal(total + (!isSubscriber ? products[1]?.price : products[1]?.subs_price));
+
                     }}
                     className={`border px-4 py-2 ${isiUlangVal && "hidden"} ${
                       status == 1 && "hidden"
@@ -453,7 +470,8 @@ const Pesanan = () => {
                       if (!history.stock_gas_12kg)
                         return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                       setGasVal(1);
-                      setTotal(total + products[2]?.price);
+                      setTotal(total + (!isSubscriber ? products[2]?.price : products[2]?.subs_price));
+
                     }}
                     className={`border px-4 py-2 ${gasVal && "hidden"} ${status == 1 && "hidden"}`}
                   >
