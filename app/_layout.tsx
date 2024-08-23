@@ -35,35 +35,35 @@ const TabIcon = ({ icon, color, name, focused }: any) => {
 };
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-    // Inter: require("@/assets/fonts/Inter-VariableFont_opsz,wght.ttf"),
-  });
+  // const [loaded, error] = useFonts({
+  //   SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+  //   // Inter: require("@/assets/fonts/Inter-VariableFont_opsz,wght.ttf"),
+  // });
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
+  // useEffect(() => {
+  //   if (loaded) {
+  //     SplashScreen.hideAsync();
+  //   }
+  // }, [loaded]);
 
-  if (!loaded) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator
-          size="large"
-          color="#60a5fa"
-        />
-      </View>
-    );
-  }
+  // if (!loaded) {
+  //   return (
+  //     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+  //       <ActivityIndicator
+  //         size="large"
+  //         color="#60a5fa"
+  //       />
+  //     </View>
+  //   );
+  // }
 
-  if (error) {
-    return (
-      <View className="flex-1 justify-center items-center">
-        <Text>Error kang</Text>
-      </View>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <View className="flex-1 justify-center items-center">
+  //       <Text>Error kang</Text>
+  //     </View>
+  //   );
+  // }
   return (
     <GlobalProvider>
       <GestureHandlerRootView>
