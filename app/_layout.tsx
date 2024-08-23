@@ -1,11 +1,10 @@
-import GlobalProvider, { useGlobalContext } from "@/context/GlobalProvider";
-import { getHistory, initDB, initHistory } from "@/database/db";
+import GlobalProvider from "@/context/GlobalProvider";
 import { useFonts } from "expo-font";
 import { SplashScreen } from "expo-router";
 import { useEffect } from "react";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { Tabs } from "expo-router";
-import { View, Image, Text, ActivityIndicator } from "react-native";
+import { View, Text } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Icon from "react-native-remix-icon";
 
