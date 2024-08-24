@@ -42,12 +42,13 @@ const StockItem = ({
   stocks,
   fetchStocks,
 }: StockItem) => {
-  const [price, setPrice] = useState<number | null>(0);
-  const [subPrice, setSubPrice] = useState<number | null>(0);
+  const [price, setPrice] = useState<number | null>(prodPrice);
+  const [subPrice, setSubPrice] = useState<number | null>(prodSubPrice);
+  const [stockPrice, setStockPrice] = useState<number | null>(0);
   const { fetchProducts } = useGlobalContext();
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-  const snapPoints = useMemo(() => [!id ? "40%" : "60%"], [id]);
+  const snapPoints = useMemo(() => [!id ? "60%" : "70%"], [id]);
   const handlePresentModalPress = useCallback(() => {
     setPrice(prodPrice);
     setSubPrice(prodSubPrice);
@@ -63,6 +64,7 @@ const StockItem = ({
   }, []);
 
   useEffect(() => {
+    
     const backAction = () => {
       bottomSheetModalRef.current?.close();
       return true;
@@ -97,9 +99,15 @@ const StockItem = ({
       await updateProductPrice(id, price, subPrice);
       fetchProducts();
       ToastAndroid.show("Harga Berhasil Di ubah!", ToastAndroid.SHORT);
+      return
     }
     try {
-      if (!addStock) {
+      if(!stockPrice){
+        ToastAndroid.show("isi harga pembelian/barang", ToastAndroid.SHORT);
+        return
+      }
+      if (!addStock || !stockPrice || stocks.saldo - addStock * stockPrice < 0 || !stockPrice) {
+        ToastAndroid.show("Saldo tidak cukup", ToastAndroid.SHORT);
         return;
       } else if (name == "Aqua") {
         if (stocks.stock_galon_kosong - addStock < 0)
@@ -108,6 +116,7 @@ const StockItem = ({
           ...stocks,
           stock_aqua: stock + addStock,
           stock_galon_kosong: stocks.stock_galon_kosong - addStock,
+          saldo: stocks.saldo - addStock * stockPrice,
           transactionId: null,
         };
         await addHistory({ ...newStocks });
@@ -144,6 +153,7 @@ const StockItem = ({
           ...stocks,
           stock_gas_12kg: stock + addStock,
           stock_gas_kosong: stocks.stock_gas_kosong - addStock,
+          saldo: stocks.saldo - addStock * stockPrice,
           transactionId: null,
         };
         await addHistory({ ...newStocks });
@@ -184,7 +194,11 @@ const StockItem = ({
       <View className="flex-row justify-between ">
         <View className="justify-center">
           <Text className="stok text-2xl font-semibold text-gray-700">{stock}</Text>
-          {/* {price && <Text className="harga text-2xl font-semibold text-gray-700">/{price}K</Text>} */}
+          {price ? (
+            <Text className="harga text-2xl font-semibold text-gray-700">
+              /{formatNumber(price)}
+            </Text>
+          ) : null}
         </View>
         <Image
           source={image}
@@ -209,9 +223,10 @@ const StockItem = ({
         onChange={handleSheetChanges}
         backdropComponent={renderBackdrop}
         handleComponent={(props) => Handle({ ...props, HandleText: "Tambah Stock" })}
+        enableDynamicSizing
       >
         <BottomSheetScrollView>
-          <View className="main py-3 gap-y-4">
+          <View className="main py-3">
             <View className="gambarBarang-jumlah  justify-center">
               <View className="items-center mb-2">
                 <Image
@@ -255,7 +270,28 @@ const StockItem = ({
                 </TouchableOpacity>
               </View>
             </View>
-            <View className={`px-3 ${!id && "hidden"}`}>
+            <View className={`px-3 mt-4 hidden ${(id == 1 || id == 4) && "flex"}`}>
+              <Text className="text-sm font-semibold mb-2.5 text-blue-800">
+                Harga Pembelian/barang:
+              </Text>
+              <View className="border-2 rounded-md px-3 border-blue-800">
+                <CurrencyInput
+                  // onFocus={() => handleSnapPress(1)}
+                  // onBlur={() => handleSnapPress(0)}
+                  className="text-blue-800 "
+                  placeholder="Masukan Harga"
+                  keyboardType="number-pad"
+                  value={stockPrice}
+                  onChangeValue={setStockPrice}
+                  prefix="Rp"
+                  // onChangeText={() => console.log()}
+                  precision={0}
+                  showPositiveSign
+                  // minValue={0}
+                />
+              </View>
+            </View>
+            <View className={`px-3 mt-4 ${!id && "hidden"}`}>
               <Text className="text-sm font-semibold mb-2.5">Harga customer:</Text>
               <View className="border-2 rounded-md px-3">
                 <CurrencyInput
@@ -273,7 +309,7 @@ const StockItem = ({
                 />
               </View>
             </View>
-            <View className={`px-3 ${!id && "hidden"}`}>
+            <View className={`px-3 mt-4 ${!id && "hidden"}`}>
               <Text className="text-sm font-semibold mb-2.5">Harga Warung:</Text>
               <View className="border-2 rounded-md px-3">
                 <CurrencyInput
@@ -291,7 +327,7 @@ const StockItem = ({
                 />
               </View>
             </View>
-            <View className="action-button px-3">
+            <View className="action-button px-3 mt-4">
               <TouchableOpacity
                 className={`rounded-lg ${false ? "bg-blue-900" : "bg-blue-800"}  px-3 py-2 mb-2.5`}
                 activeOpacity={0.9}

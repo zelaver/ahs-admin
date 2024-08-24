@@ -197,7 +197,7 @@ export default function Home() {
             </View>
             <View className="stok-row-3 flex-row justify-between ">
               <StockItem
-                id={products[0]?.id}
+                id={products[2]?.id}
                 otherStyles="mr-2"
                 image={images.gas12Kg}
                 name="Gas 12 kg"
