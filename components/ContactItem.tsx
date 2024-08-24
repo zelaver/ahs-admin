@@ -4,7 +4,7 @@ import Icon from "react-native-remix-icon";
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import Handle from "@/components/CustomHandle";
 import CartItem from "@/components/CartItem";
-import { deleteContact, updateContact } from "@/database/db";
+import { deleteContact, deleteTransaction, updateContact } from "@/database/db";
 import { SQLiteRunResult } from "expo-sqlite";
 
 type ContactItem = {
@@ -114,7 +114,7 @@ const ContactItem = ({
           {
             text: "hapus",
             onPress: async () => {
-              await deleteContact(id);
+              await deleteTransaction(id);
               await fetchContacts();
               setIsLoading(false);
               handleClosePress();

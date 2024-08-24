@@ -10,7 +10,7 @@ npm-debug.*
 *.orig.*
 web-build/
 android
-%ProgramData%
+/%ProgramData%/
 # macOS
 .DS_Store
 

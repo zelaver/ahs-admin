@@ -385,6 +385,30 @@ const updateTransaction = async (
   }
 };
 
+const deleteTransaction = async (id: number) => {
+  const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
+    useNewConnection: true,
+  });
+  try {
+    // orderList
+    // customerId
+    // status
+    // total_price
+    const result = await db.runAsync(
+      `
+      delete from transactions where id = ?
+      `,
+      [id]
+      // delete from transactions where id = 'trans001'
+    );
+    return result;
+  } catch (e) {
+    if (e instanceof Error) {
+      console.log("error di backend", e);
+    }
+  }
+};
+
 const updateProductPrice = async (id: number, price: number, subs_price: number) => {
   const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
     useNewConnection: true,
@@ -424,5 +448,6 @@ export {
   addTransaction,
   getTransactions,
   updateTransaction,
+  deleteTransaction,
   updateProductPrice,
 };

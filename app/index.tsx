@@ -10,6 +10,7 @@ import {
   ToastAndroid,
   TouchableOpacity,
   View,
+  Keyboard
 } from "react-native";
 import Icon from "react-native-remix-icon";
 import images from "@/constants/images";
@@ -56,7 +57,20 @@ export default function Home() {
 
     const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
 
-    return () => backHandler.remove();
+    const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+      bottomSheetModalRef.current?.snapToIndex(1)
+    });
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+      bottomSheetModalRef.current?.snapToIndex(0)
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+      backHandler.remove()
+    };
+
+
   }, []);
 
   const renderBackdrop = useCallback(

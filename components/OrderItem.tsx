@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, ToastAndroid } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, ToastAndroid, Alert } from "react-native";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Icon from "react-native-remix-icon";
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
@@ -7,6 +7,7 @@ import CartItem from "@/components/CartItem";
 import { useGlobalContext } from "@/context/GlobalProvider";
 import {
   addHistory,
+  deleteTransaction,
   getAllContacts,
   getContact,
   getProducts,
@@ -43,11 +44,17 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
   // const [customers, setCustomers] = useState<any[]>([]);
   const [customerId, setCustomerId] = useState(curCustomerId);
   const [total, setTotal] = useState<number>(total_price);
-  const { lastHistory: history, setHistory, fetchHistory, fetchTransactions, customers, products, } = useGlobalContext();
+  const {
+    lastHistory: history,
+    setHistory,
+    fetchHistory,
+    fetchTransactions,
+    customers,
+    products,
+  } = useGlobalContext();
 
   const [customerName, setCustomerName] = useState();
   const [customerType, setCustomerType] = useState();
-
 
   const fetchCustomer = async () => {
     try {
@@ -87,7 +94,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
   const handleSheetChanges = useCallback(
     (index: number) => {
       // console.log("handleSheetChanges", index);
-      if(index == 0) {
+      if (index == 0) {
         fetchOrderList();
       }
     },
@@ -189,10 +196,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
         saldo: history.saldo - total_price,
         stock_aqua: history.stock_aqua + parsedList[0].sum,
         stock_galon_kosong:
-          history.stock_galon_kosong -
-          galonKosongVal +
-          parsedList[0].sum +
-          parsedList[1].sum,
+          history.stock_galon_kosong - galonKosongVal + parsedList[0].sum + parsedList[1].sum,
         stock_gas_12kg: history.stock_gas_12kg + parsedList[2].sum,
         stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + parsedList[3].sum,
         stock_isi_ulang: history.stock_isi_ulang + parsedList[1].sum,
@@ -237,10 +241,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
         saldo: history.saldo - total_price,
         stock_aqua: history.stock_aqua + parsedList[0].sum,
         stock_galon_kosong:
-          history.stock_galon_kosong -
-          galonKosongVal +
-          parsedList[0].sum +
-          parsedList[1].sum,
+          history.stock_galon_kosong - galonKosongVal + parsedList[0].sum + parsedList[1].sum,
         stock_gas_12kg: history.stock_gas_12kg + parsedList[2].sum,
         stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + parsedList[3].sum,
         stock_isi_ulang: history.stock_isi_ulang + parsedList[1].sum,
@@ -267,14 +268,10 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
     if (curStatus == "pinjam" && status == "lunas") {
       await addHistory({
         saldo: history.saldo + total,
-        stock_aqua: history.stock_aqua - aquaVal ,
-        stock_galon_kosong:
-          history.stock_galon_kosong +
-          parsedList[3].sum +
-          aquaVal +
-          isiUlangVal,
-        stock_gas_12kg: history.stock_gas_12kg - gasVal ,
-        stock_gas_kosong: history.stock_gas_kosong + parsedList[4].sum + gasVal ,
+        stock_aqua: history.stock_aqua - aquaVal,
+        stock_galon_kosong: history.stock_galon_kosong + parsedList[3].sum + aquaVal + isiUlangVal,
+        stock_gas_12kg: history.stock_gas_12kg - gasVal,
+        stock_gas_kosong: history.stock_gas_kosong + parsedList[4].sum + gasVal,
         stock_isi_ulang: history.stock_isi_ulang - isiUlangVal,
         transactionId: id,
       });
@@ -283,30 +280,23 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
     if (curStatus == "pinjam" && status == "hutang") {
       await addHistory({
         saldo: history.saldo - total,
-        stock_aqua: history.stock_aqua - aquaVal ,
-        stock_galon_kosong:
-          history.stock_galon_kosong +
-          parsedList[3].sum +
-          aquaVal +
-          isiUlangVal,
-        stock_gas_12kg: history.stock_gas_12kg - gasVal ,
-        stock_gas_kosong: history.stock_gas_kosong + parsedList[4].sum + gasVal ,
+        stock_aqua: history.stock_aqua - aquaVal,
+        stock_galon_kosong: history.stock_galon_kosong + parsedList[3].sum + aquaVal + isiUlangVal,
+        stock_gas_12kg: history.stock_gas_12kg - gasVal,
+        stock_gas_kosong: history.stock_gas_kosong + parsedList[4].sum + gasVal,
         stock_isi_ulang: history.stock_isi_ulang - isiUlangVal,
         transactionId: id,
       });
     }
-    
+
     if (curStatus == "pinjam" && status == "pinjam") {
       await addHistory({
         saldo: history.saldo,
         stock_aqua: history.stock_aqua,
         stock_galon_kosong:
-          history.stock_galon_kosong -
-          (galonKosongVal - parsedList[3].sum) +
-          aquaVal +
-          isiUlangVal,
-        stock_gas_12kg: history.stock_gas_12kg ,
-        stock_gas_kosong: history.stock_gas_kosong - (gasKosongVal - parsedList[4].sum) + gasVal ,
+          history.stock_galon_kosong - (galonKosongVal - parsedList[3].sum) + aquaVal + isiUlangVal,
+        stock_gas_12kg: history.stock_gas_12kg,
+        stock_gas_kosong: history.stock_gas_kosong - (gasKosongVal - parsedList[4].sum) + gasVal,
         stock_isi_ulang: history.stock_isi_ulang,
         transactionId: id,
       });
@@ -316,12 +306,65 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
     handleClosePress();
   };
 
+  const handleDelete = async () => {
+    let parsedList = JSON.parse(orderList);
+    console.log("================");
+    console.log("id", id);
+    console.log("aqua:", parsedList[0].sum);
+    console.log("isi ulang:", parsedList[1].sum);
+    console.log("gas 12 kg:", parsedList[2].sum);
+    console.log("galon kosong:", parsedList[3].sum);
+    console.log("gas kosong:", parsedList[4].sum);
+    console.log("total_price:", total_price);
+    console.log("status:", curStatus);
+    Alert.alert(
+      "Yakin ingin menghapus?",
+      "gak di balikin loh",
+      [
+        {
+          text: "batal",
+          onPress: () => false,
+          style: "cancel",
+        },
+        {
+          text: "hapus",
+          onPress: async () => {
+            await deleteTransaction(id);
+            await addHistory({
+              saldo: history.saldo - (curStatus == "hutang" ? 0 : total_price),
+              stock_aqua: history.stock_aqua + parsedList[0].sum,
+              stock_galon_kosong:
+                history.stock_galon_kosong -
+                (curStatus == "pinjam" ? -parsedList[3].sum : parsedList[3].sum) -
+                parsedList[0].sum -
+                parsedList[1].sum,
+              stock_gas_12kg: history.stock_gas_12kg + parsedList[2].sum,
+              stock_gas_kosong:
+                history.stock_gas_kosong -
+                (curStatus == "pinjam" ? -parsedList[4].sum : parsedList[4].sum) -
+                parsedList[2].sum,
+              stock_isi_ulang: history.stock_isi_ulang + parsedList[1].sum,
+              transactionId: null,
+            });
+            await fetchHistory();
+            await fetchTransactions();
+            handleClosePress();
+          },
+        },
+      ],
+      {
+        cancelable: true,
+        onDismiss() {},
+      }
+    );
+  };
+
   const handleSelected = async (id: number) => {
     // console.log(customerType)
     setCustomerId(id);
     const getCustomer: any = await getContact(id);
     setCustomerType(getCustomer.isSubscriber);
-    console.log(getCustomer.isSubscriber)
+    // console.log(getCustomer.isSubscriber)
     if (getCustomer.isSubscriber == 0) {
       setTotal(
         aquaVal * products[0]?.price +
@@ -402,7 +445,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                     }),
                   ]}
                   setSelected={(val: any) => {
-                    handleSelected(val)
+                    handleSelected(val);
                   }}
                   defaultOption={{ key: curCustomerId, value: customerName }}
                   // setSelected={val => console.log(val)}
@@ -413,7 +456,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
               </View>
             </View>
             <View className="cart border-t border-b py-4">
-            <CartItem
+              <CartItem
                 name="Aqua"
                 image={images.aqua}
                 price={customerType == 0 ? products[0]?.price : products[0]?.subs_price}
@@ -494,8 +537,10 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                       if (!history.stock_aqua)
                         return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                       setAquaVal(1);
-                      console.log(customerType)
-                      setTotal(total + (!customerType ? products[0]?.price : products[0]?.subs_price));
+                      console.log(customerType);
+                      setTotal(
+                        total + (!customerType ? products[0]?.price : products[0]?.subs_price)
+                      );
                     }}
                     className={`border px-4 py-2 ${aquaVal && "hidden"} ${status == 1 && "hidden"}`}
                   >
@@ -506,8 +551,9 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                       if (!history.stock_isi_ulang)
                         return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                       setIsiUlangVal(1);
-                      setTotal(total + (!customerType ? products[1]?.price : products[1]?.subs_price));
-
+                      setTotal(
+                        total + (!customerType ? products[1]?.price : products[1]?.subs_price)
+                      );
                     }}
                     className={`border px-4 py-2 ${isiUlangVal && "hidden"} ${
                       status == 1 && "hidden"
@@ -520,8 +566,9 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                       if (!history.stock_gas_12kg)
                         return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                       setGasVal(1);
-                      setTotal(total + (!customerType ? products[2]?.price : products[2]?.subs_price));
-
+                      setTotal(
+                        total + (!customerType ? products[2]?.price : products[2]?.subs_price)
+                      );
                     }}
                     className={`border px-4 py-2 ${gasVal && "hidden"} ${status == 1 && "hidden"}`}
                   >
@@ -608,9 +655,9 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => {
-                    if(curStatus == "pinjam"){
+                    if (curStatus == "pinjam") {
                       setStatus("lunas");
-                      return
+                      return;
                     }
                     setStatus("lunas");
                     setGalonKosongVal(0);
@@ -640,6 +687,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
               <TouchableOpacity
                 className="rounded-lg bg-red-500 px-3 py-2 border"
                 activeOpacity={0.9}
+                onPress={() => handleDelete()}
               >
                 <Text className="text-center text-gray-100 text-xs font-semibold">Hapus</Text>
               </TouchableOpacity>
