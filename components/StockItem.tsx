@@ -64,7 +64,9 @@ const StockItem = ({
   }, []);
 
   useEffect(() => {
-    
+    setPrice(prodPrice);
+    setSubPrice(prodSubPrice);
+    setAddStock(0);
     const backAction = () => {
       bottomSheetModalRef.current?.close();
       return true;
@@ -73,7 +75,7 @@ const StockItem = ({
     const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
 
     return () => backHandler.remove();
-  }, []);
+  }, [prodPrice, prodSubPrice]);
 
   const renderBackdrop = useCallback(
     (props: any) => (

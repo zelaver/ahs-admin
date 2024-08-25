@@ -1,6 +1,6 @@
 import { View, Text, SafeAreaView, TouchableOpacity, ToastAndroid } from "react-native";
 import React from "react";
-import { getQuery,  } from "@/database/db";
+import { getQuery } from "@/database/db";
 import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system";
 import * as DocumentPicker from "expo-document-picker";
@@ -9,7 +9,8 @@ import JSZip from "jszip";
 import { useGlobalContext } from "@/context/GlobalProvider";
 
 const backup = () => {
-  const { fetchHistory, fetchCustomers, fetchTransactions, fetchProducts } = useGlobalContext();
+  const { history, fetchHistory, fetchCustomers, fetchTransactions, fetchProducts } =
+    useGlobalContext();
   const exportDatabase = async () => {
     try {
       const dir = FileSystem.documentDirectory + "SQLite/";
@@ -89,7 +90,7 @@ const backup = () => {
         fetchHistory();
         fetchCustomers();
         fetchTransactions();
-        fetchProducts()
+        fetchProducts();
       } else {
         console.log("No file selected.");
         ToastAndroid.show("file tidak terpilih!", ToastAndroid.SHORT);
@@ -100,9 +101,32 @@ const backup = () => {
   };
 
   const debug = async () => {
-    const data = await getQuery()
-    // console.log(data)
-  }
+    // const data = await getQuery()
+    // console.log(history);
+
+    const saldoTerakhirPerTanggal = history.reduce((acc, current) => {
+      const dateOnly = current.date.split(" ")[0]; // Pisahkan tanggal dari waktu
+      if (!acc.has(dateOnly)) {
+        acc.set(dateOnly, current); // Tambahkan entri pertama untuk tanggal ini
+      } else {
+        // Update jika entri ini lebih baru
+        const existingEntry = acc.get(dateOnly);
+        if (new Date(current.date) > new Date(existingEntry.date)) {
+          acc.set(dateOnly, current);
+        }
+      }
+      return acc;
+    }, new Map());
+    // @ts-ignore
+    const saldoTerakhir = Array.from(saldoTerakhirPerTanggal.values()).map((entry) => ({
+      // @ts-ignore
+      date: entry.date.split(" ")[0],
+      // @ts-ignore
+      saldo: entry.saldo,
+    }));
+
+    console.log(saldoTerakhir);
+  };
 
   return (
     <SafeAreaView>

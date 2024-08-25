@@ -476,7 +476,7 @@ const Pesanan = () => {
                   activeOpacity={1}
                 >
                   <Text
-                    className={`px-3 py-1 border font-semibold rounded-md w-[67px] text-center text-xs border-red-500 
+                    className={`px-3 py-1 border font-semibold rounded-md w-min-[67px] text-center text-xs border-red-500 
                     ${!status ? "text-white bg-red-500" : "text-red-500"} `}
                   >
                     Hutang
@@ -493,7 +493,7 @@ const Pesanan = () => {
                   activeOpacity={1}
                 >
                   <Text
-                    className={`px-3 py-1 border rounded-md w-[67px] text-center text-xs border-yellow-500 font-semibold
+                    className={`px-3 py-1 border rounded-md w-min-[67px] text-center text-xs border-yellow-500 font-semibold
                     ${status == 1 ? "text-white bg-yellow-500" : "text-yellow-500"}`}
                   >
                     Pinjam
@@ -508,7 +508,7 @@ const Pesanan = () => {
                   activeOpacity={1}
                 >
                   <Text
-                    className={`px-3 py-1 border rounded-md w-[67px] text-center text-xs border-green-500 font-semibold
+                    className={`px-3 py-1 border rounded-md w-min-[67px] text-center text-xs border-green-500 font-semibold
                     ${status == 2 ? "text-white bg-green-500" : "text-green-500"}`}
                   >
                     Lunas

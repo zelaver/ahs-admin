@@ -11,11 +11,12 @@ import {
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Icon from "react-native-remix-icon";
 import { useGlobalContext } from "@/context/GlobalProvider";
+import { LineChart, LineChartPropsType } from "react-native-gifted-charts";
 
 const Histori = () => {
   const { history, fetchHistory } = useGlobalContext();
   const [ascending, setAscending] = useState(false);
-
+  const [chartData, setChartData] = useState();
   const sort = (a, b) => {
     if (ascending) {
       return b - a;
@@ -30,18 +31,50 @@ const Histori = () => {
     setRefreshing(false);
   };
 
-  // const scrollViewRef = useRef(null);
-  // useEffect(() => {
-  //   // Scroll to bottom when component is mounted
-  //   if (scrollViewRef.current) {
-  //     scrollViewRef.current.scrollToEnd({ animated: true });
-  //   }
-  // }, []);
+  const formatData = (data) => {
+    const saldoTerakhirPerTanggal = data.reduce((acc, current) => {
+      const dateOnly = current.date.split(" ")[0]; // Pisahkan tanggal dari waktu
+      if (!acc.has(dateOnly)) {
+        acc.set(dateOnly, current); // Tambahkan entri pertama untuk tanggal ini
+      } else {
+        // Update jika entri ini lebih baru
+        const existingEntry = acc.get(dateOnly);
+        if (new Date(current.date) > new Date(existingEntry.date)) {
+          acc.set(dateOnly, current);
+        }
+      }
+      return acc;
+    }, new Map());
+    // @ts-ignore
+    const saldoTerakhir = Array.from(saldoTerakhirPerTanggal.values()).map((entry) => ({
+      // @ts-ignore
+      date: entry.date.split(" ")[0],
+      // @ts-ignore
+      saldo: entry.saldo,
+    }));
 
+    const formattedData = saldoTerakhir.map((item) => ({
+      value: item.saldo / 1000, // Convert saldo to thousands
+      saldo: item.saldo.toLocaleString("id-ID"), // Format saldo with thousands separator
+      date: new Date(item.date)
+        .toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        })
+        .replace(/\./g, ""),
+    }));
+
+    return formattedData;
+  };
+
+  useEffect(() => {
+    setChartData(formatData(history));
+  }, [history]);
   return (
     <SafeAreaView className="py-8">
       <View className="section-1 px-5 py-2 flex-row items-center">
-        <Text className="text-2xl font-semibold mr-3">Histori</Text>
+        <Text className="text-2xl font-bold mr-3">Histori</Text>
         <TouchableOpacity onPress={() => setAscending(!ascending)}>
           <Icon
             name={`${ascending ? "sort-desc" : "sort-asc"}`}
@@ -50,8 +83,14 @@ const Histori = () => {
         </TouchableOpacity>
       </View>
       <View>
-        <View className="main ">
-          <View className="section-2 px-5 py-5">
+        <ScrollView
+          className="main "
+          nestedScrollEnabled
+        >
+          <View className="section-2 px-5 ">
+            <View className="section-1 py-2 flex-row items-center">
+              <Text className="text-lg font-semibold mr-3">Stock</Text>
+            </View>
             <View className="header p-2 bg-blue-800 rounded-tl-md rounded-tr-md">
               <View className="flex-row items-center">
                 <Text className="text-sm text-white flex-1 font-semibold mr-2.5">Aqua</Text>
@@ -62,8 +101,9 @@ const Histori = () => {
               </View>
             </View>
             <ScrollView
+              nestedScrollEnabled
               // ref={scrollViewRef}
-              className="h-96"
+              className="h-96 border-b border-blue-800"
               refreshControl={
                 <RefreshControl
                   refreshing={refreshing}
@@ -81,15 +121,92 @@ const Histori = () => {
                   />
                 ))}
             </ScrollView>
-            {/* <RowData /> */}
-            {/* <TouchableOpacity
-              // onPress={() => console.log(JSON.stringify(history, null, 2))}
-              onPress={() => console.log(ascending)}
-            >
-              <Text>Debug history</Text>
-            </TouchableOpacity> */}
+
+            <View className="pb-36 pt-10">
+              <View className="section-1 py-2 flex-row items-center">
+                <Text className="text-lg font-semibold mr-3">Saldo Harian</Text>
+              </View>
+              <LineChart
+                areaChart
+                data={chartData}
+                rotateLabel
+                width={300}
+                hideDataPoints
+                spacing={10}
+                color="#1943b4"
+                thickness={2}
+                startFillColor="rgba(25, 67, 180,0.3)"
+                endFillColor="rgba(25, 67, 180,0.01)"
+                startOpacity={0.9}
+                endOpacity={0.2}
+                initialSpacing={40}
+                noOfSections={6}
+                maxValue={600}
+                yAxisColor="white"
+                yAxisThickness={0}
+                rulesType="solid"
+                rulesColor="gray"
+                yAxisTextStyle={{ color: "gray" }}
+                yAxisSide="right"
+                xAxisColor="lightgray"
+                pointerConfig={{
+                  pointerStripHeight: 160,
+                  pointerStripColor: "#0481c6",
+                  pointerStripWidth: 2,
+                  pointerColor: "#0481c6",
+                  radius: 6,
+                  pointerLabelWidth: 100,
+                  pointerLabelHeight: 90,
+                  activatePointersOnLongPress: true,
+                  autoAdjustPointerLabelPosition: false,
+                  pointerLabelComponent: (items) => {
+                    return (
+                      <View
+                        style={{
+                          height: 90,
+                          width: 100,
+                          justifyContent: "center",
+                          marginTop: -20,
+                          zIndex: 999,
+                          marginLeft: -40,
+                          display: items[0].value || items[0].value == 0 ? "flex" : "none",
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "black",
+                            fontSize: 14,
+                            marginBottom: 6,
+                            marginTop: 6,
+                            textAlign: "center",
+                            fontWeight: "bold",
+                            minWidth: 120,
+                          }}
+                        >
+                          {items[0].date}
+                        </Text>
+
+                        <View
+                          style={{
+                            paddingHorizontal: 14,
+                            paddingVertical: 6,
+                            borderRadius: 16,
+                            backgroundColor: "black",
+                            minWidth: 120,
+                          }}
+                        >
+                          <Text style={{ fontWeight: "bold", textAlign: "center", color: "white" }}>
+                            {"Rp" + items[0].saldo + ",00"}
+                          </Text>
+                        </View>
+                      </View>
+                    );
+                  },
+                }}
+              />
+            </View>
           </View>
-        </View>
+        </ScrollView>
       </View>
     </SafeAreaView>
   );
@@ -100,7 +217,7 @@ const RowData = ({ id, data }) => {
   // if()
   const dataRowBefore = data.find((item) => item.id == id - 1);
   return (
-    <View className="row-data px-2 py-3">
+    <View className="row-data px-2 py-2.5 ">
       <View className="flex-row">
         <View className="flex-1 mr-2.5 flex-row ">
           <Text className=" text-gray-700 text-sm mr-2">{dataRow.stock_aqua}</Text>
