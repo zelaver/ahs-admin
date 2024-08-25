@@ -46,7 +46,6 @@ const Pesanan = () => {
     customers,
     products,
   } = useGlobalContext();
-
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ["90%"], []);
   const handlePresentModalPress = useCallback(() => {
@@ -155,8 +154,8 @@ const Pesanan = () => {
       stock_isi_ulang: history.stock_isi_ulang - isiUlangVal,
       transactionId: transactionId,
     });
-    fetchHistory();
-    fetchTransactions();
+    await fetchHistory();
+    await fetchTransactions();
     handleClosePress();
     // console.log("id customer:", customerId);
     // console.log("status:", statusString);
@@ -192,7 +191,6 @@ const Pesanan = () => {
     }
   };
 
-  
 
   return (
     <SafeAreaView className="py-8">
@@ -237,30 +235,6 @@ const Pesanan = () => {
       >
         <View className="main pb-16">
           <View className="section-3 px-5 py-3 ">
-            {/* <View className="pesanan-item border rounded-lg p-2.5 flex-row justify-between items-center mb-4">
-              <View className="flex-row">
-                <View className="bg-gray-200 rounded-full w-10 h-10 items-center justify-center">
-                  <Icon
-                    name="user-3-line"
-                    size={24}
-                  ></Icon>
-                </View>
-                <View className="ml-4">
-                  <Text className="text-sm font-medium">AG 5</Text>
-                  <Text className="text-xs font-normal text-gray-400">2 juli, 2024</Text>
-                </View>
-              </View>
-              <View className="flex-row items-center">
-                <Text className="bg-red-500 text-gray-50 text-xs font-semibold px-3 py-1 rounded-md mr-2">
-                  Hutang
-                </Text>
-                <Icon
-                  name="pencil-line"
-                  size={16}
-                ></Icon>
-              </View>
-            </View> */}
-            {/* <OrderItem /> */}
             {transactions.map((item: any, i: any) => (
               <OrderItem
                 key={i}

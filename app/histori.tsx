@@ -16,7 +16,7 @@ import { LineChart, LineChartPropsType } from "react-native-gifted-charts";
 const Histori = () => {
   const { history, fetchHistory } = useGlobalContext();
   const [ascending, setAscending] = useState(false);
-  const [chartData, setChartData] = useState();
+  const [chartData, setChartData] = useState([]);
   const sort = (a, b) => {
     if (ascending) {
       return b - a;
@@ -128,6 +128,9 @@ const Histori = () => {
               </View>
               <LineChart
                 areaChart
+                // isAnimated
+                curved
+                // animationDuration={2000}
                 data={chartData}
                 rotateLabel
                 width={300}
@@ -141,7 +144,7 @@ const Histori = () => {
                 endOpacity={0.2}
                 initialSpacing={40}
                 noOfSections={6}
-                maxValue={600}
+                maxValue={chartData[chartData.length - 1].value + 600}
                 yAxisColor="white"
                 yAxisThickness={0}
                 rulesType="solid"
@@ -204,6 +207,11 @@ const Histori = () => {
                   },
                 }}
               />
+            {/* <TouchableOpacity
+              onPress={() => console.log(chartData[chartData.length - 1].value)}
+            >
+              <Text>test</Text>
+            </TouchableOpacity> */}
             </View>
           </View>
         </ScrollView>

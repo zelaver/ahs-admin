@@ -149,13 +149,13 @@ const backup = () => {
           >
             <Text className="text-xl text-blue-800 font-semibold">Import</Text>
           </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             className="border px-4 py-2 border-blue-800 rounded-md border-dashed"
             activeOpacity={0.9}
             onPress={() => debug()}
           >
             <Text className="text-xl text-blue-800 font-semibold">Debug</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
     </SafeAreaView>
