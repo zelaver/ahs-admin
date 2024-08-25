@@ -9,6 +9,7 @@ import {
   Easing,
   ToastAndroid,
   RefreshControl,
+  ActivityIndicator,
 } from "react-native";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import SearchInput from "@/components/SearchInput";
@@ -191,6 +192,7 @@ const Pesanan = () => {
     }
   };
 
+  const [isLoading, setIsLoading] = useState(false)
 
   return (
     <SafeAreaView className="py-8">
@@ -492,20 +494,24 @@ const Pesanan = () => {
             </View>
             <View className="action-button px-3">
               <TouchableOpacity
-                className="rounded-lg bg-blue-800 px-3 py-2 mb-2.5"
+                className={`rounded-lg px-3 py-2 mb-2.5 ${isLoading ? "bg-blue-900" : "bg-blue-800"}`}
                 activeOpacity={0.9}
-                onPress={() => {
-                  handleSave();
+                disabled={isLoading}
+                onPress={async () => {
+                  setIsLoading(true)
+                  await handleSave();
+                  setIsLoading(false)
                 }}
               >
-                <Text className="text-center text-gray-100 text-xs font-semibold">Simpan</Text>
+                <ActivityIndicator size={"small"} color={"#ffff"} className={`${!isLoading && "hidden"}`}/>
+                <Text className={`text-center text-gray-100 text-xs font-semibold ${isLoading && "hidden"}`}>Simpan</Text>
               </TouchableOpacity>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 className="rounded-lg bg-red-500 px-3 py-2 border"
                 activeOpacity={0.9}
               >
                 <Text className="text-center text-gray-100 text-xs font-semibold">Hapus</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
           </View>
         </BottomSheetScrollView>

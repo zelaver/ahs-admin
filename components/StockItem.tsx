@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   BackHandler,
   Image,
   Platform,
@@ -90,6 +91,7 @@ const StockItem = ({
   );
 
   const [addStock, setAddStock] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSave = async () => {
     // console.log(name)
@@ -99,14 +101,14 @@ const StockItem = ({
     }
     if (id && (price != prodPrice || subPrice != prodSubPrice)) {
       await updateProductPrice(id, price, subPrice);
-      fetchProducts();
+      await fetchProducts();
       ToastAndroid.show("Harga Berhasil Di ubah!", ToastAndroid.SHORT);
-      return
+      return;
     }
     try {
-      if(!stockPrice){
+      if (!stockPrice) {
         ToastAndroid.show("isi harga pembelian/barang", ToastAndroid.SHORT);
-        return
+        return;
       }
       if (!addStock || !stockPrice || stocks.saldo - addStock * stockPrice < 0 || !stockPrice) {
         ToastAndroid.show("Saldo tidak cukup", ToastAndroid.SHORT);
@@ -331,12 +333,29 @@ const StockItem = ({
             </View>
             <View className="action-button px-3 mt-4">
               <TouchableOpacity
-                className={`rounded-lg ${false ? "bg-blue-900" : "bg-blue-800"}  px-3 py-2 mb-2.5`}
+                className={`rounded-lg ${
+                  isLoading ? "bg-blue-900" : "bg-blue-800"
+                }  px-3 py-2 mb-2.5`}
                 activeOpacity={0.9}
-                onPress={handleSave}
+                onPress={async () => {
+                  setIsLoading(true);
+                  await handleSave();
+                  setIsLoading(true);
+                }}
                 // disabled={isLoading}
               >
-                <Text className="text-center text-gray-100 text-xs font-semibold">Simpan</Text>
+                <ActivityIndicator
+                  size={"small"}
+                  color={"#ffff"}
+                  className={`${!isLoading && "hidden"}`}
+                />
+                <Text
+                  className={`text-center text-gray-100 text-xs font-semibold ${
+                    isLoading && "hidden"
+                  }`}
+                >
+                  Simpan
+                </Text>
               </TouchableOpacity>
             </View>
           </View>

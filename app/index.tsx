@@ -10,7 +10,8 @@ import {
   ToastAndroid,
   TouchableOpacity,
   View,
-  Keyboard
+  Keyboard,
+  ActivityIndicator
 } from "react-native";
 import Icon from "react-native-remix-icon";
 import images from "@/constants/images";
@@ -57,20 +58,18 @@ export default function Home() {
 
     const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
 
-    const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
-      bottomSheetModalRef.current?.snapToIndex(1)
+    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
+      bottomSheetModalRef.current?.snapToIndex(1);
     });
-    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
-      bottomSheetModalRef.current?.snapToIndex(0)
+    const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
+      bottomSheetModalRef.current?.snapToIndex(0);
     });
 
     return () => {
       showSubscription.remove();
       hideSubscription.remove();
-      backHandler.remove()
+      backHandler.remove();
     };
-
-
   }, []);
 
   const renderBackdrop = useCallback(
@@ -92,23 +91,25 @@ export default function Home() {
     setHistory: setStocks,
     products,
     fetchHistory: fetchStocks,
-    isLoading
   } = useGlobalContext();
   const [keteranganSaldo, setkKteranganSaldo] = useState();
   const [saldoInput, setSaldoInput] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
- 
   if (debugMode) {
     return <Redirect href={"/(tabs)/backup"} />;
   }
 
+  const [isLoading, setIsLoading] = useState(false);
   const handleSave = async () => {
     if (!saldoInput) return ToastAndroid.show("Input saldo tidak boleh kosong", ToastAndroid.SHORT);
-    if (stocks?.saldo + saldoInput < 0)
+    if (stocks?.saldo + saldoInput < 0) {
       return ToastAndroid.show("Saldo anda tidak cukup", ToastAndroid.SHORT);
+    }
+    setIsLoading(true)
     await addHistory({ ...stocks, saldo: stocks?.saldo + saldoInput });
     await fetchStocks();
+    setIsLoading(false)
     handleClosePress();
   };
 
@@ -256,7 +257,7 @@ export default function Home() {
                   value={saldoInput}
                   onChangeValue={setSaldoInput}
                   prefix="Rp"
-                  onChangeText={() => console.log(saldoInput)}
+                  // onChangeText={() => console.log(saldoInput)}
                   precision={0}
                   showPositiveSign
                   // minValue={0}
@@ -266,11 +267,13 @@ export default function Home() {
 
             <View className="action-button px-3">
               <TouchableOpacity
-                className={`rounded-lg ${false ? "bg-blue-900" : "bg-blue-800"}  px-3 py-2 mb-2.5`}
+                className={`rounded-lg ${isLoading ? "bg-blue-900" : "bg-blue-800"}  px-3 py-2 mb-2.5`}
                 activeOpacity={0.9}
                 onPress={handleSave}
+                disabled={isLoading}
               >
-                <Text className="text-center text-gray-100 text-xs font-semibold">Simpan</Text>
+                <ActivityIndicator size={"small"} color={"#ffff"} className={`${!isLoading && "hidden"}`}/>
+                <Text className={`text-center text-gray-100 text-xs font-semibold ${isLoading && "hidden"}`}>Simpan</Text>
               </TouchableOpacity>
             </View>
           </View>

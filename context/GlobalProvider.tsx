@@ -1,4 +1,11 @@
-import { getAllContacts, getHistory, getProducts, getTransactions, initDB, initHistory } from "@/database/db";
+import {
+  getAllContacts,
+  getHistory,
+  getProducts,
+  getTransactions,
+  initDB,
+  initHistory,
+} from "@/database/db";
 import { createContext, useContext, useEffect, useState } from "react";
 
 type context = {
@@ -68,7 +75,6 @@ const GlobalProvider = ({ children }: any) => {
     } catch (error) {
       console.error("Error fetching contacts:", error);
     }
-    
   };
 
   const fetchTransactions = async () => {
@@ -94,12 +100,16 @@ const GlobalProvider = ({ children }: any) => {
   };
 
   useEffect(() => {
-    initDatabase();
-    fetchTransactions();
-    fetchHistory();
-    fetchCustomers();
-    fetchProducts();
-    setIsLoading(false)
+    const loadEverything = async () => {
+      await initDatabase();
+      await fetchTransactions();
+      await fetchHistory();
+      await fetchCustomers();
+      await fetchProducts();
+      setIsLoading(false);
+    };
+
+    loadEverything();
   }, []);
 
   return (
@@ -115,7 +125,7 @@ const GlobalProvider = ({ children }: any) => {
         fetchHistory,
         fetchTransactions,
         fetchCustomers,
-        fetchProducts
+        fetchProducts,
       }}
     >
       {children}

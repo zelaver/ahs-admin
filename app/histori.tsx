@@ -13,10 +13,15 @@ import Icon from "react-native-remix-icon";
 import { useGlobalContext } from "@/context/GlobalProvider";
 import { LineChart, LineChartPropsType } from "react-native-gifted-charts";
 
+type ChartData = {
+  value: number
+  date: string
+  saldo: string
+}
+
 const Histori = () => {
   const { history, fetchHistory } = useGlobalContext();
   const [ascending, setAscending] = useState(false);
-  const [chartData, setChartData] = useState([]);
   const sort = (a, b) => {
     if (ascending) {
       return b - a;
@@ -67,6 +72,9 @@ const Histori = () => {
 
     return formattedData;
   };
+
+  const [chartData, setChartData] = useState<ChartData[]>(formatData(history));
+
 
   useEffect(() => {
     setChartData(formatData(history));
@@ -148,7 +156,7 @@ const Histori = () => {
                 yAxisColor="white"
                 yAxisThickness={0}
                 rulesType="solid"
-                rulesColor="gray"
+                rulesColor="rgba(25, 67, 180,0.3)"
                 yAxisTextStyle={{ color: "gray" }}
                 yAxisSide="right"
                 xAxisColor="lightgray"
@@ -194,7 +202,7 @@ const Histori = () => {
                             paddingHorizontal: 14,
                             paddingVertical: 6,
                             borderRadius: 16,
-                            backgroundColor: "black",
+                            backgroundColor: "#1e1e1e",
                             minWidth: 120,
                           }}
                         >

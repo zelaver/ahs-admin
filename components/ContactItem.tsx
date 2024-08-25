@@ -1,4 +1,12 @@
-import { View, Text, TextInput, TouchableOpacity, ToastAndroid, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ToastAndroid,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Icon from "react-native-remix-icon";
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
@@ -268,7 +276,18 @@ const ContactItem = ({
                 onPress={handleSave}
                 disabled={isLoading}
               >
-                <Text className="text-center text-gray-100 text-xs font-semibold">Simpan</Text>
+                <ActivityIndicator
+                  size={"small"}
+                  color={"#ffff"}
+                  className={`${!isLoading && "hidden"}`}
+                />
+                <Text
+                  className={`text-center text-gray-100 text-xs font-semibold ${
+                    isLoading && "hidden"
+                  }`}
+                >
+                  Simpan
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 className={`rounded-lg ${isLoading ? "bg-red-600" : "bg-red-500"} px-3 py-2 border`}
@@ -276,7 +295,18 @@ const ContactItem = ({
                 onPress={handleDelete}
                 disabled={isLoading}
               >
-                <Text className="text-center text-gray-100 text-xs font-semibold">Hapus</Text>
+                <ActivityIndicator
+                  size={"small"}
+                  color={"#ffff"}
+                  className={`${!isLoading && "hidden"}`}
+                />
+                <Text
+                  className={`text-center text-gray-100 text-xs font-semibold ${
+                    isLoading && "hidden"
+                  }`}
+                >
+                  Hapus
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -285,7 +315,5 @@ const ContactItem = ({
     </View>
   );
 };
-
-
 
 export default ContactItem;

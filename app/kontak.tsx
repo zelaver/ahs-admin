@@ -7,6 +7,7 @@ import {
   BackHandler,
   ToastAndroid,
   RefreshControl,
+  ActivityIndicator,
 } from "react-native";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import SearchInput from "@/components/SearchInput";
@@ -24,7 +25,7 @@ const Kontak = () => {
   const [address, setAddress] = useState<string>("");
   const [status, setStatus] = useState<number>(0);
   const { customers: contacts, fetchCustomers: fetchContacts } = useGlobalContext();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  // const [isLoading, setIsLoading] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState(false);
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ["55%"], []);
@@ -78,10 +79,8 @@ const Kontak = () => {
       return;
     }
     try {
-      setIsLoading(true);
       await addContact({ name, phone, address, isSubscriber: status });
       await fetchContacts();
-      setIsLoading(false);
       handleClosePress();
     } catch (e) {
       if (e instanceof Error) {
@@ -95,6 +94,8 @@ const Kontak = () => {
     await fetchContacts();
     setRefreshing(false);
   };
+
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
     <SafeAreaView className="py-8 bg-white flex-1">
@@ -248,10 +249,15 @@ const Kontak = () => {
                   isLoading ? "bg-blue-900" : "bg-blue-800"
                 }  px-3 py-2 mb-2.5`}
                 activeOpacity={0.9}
-                onPress={handleSave}
+                onPress={async () => {
+                  setIsLoading(true);
+                  await handleSave();
+                  setIsLoading(false);
+                }}
                 disabled={isLoading}
               >
-                <Text className="text-center text-gray-100 text-xs font-semibold">Simpan</Text>
+                <ActivityIndicator size={"small"} color={"#ffff"} className={`${!isLoading && "hidden"}`}/>
+                <Text className={`text-center text-gray-100 text-xs font-semibold ${isLoading && "hidden"}`}>Simpan</Text>
               </TouchableOpacity>
               {/* <TouchableOpacity
                 className={`rounded-lg ${isLoading ? "bg-red-600" : "bg-red-500"} px-3 py-2 border`}

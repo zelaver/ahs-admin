@@ -1,4 +1,12 @@
-import { View, Text, TextInput, TouchableOpacity, ToastAndroid, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ToastAndroid,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Icon from "react-native-remix-icon";
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
@@ -380,6 +388,8 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
     }
   };
 
+  const [isLoading, setIsLoading] = useState(false);
+
   return (
     <View className="pesanan-item border rounded-lg p-2.5 flex-row justify-between items-center mb-4">
       <View className="flex-row">
@@ -676,20 +686,52 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
             </View>
             <View className="action-button px-3">
               <TouchableOpacity
-                className="rounded-lg bg-blue-800 px-3 py-2 mb-2.5"
+                className={`rounded-lg ${
+                  isLoading ? "bg-blue-900" : "bg-blue-800"
+                } px-3 py-2 mb-2.5`}
                 activeOpacity={0.9}
-                onPress={() => {
-                  handleSave();
+                disabled={isLoading}
+                onPress={async () => {
+                  setIsLoading(true);
+                  await handleSave();
+                  setIsLoading(false);
                 }}
               >
-                <Text className="text-center text-gray-100 text-xs font-semibold">Simpan</Text>
+                <ActivityIndicator
+                  size={"small"}
+                  color={"#ffff"}
+                  className={`${!isLoading && "hidden"}`}
+                />
+                <Text
+                  className={`text-center text-gray-100 text-xs font-semibold ${
+                    isLoading && "hidden"
+                  }`}
+                >
+                  Simpan
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                className="rounded-lg bg-red-500 px-3 py-2 border"
+                className={`rounded-lg ${isLoading ? "bg-red-600" : "bg-red-500"} px-3 py-2 border`}
                 activeOpacity={0.9}
-                onPress={() => handleDelete()}
+                disabled={isLoading}
+                onPress={async () => {
+                  setIsLoading(true);
+                  await handleDelete();
+                  setIsLoading(false);
+                }}
               >
-                <Text className="text-center text-gray-100 text-xs font-semibold">Hapus</Text>
+                <ActivityIndicator
+                  size={"small"}
+                  color={"#ffff"}
+                  className={`${!isLoading && "hidden"}`}
+                />
+                <Text
+                  className={`text-center text-gray-100 text-xs font-semibold ${
+                    isLoading && "hidden"
+                  }`}
+                >
+                  Hapus
+                </Text>
               </TouchableOpacity>
             </View>
           </View>

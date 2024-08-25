@@ -1,5 +1,12 @@
-import { View, Text, SafeAreaView, TouchableOpacity, ToastAndroid } from "react-native";
-import React from "react";
+import {
+  View,
+  Text,
+  SafeAreaView,
+  TouchableOpacity,
+  ToastAndroid,
+  ActivityIndicator,
+} from "react-native";
+import React, { useState } from "react";
 import { getQuery } from "@/database/db";
 import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system";
@@ -11,6 +18,7 @@ import { useGlobalContext } from "@/context/GlobalProvider";
 const backup = () => {
   const { history, fetchHistory, fetchCustomers, fetchTransactions, fetchProducts } =
     useGlobalContext();
+  const [isLoading, setIsLoading] = useState(false);
   const exportDatabase = async () => {
     try {
       const dir = FileSystem.documentDirectory + "SQLite/";
@@ -136,16 +144,35 @@ const backup = () => {
         </View>
         <View className="section-2 px-5 py-2 h-full  justify-center items-center">
           <TouchableOpacity
-            className="bg-blue-800 px-4 py-2 mb-4  rounded-md"
+            className={`${
+              isLoading ? "bg-blue-900" : "bg-blue-800"
+            } px-4 py-2 mb-4 min-w-[100px] rounded-md border border-blue-800 justify-center items-center min-h-[50px]`}
             activeOpacity={0.9}
-            onPress={() => exportDatabase()}
+            disabled={isLoading}
+            onPress={async () => {
+              setIsLoading(true);
+              await exportDatabase();
+              setIsLoading(false);
+            }}
           >
-            <Text className="text-xl text-blue-50 font-semibold">Export</Text>
+            <ActivityIndicator
+              size={"small"}
+              color={"white"}
+              className={`${!isLoading && "hidden"}`}
+            />
+            <Text className={`text-xl text-blue-50 font-semibold ${isLoading && "hidden"}`}>
+              Export
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            className="border px-4 py-2 border-blue-800 rounded-md border-dashed"
+            className={"border px-4 py-2 border-blue-800 rounded-md border-dashed min-w-[100px] justify-center items-center min-h-[50px]"}
             activeOpacity={0.9}
-            onPress={() => importAndExtractZip()}
+            disabled={isLoading}
+            onPress={() => {
+              setIsLoading(true);
+              importAndExtractZip();
+              setIsLoading(false);
+            }}
           >
             <Text className="text-xl text-blue-800 font-semibold">Import</Text>
           </TouchableOpacity>
