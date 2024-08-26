@@ -106,11 +106,12 @@ const StockItem = ({
       return;
     }
     try {
-      if (!stockPrice) {
+      if (!stockPrice && id != 3) {
+        console.log(id);
         ToastAndroid.show("isi harga pembelian/barang", ToastAndroid.SHORT);
         return;
       }
-      if (!addStock || !stockPrice || stocks.saldo - addStock * stockPrice < 0 || !stockPrice) {
+      if (!addStock || ((!stockPrice || stocks.saldo - addStock * stockPrice < 0) && id != 3)) {
         ToastAndroid.show("Saldo tidak cukup", ToastAndroid.SHORT);
         return;
       } else if (name == "Aqua") {
@@ -210,16 +211,17 @@ const StockItem = ({
           className="w-14 h-16"
         />
       </View>
-      <View className="flex-row items-center opacity-50">
-        <TouchableOpacity onPress={handlePresentModalPress}>
-          <Text className="text-gray-700 text-xs font-normal">Tambah Stok</Text>
-        </TouchableOpacity>
+      <TouchableOpacity
+        onPress={handlePresentModalPress}
+        className="flex-row items-center opacity-50 w-full py-1"
+      >
+        <Text className="text-gray-700 text-xs font-normal">Tambah Stok</Text>
         <Icon
           name="arrow-right-s-line"
           size={12}
           color="#374151"
         ></Icon>
-      </View>
+      </TouchableOpacity>
       <BottomSheetModal
         ref={bottomSheetModalRef}
         index={0}
@@ -337,10 +339,11 @@ const StockItem = ({
                   isLoading ? "bg-blue-900" : "bg-blue-800"
                 }  px-3 py-2 mb-2.5`}
                 activeOpacity={0.9}
+                disabled={isLoading}
                 onPress={async () => {
                   setIsLoading(true);
                   await handleSave();
-                  setIsLoading(true);
+                  setIsLoading(false);
                 }}
                 // disabled={isLoading}
               >

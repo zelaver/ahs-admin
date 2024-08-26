@@ -1,10 +1,10 @@
-import GlobalProvider from "@/context/GlobalProvider";
+import GlobalProvider, { useGlobalContext } from "@/context/GlobalProvider";
 import { useFonts } from "expo-font";
 import { SplashScreen } from "expo-router";
 import { useEffect } from "react";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { Tabs } from "expo-router";
-import { View, Text } from "react-native";
+import { View, Text, ActivityIndicator } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Icon from "react-native-remix-icon";
 
@@ -33,20 +33,22 @@ const TabIcon = ({ icon, color, name, focused }: any) => {
 };
 
 export default function RootLayout() {
-  // const [loaded, error] = useFonts({
-  //   SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-  //   // Inter: require("@/assets/fonts/Inter-VariableFont_opsz,wght.ttf"),
-  // });
+  const { isLoading } = useGlobalContext();
 
-  // useEffect(() => {
-  //   if (error) throw error;
-  //   if (loaded) SplashScreen.hideAsync();
-  // }, [loaded, error]);
-  // if (!loaded && !error) return null;
+  // if (isLoading) {
+  //   return (
+  //     <View className="flex-1 justify-center items-center">
+  //       <ActivityIndicator
+  //         size={"large"}
+  //         color={"black"}
+  //       />
+  //     </View>
+  //   );
+  // }
 
   return (
-    <GestureHandlerRootView className="flex-1">
-      <GlobalProvider>
+    <GlobalProvider>
+      <GestureHandlerRootView className="flex-1">
         <BottomSheetModalProvider>
           <Tabs
             screenOptions={{
@@ -148,7 +150,7 @@ export default function RootLayout() {
             />
           </Tabs>
         </BottomSheetModalProvider>
-      </GlobalProvider>
-    </GestureHandlerRootView>
+      </GestureHandlerRootView>
+    </GlobalProvider>
   );
 }

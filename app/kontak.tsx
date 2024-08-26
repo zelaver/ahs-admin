@@ -62,6 +62,8 @@ const Kontak = () => {
     []
   );
 
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     const backAction = () => {
       bottomSheetModalRef.current?.close();
@@ -71,7 +73,7 @@ const Kontak = () => {
     const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
 
     return () => backHandler.remove();
-  }, []);
+  }, [contacts]);
 
   const handleSave = async () => {
     if (!name || !phone || !address) {
@@ -95,10 +97,8 @@ const Kontak = () => {
     setRefreshing(false);
   };
 
-  const [isLoading, setIsLoading] = useState(false);
-
   return (
-    <SafeAreaView className="py-8 bg-white flex-1">
+    <SafeAreaView className="py-8 bg-white">
       <View className="Header pb-3">
         <View className="section-1 px-5 py-2">
           <Text className="text-2xl font-semibold">Kontak</Text>
@@ -143,7 +143,7 @@ const Kontak = () => {
         }
       >
         <View className="main pb-16">
-          <View className="section-3 px-5 py-1.5 ">
+          <View className="section-3 px-5 py-1.5">
             {[...contacts]
               .filter((item) =>
                 query
@@ -256,8 +256,18 @@ const Kontak = () => {
                 }}
                 disabled={isLoading}
               >
-                <ActivityIndicator size={"small"} color={"#ffff"} className={`${!isLoading && "hidden"}`}/>
-                <Text className={`text-center text-gray-100 text-xs font-semibold ${isLoading && "hidden"}`}>Simpan</Text>
+                <ActivityIndicator
+                  size={"small"}
+                  color={"#ffff"}
+                  className={`${!isLoading && "hidden"}`}
+                />
+                <Text
+                  className={`text-center text-gray-100 text-xs font-semibold ${
+                    isLoading && "hidden"
+                  }`}
+                >
+                  Simpan
+                </Text>
               </TouchableOpacity>
               {/* <TouchableOpacity
                 className={`rounded-lg ${isLoading ? "bg-red-600" : "bg-red-500"} px-3 py-2 border`}

@@ -7,6 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
+  ActivityIndicator,
 } from "react-native";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Icon from "react-native-remix-icon";
@@ -14,10 +15,10 @@ import { useGlobalContext } from "@/context/GlobalProvider";
 import { LineChart, LineChartPropsType } from "react-native-gifted-charts";
 
 type ChartData = {
-  value: number
-  date: string
-  saldo: string
-}
+  value: number;
+  date: string;
+  saldo: string;
+};
 
 const Histori = () => {
   const { history, fetchHistory } = useGlobalContext();
@@ -75,62 +76,32 @@ const Histori = () => {
 
   const [chartData, setChartData] = useState<ChartData[]>(formatData(history));
 
-
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
+    setIsLoading(true);
     setChartData(formatData(history));
+    setIsLoading(false);
   }, [history]);
+
   return (
-    <SafeAreaView className="py-8">
+    <SafeAreaView className="py-8 h-full">
       <View className="section-1 px-5 py-2 flex-row items-center">
         <Text className="text-2xl font-bold mr-3">Histori</Text>
-        <TouchableOpacity onPress={() => setAscending(!ascending)}>
-          <Icon
-            name={`${ascending ? "sort-desc" : "sort-asc"}`}
-            size={24}
-          />
-        </TouchableOpacity>
       </View>
-      <View>
-        <ScrollView
-          className="main "
-          nestedScrollEnabled
-        >
-          <View className="section-2 px-5 ">
-            <View className="section-1 py-2 flex-row items-center">
-              <Text className="text-lg font-semibold mr-3">Stock</Text>
-            </View>
-            <View className="header p-2 bg-blue-800 rounded-tl-md rounded-tr-md">
-              <View className="flex-row items-center">
-                <Text className="text-sm text-white flex-1 font-semibold mr-2.5">Aqua</Text>
-                <Text className="text-sm text-white flex-1 font-semibold mr-2.5">Isi Ulang</Text>
-                <Text className="text-sm text-white flex-1 font-semibold mr-2.5">Galon Kosong</Text>
-                <Text className="text-sm text-white flex-1 font-semibold mr-2.5">Gas 12 Kg</Text>
-                <Text className="text-sm text-white flex-1 font-semibold">Gas Kosong</Text>
-              </View>
-            </View>
-            <ScrollView
-              nestedScrollEnabled
-              // ref={scrollViewRef}
-              className="h-96 border-b border-blue-800"
-              refreshControl={
-                <RefreshControl
-                  refreshing={refreshing}
-                  onRefresh={onRefresh}
-                />
-              }
-            >
-              {[...history]
-                .sort((a, b) => sort(b.id, a.id))
-                .map((item, i) => (
-                  <RowData
-                    key={i}
-                    id={item.id}
-                    data={history}
-                  />
-                ))}
-            </ScrollView>
-
-            <View className="pb-36 pt-10">
+      <View className="h-full">
+        {isLoading ? (
+          <View className="flex-1 justify-center items-center ">
+            <ActivityIndicator
+              size={"large"}
+              color={"black"}
+            />
+          </View>
+        ) : (
+          <ScrollView
+            className="main "
+            nestedScrollEnabled
+          >
+            <View className="py-2 px-5 chart">
               <View className="section-1 py-2 flex-row items-center">
                 <Text className="text-lg font-semibold mr-3">Saldo Harian</Text>
               </View>
@@ -196,7 +167,6 @@ const Histori = () => {
                         >
                           {items[0].date}
                         </Text>
-
                         <View
                           style={{
                             paddingHorizontal: 14,
@@ -215,14 +185,57 @@ const Histori = () => {
                   },
                 }}
               />
-            {/* <TouchableOpacity
+              {/* <TouchableOpacity
               onPress={() => console.log(chartData[chartData.length - 1].value)}
             >
               <Text>test</Text>
             </TouchableOpacity> */}
             </View>
-          </View>
-        </ScrollView>
+            <View className="section-2 px-5 table">
+              <View className="section-1 py-2 flex-row items-center ">
+                <Text className="text-lg font-semibold mr-2.5">Stock</Text>
+                <TouchableOpacity onPress={() => setAscending(!ascending)}>
+                  <Icon
+                    name={`${ascending ? "sort-desc" : "sort-asc"}`}
+                    size={20}
+                  />
+                </TouchableOpacity>
+              </View>
+              <View className="header p-2 bg-blue-800 rounded-tl-md rounded-tr-md">
+                <View className="flex-row items-center">
+                  <Text className="text-sm text-white flex-1 font-semibold mr-2.5">Aqua</Text>
+                  <Text className="text-sm text-white flex-1 font-semibold mr-2.5">Isi Ulang</Text>
+                  <Text className="text-sm text-white flex-1 font-semibold mr-2.5">
+                    Galon Kosong
+                  </Text>
+                  <Text className="text-sm text-white flex-1 font-semibold mr-2.5">Gas 12 Kg</Text>
+                  <Text className="text-sm text-white flex-1 font-semibold">Gas Kosong</Text>
+                </View>
+              </View>
+              <ScrollView
+                nestedScrollEnabled
+                // ref={scrollViewRef}
+                className="h-96 border-b border-blue-800"
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                  />
+                }
+              >
+                {[...history]
+                  .sort((a, b) => sort(b.id, a.id))
+                  .map((item, i) => (
+                    <RowData
+                      key={i}
+                      id={item.id}
+                      data={history}
+                    />
+                  ))}
+              </ScrollView>
+            </View>
+          </ScrollView>
+        )}
       </View>
     </SafeAreaView>
   );

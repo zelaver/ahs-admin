@@ -25,6 +25,7 @@ import Popover from "react-native-popover-view/dist/Popover";
 import { PopoverPlacement } from "react-native-popover-view";
 import images from "@/constants/images";
 import { useGlobalContext } from "@/context/GlobalProvider";
+import { filter } from "jszip";
 
 const Pesanan = () => {
   const [query, setQuery] = useState<string>();
@@ -176,7 +177,7 @@ const Pesanan = () => {
     setCustomerId(id);
     const getCustomer: any = await getContact(id);
     setIsSubscriber(getCustomer.isSubscriber);
-    console.log(getCustomer.isSubscriber);
+    // console.log(getCustomer.isSubscriber);
     if (getCustomer.isSubscriber == 0) {
       setTotal(
         aquaVal * products[0]?.price +
@@ -192,31 +193,72 @@ const Pesanan = () => {
     }
   };
 
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+  const [filterStatus, setFilterStatus] = useState("lunas");
+
+  const [ascending, setAscending] = useState(false);
+  const sort = (a, b) => {
+    if (ascending) {
+      return b - a;
+    } else {
+      return a - b;
+    }
+  };
 
   return (
     <SafeAreaView className="py-8">
-      <View className="header pb-3">
+      <View className="header pb-1">
         <View className="section-1 px-5 py-2">
           <Text className="text-2xl font-semibold">Pesanan</Text>
         </View>
         <View className="section-2 px-5 flex-row items-center ">
-          <View className={`flex-row py-1 flex-1 px-2 mr-2 rounded-md items-center border`}>
-            <TextInput
-              className=" text-xs flex-1 font-normal mr-2 justify-center items-center"
-              value={query}
-              placeholder={"Cari Kontak"}
-              placeholderTextColor={"#CDCDE0"}
-              onChangeText={(e) => {
-                setQuery(e);
-                console.log(query);
+          <View className={`flex-row py-1 flex-1 mr-2 rounded-md items-center `}>
+            <TouchableOpacity
+              onPress={() => {
+                setFilterStatus("hutang");
               }}
-            />
-            <TouchableOpacity>
+              activeOpacity={1}
+              className="mr-2"
+            >
+              <Text
+                className={`px-3 py-1 border font-semibold rounded-md w-min-[67px] text-center text-xs border-red-500 
+                    ${filterStatus == "hutang" ? "text-white bg-red-500" : "text-red-500"} `}
+              >
+                Hutang
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setFilterStatus("pinjam");
+              }}
+              activeOpacity={1}
+              className="mr-2"
+            >
+              <Text
+                className={`px-3 py-1 border rounded-md w-min-[67px] text-center text-xs border-yellow-500 font-semibold
+                    ${filterStatus == "pinjam" ? "text-white bg-yellow-500" : "text-yellow-500"}`}
+              >
+                Pinjam
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setFilterStatus("lunas");
+              }}
+              activeOpacity={1}
+            >
+              <Text
+                className={`px-3 py-1 border rounded-md w-min-[67px] text-center text-xs border-green-500 font-semibold
+                    ${filterStatus == "lunas" ? "text-white bg-green-500" : "text-green-500"}`}
+              >
+                Lunas
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setAscending(!ascending)} className="ml-3">
               <Icon
-                name="search-2-line"
-                size={16}
-              ></Icon>
+                name={`${ascending ? "sort-desc" : "sort-asc"}`}
+                size={24}
+              />
             </TouchableOpacity>
           </View>
           <TouchableOpacity onPress={handlePresentModalPress}>
@@ -237,17 +279,20 @@ const Pesanan = () => {
       >
         <View className="main pb-16">
           <View className="section-3 px-5 py-3 ">
-            {transactions.map((item: any, i: any) => (
-              <OrderItem
-                key={i}
-                curCustomerId={item.customerId}
-                curStatus={item.status}
-                date={item.date}
-                total_price={item.total_price}
-                id={item.id}
-                orderList={item.orderList}
-              />
-            ))}
+            {[...transactions]
+              .filter((item) => item.status == filterStatus)
+              .sort((a, b) => sort(b.id, a.id))
+              .map((item: any, i: any) => (
+                <OrderItem
+                  key={i}
+                  curCustomerId={item.customerId}
+                  curStatus={item.status}
+                  date={item.date}
+                  total_price={item.total_price}
+                  id={item.id}
+                  orderList={item.orderList}
+                />
+              ))}
           </View>
         </View>
       </ScrollView>
@@ -359,7 +404,7 @@ const Pesanan = () => {
                       if (!history.stock_aqua)
                         return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                       setAquaVal(1);
-                      console.log(isSubscriber);
+                      // console.log(isSubscriber);
                       setTotal(
                         total + (!isSubscriber ? products[0]?.price : products[0]?.subs_price)
                       );
@@ -494,17 +539,29 @@ const Pesanan = () => {
             </View>
             <View className="action-button px-3">
               <TouchableOpacity
-                className={`rounded-lg px-3 py-2 mb-2.5 ${isLoading ? "bg-blue-900" : "bg-blue-800"}`}
+                className={`rounded-lg px-3 py-2 mb-2.5 ${
+                  isLoading ? "bg-blue-900" : "bg-blue-800"
+                }`}
                 activeOpacity={0.9}
                 disabled={isLoading}
                 onPress={async () => {
-                  setIsLoading(true)
+                  setIsLoading(true);
                   await handleSave();
-                  setIsLoading(false)
+                  setIsLoading(false);
                 }}
               >
-                <ActivityIndicator size={"small"} color={"#ffff"} className={`${!isLoading && "hidden"}`}/>
-                <Text className={`text-center text-gray-100 text-xs font-semibold ${isLoading && "hidden"}`}>Simpan</Text>
+                <ActivityIndicator
+                  size={"small"}
+                  color={"#ffff"}
+                  className={`${!isLoading && "hidden"}`}
+                />
+                <Text
+                  className={`text-center text-gray-100 text-xs font-semibold ${
+                    isLoading && "hidden"
+                  }`}
+                >
+                  Simpan
+                </Text>
               </TouchableOpacity>
               {/* <TouchableOpacity
                 className="rounded-lg bg-red-500 px-3 py-2 border"

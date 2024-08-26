@@ -1,3 +1,4 @@
+import images from "@/constants/images";
 import {
   getAllContacts,
   getHistory,
@@ -7,6 +8,8 @@ import {
   initHistory,
 } from "@/database/db";
 import { createContext, useContext, useEffect, useState } from "react";
+import { ActivityIndicator, Image } from "react-native";
+import { View } from "react-native";
 
 type context = {
   history: [];
@@ -29,7 +32,7 @@ const GlobalProvider = ({ children }: any) => {
   const [history, setHistory] = useState<[]>([]);
   const [lastHistory, setLastHistory] = useState<[]>([]);
   const [transactions, setTransactions] = useState<[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [customers, setCustomers] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
 
@@ -106,10 +109,12 @@ const GlobalProvider = ({ children }: any) => {
       await fetchHistory();
       await fetchCustomers();
       await fetchProducts();
-      setIsLoading(false);
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
     };
-
     loadEverything();
+    // setIsLoading(false);
   }, []);
 
   return (
@@ -128,7 +133,17 @@ const GlobalProvider = ({ children }: any) => {
         fetchProducts,
       }}
     >
-      {children}
+      {isLoading ? (
+        <View className="flex-1 justify-center h-full items-center">
+          <Image
+            source={images.logo}
+            className="w-[300px]"
+            resizeMode="contain"
+          />
+        </View>
+      ) : (
+        children
+      )}
     </GlobalContext.Provider>
   );
 };

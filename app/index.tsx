@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View,
   Keyboard,
-  ActivityIndicator
+  ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-remix-icon";
 import images from "@/constants/images";
@@ -91,6 +91,7 @@ export default function Home() {
     setHistory: setStocks,
     products,
     fetchHistory: fetchStocks,
+    // isLoading: isGlobalLoading,
   } = useGlobalContext();
   const [keteranganSaldo, setkKteranganSaldo] = useState();
   const [saldoInput, setSaldoInput] = useState<number | null>(null);
@@ -100,16 +101,28 @@ export default function Home() {
     return <Redirect href={"/(tabs)/backup"} />;
   }
 
+  // console.log(stocks.length)
+  // if (!stocks.length) {
+  //   return (
+  //     <View className="flex-1 justify-center items-center">
+  //       <ActivityIndicator
+  //         size={"small"}
+  //         color={"black"}
+  //       />
+  //     </View>
+  //   );
+  // }
+
   const [isLoading, setIsLoading] = useState(false);
   const handleSave = async () => {
     if (!saldoInput) return ToastAndroid.show("Input saldo tidak boleh kosong", ToastAndroid.SHORT);
     if (stocks?.saldo + saldoInput < 0) {
       return ToastAndroid.show("Saldo anda tidak cukup", ToastAndroid.SHORT);
     }
-    setIsLoading(true)
+    setIsLoading(true);
     await addHistory({ ...stocks, saldo: stocks?.saldo + saldoInput });
     await fetchStocks();
-    setIsLoading(false)
+    setIsLoading(false);
     handleClosePress();
   };
 
@@ -163,7 +176,7 @@ export default function Home() {
                 </Text>
               </View>
               <TouchableOpacity
-                className="flex-row items-center"
+                className="flex-row items-center w-full py-1"
                 onPress={handlePresentModalPress}
               >
                 <Text className="text-gray-100 opacity-50">Ubah Saldo</Text>
@@ -267,13 +280,25 @@ export default function Home() {
 
             <View className="action-button px-3">
               <TouchableOpacity
-                className={`rounded-lg ${isLoading ? "bg-blue-900" : "bg-blue-800"}  px-3 py-2 mb-2.5`}
+                className={`rounded-lg ${
+                  isLoading ? "bg-blue-900" : "bg-blue-800"
+                }  px-3 py-2 mb-2.5`}
                 activeOpacity={0.9}
                 onPress={handleSave}
                 disabled={isLoading}
               >
-                <ActivityIndicator size={"small"} color={"#ffff"} className={`${!isLoading && "hidden"}`}/>
-                <Text className={`text-center text-gray-100 text-xs font-semibold ${isLoading && "hidden"}`}>Simpan</Text>
+                <ActivityIndicator
+                  size={"small"}
+                  color={"#ffff"}
+                  className={`${!isLoading && "hidden"}`}
+                />
+                <Text
+                  className={`text-center text-gray-100 text-xs font-semibold ${
+                    isLoading && "hidden"
+                  }`}
+                >
+                  Simpan
+                </Text>
               </TouchableOpacity>
             </View>
           </View>

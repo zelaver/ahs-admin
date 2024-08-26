@@ -29,6 +29,8 @@ type OrderItem = {
   id: number;
   orderList: any[];
   curCustomerId: number;
+  // curCustomerName: string;
+  // curCustomerType: number;
   curStatus: string;
   total_price: number;
   date: string;
@@ -61,8 +63,8 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
     products,
   } = useGlobalContext();
 
-  const [customerName, setCustomerName] = useState();
-  const [customerType, setCustomerType] = useState();
+  const [customerName, setCustomerName] = useState("");
+  const [customerType, setCustomerType] = useState("");
 
   const fetchCustomer = async () => {
     try {
@@ -91,8 +93,8 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
 
   useEffect(() => {
     fetchCustomer();
-    // fetchTransactions();
-  }, [orderList, curCustomerId, curStatus, total_price, status, customers]);
+    fetchOrderList();
+  }, [orderList, curCustomerId, curStatus, total_price, customers, customerId, date]);
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ["90%"], []);
@@ -101,12 +103,9 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
   }, []);
   const handleSheetChanges = useCallback(
     (index: number) => {
-      // console.log("handleSheetChanges", index);
-      if (index == 0) {
-        fetchOrderList();
-      }
+      fetchOrderList();
     },
-    [orderList, curCustomerId, curStatus, total_price]
+    [orderList, curCustomerId, curStatus, total_price, customers, customerId, date]
   );
   const handleClosePress = useCallback(() => {
     bottomSheetModalRef.current?.close();
@@ -315,56 +314,57 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
   };
 
   const handleDelete = async () => {
-    let parsedList = JSON.parse(orderList);
-    console.log("================");
-    console.log("id", id);
-    console.log("aqua:", parsedList[0].sum);
-    console.log("isi ulang:", parsedList[1].sum);
-    console.log("gas 12 kg:", parsedList[2].sum);
-    console.log("galon kosong:", parsedList[3].sum);
-    console.log("gas kosong:", parsedList[4].sum);
-    console.log("total_price:", total_price);
-    console.log("status:", curStatus);
-    Alert.alert(
-      "Yakin ingin menghapus?",
-      "gak di balikin loh",
-      [
-        {
-          text: "batal",
-          onPress: () => false,
-          style: "cancel",
-        },
-        {
-          text: "hapus",
-          onPress: async () => {
-            await deleteTransaction(id);
-            await addHistory({
-              saldo: history.saldo - (curStatus == "hutang" ? 0 : total_price),
-              stock_aqua: history.stock_aqua + parsedList[0].sum,
-              stock_galon_kosong:
-                history.stock_galon_kosong -
-                (curStatus == "pinjam" ? -parsedList[3].sum : parsedList[3].sum) -
-                parsedList[0].sum -
-                parsedList[1].sum,
-              stock_gas_12kg: history.stock_gas_12kg + parsedList[2].sum,
-              stock_gas_kosong:
-                history.stock_gas_kosong -
-                (curStatus == "pinjam" ? -parsedList[4].sum : parsedList[4].sum) -
-                parsedList[2].sum,
-              stock_isi_ulang: history.stock_isi_ulang + parsedList[1].sum,
-              transactionId: null,
-            });
-            await fetchHistory();
-            await fetchTransactions();
-            handleClosePress();
-          },
-        },
-      ],
-      {
-        cancelable: true,
-        onDismiss() {},
-      }
-    );
+    // let parsedList = JSON.parse(orderList);
+    // console.log("================");
+    // console.log("id", id);
+    // console.log("aqua:", parsedList[0].sum);
+    // console.log("isi ulang:", parsedList[1].sum);
+    // console.log("gas 12 kg:", parsedList[2].sum);
+    // console.log("galon kosong:", parsedList[3].sum);
+    // console.log("gas kosong:", parsedList[4].sum);
+    // console.log("total_price:", total_price);
+    // console.log("status:", curStatus);
+    // console.log(curCustomerId)
+    // Alert.alert(
+    //   "Yakin ingin menghapus?",
+    //   "gak di balikin loh",
+    //   [
+    //     {
+    //       text: "batal",
+    //       onPress: () => false,
+    //       style: "cancel",
+    //     },
+    //     {
+    //       text: "hapus",
+    //       onPress: async () => {
+    //         await deleteTransaction(id);
+    //         await addHistory({
+    //           saldo: history.saldo - (curStatus == "hutang" ? 0 : total_price),
+    //           stock_aqua: history.stock_aqua + parsedList[0].sum,
+    //           stock_galon_kosong:
+    //             history.stock_galon_kosong -
+    //             (curStatus == "pinjam" ? -parsedList[3].sum : parsedList[3].sum) -
+    //             parsedList[0].sum -
+    //             parsedList[1].sum,
+    //           stock_gas_12kg: history.stock_gas_12kg + parsedList[2].sum,
+    //           stock_gas_kosong:
+    //             history.stock_gas_kosong -
+    //             (curStatus == "pinjam" ? -parsedList[4].sum : parsedList[4].sum) -
+    //             parsedList[2].sum,
+    //           stock_isi_ulang: history.stock_isi_ulang + parsedList[1].sum,
+    //           transactionId: null,
+    //         });
+    //         await fetchHistory();
+    //         await fetchTransactions();
+    //         handleClosePress();
+    //       },
+    //     },
+    //   ],
+    //   {
+    //     cancelable: true,
+    //     onDismiss() {},
+    //   }
+    // );
   };
 
   const handleSelected = async (id: number) => {
@@ -392,7 +392,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
 
   return (
     <View className="pesanan-item border rounded-lg p-2.5 flex-row justify-between items-center mb-4">
-      <View className="flex-row">
+      {/* <View className="flex-row">
         <View className="bg-gray-200 rounded-full w-10 h-10 items-center justify-center">
           <Icon
             name={`${customerType ? "home-smile-2-line" : "user-3-line"}`}
@@ -403,7 +403,11 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
           <Text className="text-sm font-medium">{customerName}</Text>
           <Text className="text-xs font-normal text-gray-400">{formatDate(date)}</Text>
         </View>
-      </View>
+      </View> */}
+      <CustomerComponent
+        customerId={curCustomerId}
+        date={date}
+      />
       <View className="flex-row items-center">
         {status == "hutang" && (
           <Text className="bg-red-500 text-gray-50 text-xs font-semibold px-3 py-1 rounded-md mr-2 w-[67px] text-center">
@@ -447,7 +451,6 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
             <View className="customer px-3">
               <Text className="text-sm font-semibold mb-2.5">Customer:</Text>
               <View className="rounded-md px-3">
-                {/* <TextInput placeholder="isi nama Customer" /> */}
                 <SelectList
                   data={[
                     ...customers.map((item, i) => {
@@ -457,7 +460,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                   setSelected={(val: any) => {
                     handleSelected(val);
                   }}
-                  defaultOption={{ key: curCustomerId, value: customerName }}
+                  defaultOption={{ key: curCustomerId, value: customers[curCustomerId - 1].name }}
                   // setSelected={val => console.log(val)}
 
                   placeholder="pilih pelanggan"
@@ -737,6 +740,43 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
           </View>
         </BottomSheetScrollView>
       </BottomSheetModal>
+    </View>
+  );
+};
+
+const CustomerComponent = ({ customerId, date }: { customerId: number; date: string }) => {
+  const [customerName, setCustomerName] = useState<string>("");
+  const [customerType, setCustomerType] = useState<number>();
+  const [formatedDate, setFormatedDate] = useState(formatDate(date));
+
+  useEffect(() => {
+    const fetchCustomer = async () => {
+      try {
+        const data: any = await getContact(customerId);
+        setCustomerName(data.name);
+        setCustomerType(data.isSubscriber);
+      } catch (e) {
+        if (e instanceof Error) {
+          console.log("error", e);
+        }
+      }
+    };
+    setFormatedDate(formatDate(date));
+    fetchCustomer();
+  }, [customerId, date]); // Dependency array untuk men-trigger useEffect ketika customerId berubah
+
+  return (
+    <View className="flex-row">
+      <View className="bg-gray-200 rounded-full w-10 h-10 items-center justify-center">
+        <Icon
+          name={`${customerType ? "home-smile-2-line" : "user-3-line"}`}
+          size={24}
+        />
+      </View>
+      <View className="ml-4">
+        <Text className="text-sm font-medium">{customerName}</Text>
+        <Text className="text-xs font-normal text-gray-400">{formatedDate}</Text>
+      </View>
     </View>
   );
 };
