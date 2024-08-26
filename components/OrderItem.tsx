@@ -314,57 +314,57 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
   };
 
   const handleDelete = async () => {
-    // let parsedList = JSON.parse(orderList);
-    // console.log("================");
-    // console.log("id", id);
-    // console.log("aqua:", parsedList[0].sum);
-    // console.log("isi ulang:", parsedList[1].sum);
-    // console.log("gas 12 kg:", parsedList[2].sum);
-    // console.log("galon kosong:", parsedList[3].sum);
-    // console.log("gas kosong:", parsedList[4].sum);
-    // console.log("total_price:", total_price);
-    // console.log("status:", curStatus);
-    // console.log(curCustomerId)
-    // Alert.alert(
-    //   "Yakin ingin menghapus?",
-    //   "gak di balikin loh",
-    //   [
-    //     {
-    //       text: "batal",
-    //       onPress: () => false,
-    //       style: "cancel",
-    //     },
-    //     {
-    //       text: "hapus",
-    //       onPress: async () => {
-    //         await deleteTransaction(id);
-    //         await addHistory({
-    //           saldo: history.saldo - (curStatus == "hutang" ? 0 : total_price),
-    //           stock_aqua: history.stock_aqua + parsedList[0].sum,
-    //           stock_galon_kosong:
-    //             history.stock_galon_kosong -
-    //             (curStatus == "pinjam" ? -parsedList[3].sum : parsedList[3].sum) -
-    //             parsedList[0].sum -
-    //             parsedList[1].sum,
-    //           stock_gas_12kg: history.stock_gas_12kg + parsedList[2].sum,
-    //           stock_gas_kosong:
-    //             history.stock_gas_kosong -
-    //             (curStatus == "pinjam" ? -parsedList[4].sum : parsedList[4].sum) -
-    //             parsedList[2].sum,
-    //           stock_isi_ulang: history.stock_isi_ulang + parsedList[1].sum,
-    //           transactionId: null,
-    //         });
-    //         await fetchHistory();
-    //         await fetchTransactions();
-    //         handleClosePress();
-    //       },
-    //     },
-    //   ],
-    //   {
-    //     cancelable: true,
-    //     onDismiss() {},
-    //   }
-    // );
+    let parsedList = JSON.parse(orderList);
+    console.log("================");
+    console.log("id", id);
+    console.log("aqua:", parsedList[0].sum);
+    console.log("isi ulang:", parsedList[1].sum);
+    console.log("gas 12 kg:", parsedList[2].sum);
+    console.log("galon kosong:", parsedList[3].sum);
+    console.log("gas kosong:", parsedList[4].sum);
+    console.log("total_price:", total_price);
+    console.log("status:", curStatus);
+    console.log(curCustomerId)
+    Alert.alert(
+      "Yakin ingin menghapus?",
+      "gak di balikin loh",
+      [
+        {
+          text: "batal",
+          onPress: () => false,
+          style: "cancel",
+        },
+        {
+          text: "hapus",
+          onPress: async () => {
+            await deleteTransaction(id);
+            await addHistory({
+              saldo: history.saldo - (curStatus == "hutang" ? 0 : total_price),
+              stock_aqua: history.stock_aqua + parsedList[0].sum,
+              stock_galon_kosong:
+                history.stock_galon_kosong -
+                (curStatus == "pinjam" ? -parsedList[3].sum : parsedList[3].sum) -
+                parsedList[0].sum -
+                parsedList[1].sum,
+              stock_gas_12kg: history.stock_gas_12kg + parsedList[2].sum,
+              stock_gas_kosong:
+                history.stock_gas_kosong -
+                (curStatus == "pinjam" ? -parsedList[4].sum : parsedList[4].sum) -
+                parsedList[2].sum,
+              stock_isi_ulang: history.stock_isi_ulang + parsedList[1].sum,
+              transactionId: null,
+            });
+            await fetchHistory();
+            await fetchTransactions();
+            handleClosePress();
+          },
+        },
+      ],
+      {
+        cancelable: true,
+        onDismiss() {},
+      }
+    );
   };
 
   const handleSelected = async (id: number) => {
