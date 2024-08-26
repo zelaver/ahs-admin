@@ -98,7 +98,7 @@ const Kontak = () => {
   };
 
   return (
-    <SafeAreaView className="py-8 bg-white">
+    <SafeAreaView className="pt-8 bg-white flex-1">
       <View className="Header pb-3">
         <View className="section-1 px-5 py-2">
           <Text className="text-2xl font-semibold">Kontak</Text>

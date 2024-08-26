@@ -76,7 +76,7 @@ const getQuery = async () => {
 
   try {
     // const result: any = await db.getAllAsync("SELECT * FROM products");
-    const result: any = await db.getAllAsync("SELECT * FROM history;");
+    const result: any = await db.getAllAsync("SELECT * FROM transactions;");
     console.log(JSON.stringify(result, null, 2));
     // console.log(result[result.length - 1])
     // console.log(typeof JSON.parse(result[0].orderList)[0].productId);
@@ -122,8 +122,9 @@ const execQuery = async () => {
     const total_price = 100; // contoh nilai total_price
     const result = await db.execAsync(
       `
-      insert into products (name, price, subs_price) values("Gas 12 kg", 220000, 220000);
+      delete from transactions where customerId = 8
       `
+      // insert into products (name, price, subs_price) values("Gas 12 kg", 220000, 220000);
       // delete from products where id = 2
       // insert into history (saldo, stock_aqua, stock_galon_kosong, stock_gas_12kg, stock_gas_kosong, stock_isi_ulang, transactionId)
       // values(200000,0,300,0,20,0,null)
@@ -224,8 +225,13 @@ const deleteContact = async (id: number) => {
     useNewConnection: true,
   });
   try {
-    const result = await db.runAsync("DELETE FROM customers WHERE id = $id", { $id: id });
+    const result = await db.execAsync(
+      `
+      DELETE FROM customers WHERE id = ${id};
+      DELETE FROM transactions WHERE customerId = ${id};
+      `);
     // console.log(result[0])
+    // console.log("masuk");
     return result;
   } catch (e) {
     if (e instanceof Error) {

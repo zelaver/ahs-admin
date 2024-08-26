@@ -324,7 +324,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
     console.log("gas kosong:", parsedList[4].sum);
     console.log("total_price:", total_price);
     console.log("status:", curStatus);
-    console.log(curCustomerId)
+    console.log(curCustomerId);
     Alert.alert(
       "Yakin ingin menghapus?",
       "gak di balikin loh",
@@ -460,7 +460,10 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                   setSelected={(val: any) => {
                     handleSelected(val);
                   }}
-                  defaultOption={{ key: curCustomerId, value: customers[curCustomerId - 1].name }}
+                  defaultOption={{
+                    key: curCustomerId,
+                    value: customers?.find((item) => item.id == curCustomerId)?.name,
+                  }}
                   // setSelected={val => console.log(val)}
 
                   placeholder="pilih pelanggan"
@@ -735,6 +738,14 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                 >
                   Hapus
                 </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  const test = customers.find((item) => item.id == curCustomerId);
+                  console.log(test);
+                }}
+              >
+                <Text>test</Text>
               </TouchableOpacity>
             </View>
           </View>

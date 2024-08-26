@@ -14,6 +14,7 @@ import Handle from "@/components/CustomHandle";
 import CartItem from "@/components/CartItem";
 import { deleteContact, deleteTransaction, updateContact } from "@/database/db";
 import { SQLiteRunResult } from "expo-sqlite";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 type ContactItem = {
   id: number;
@@ -73,6 +74,7 @@ const ContactItem = ({
   const [editAddress, setEditAddress] = useState<string>();
   const [editStatus, setEditStatus] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { fetchTransactions } = useGlobalContext();
 
   useEffect(() => {
     setEditName(name);
@@ -122,8 +124,9 @@ const ContactItem = ({
           {
             text: "hapus",
             onPress: async () => {
-              await deleteTransaction(id);
+              await deleteContact(id);
               await fetchContacts();
+              await fetchTransactions();
               setIsLoading(false);
               handleClosePress();
             },

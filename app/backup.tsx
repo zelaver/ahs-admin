@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
-import { getQuery } from "@/database/db";
+import { execQuery, getAllContacts, getQuery } from "@/database/db";
 import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system";
 import * as DocumentPicker from "expo-document-picker";
@@ -109,31 +109,30 @@ const backup = () => {
   };
 
   const debug = async () => {
-    // const data = await getQuery()
-    // console.log(history);
+    await getQuery()
 
-    const saldoTerakhirPerTanggal = history.reduce((acc, current) => {
-      const dateOnly = current.date.split(" ")[0]; // Pisahkan tanggal dari waktu
-      if (!acc.has(dateOnly)) {
-        acc.set(dateOnly, current); // Tambahkan entri pertama untuk tanggal ini
-      } else {
-        // Update jika entri ini lebih baru
-        const existingEntry = acc.get(dateOnly);
-        if (new Date(current.date) > new Date(existingEntry.date)) {
-          acc.set(dateOnly, current);
-        }
-      }
-      return acc;
-    }, new Map());
-    // @ts-ignore
-    const saldoTerakhir = Array.from(saldoTerakhirPerTanggal.values()).map((entry) => ({
-      // @ts-ignore
-      date: entry.date.split(" ")[0],
-      // @ts-ignore
-      saldo: entry.saldo,
-    }));
+    // const saldoTerakhirPerTanggal = history.reduce((acc, current) => {
+    //   const dateOnly = current.date.split(" ")[0]; // Pisahkan tanggal dari waktu
+    //   if (!acc.has(dateOnly)) {
+    //     acc.set(dateOnly, current); // Tambahkan entri pertama untuk tanggal ini
+    //   } else {
+    //     // Update jika entri ini lebih baru
+    //     const existingEntry = acc.get(dateOnly);
+    //     if (new Date(current.date) > new Date(existingEntry.date)) {
+    //       acc.set(dateOnly, current);
+    //     }
+    //   }
+    //   return acc;
+    // }, new Map());
+    // // @ts-ignore
+    // const saldoTerakhir = Array.from(saldoTerakhirPerTanggal.values()).map((entry) => ({
+    //   // @ts-ignore
+    //   date: entry.date.split(" ")[0],
+    //   // @ts-ignore
+    //   saldo: entry.saldo,
+    // }));
 
-    console.log(saldoTerakhir);
+    // console.log(saldoTerakhir);
   };
 
   return (
@@ -176,13 +175,13 @@ const backup = () => {
           >
             <Text className="text-xl text-blue-800 font-semibold">Import</Text>
           </TouchableOpacity>
-          {/* <TouchableOpacity
-            className="border px-4 py-2 border-blue-800 rounded-md border-dashed"
+          <TouchableOpacity
+            className="border px-4 py-2 border-blue-800 rounded-md border-dashed mt-20"
             activeOpacity={0.9}
             onPress={() => debug()}
           >
             <Text className="text-xl text-blue-800 font-semibold">Debug</Text>
-          </TouchableOpacity> */}
+          </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>
