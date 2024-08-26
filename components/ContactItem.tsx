@@ -163,9 +163,9 @@ const ContactItem = ({
           />
         </TouchableOpacity>
       </View>
-      <View className="border rounded-md">
+      <View className="border rounded-lg bg-white">
         <View className="phone flex-row items-center border-b">
-          <View className="bg-blue-800 p-2 rounded-tl-sm mr-3">
+          <View className="bg-blue-800 p-2 rounded-tl-md mr-3">
             <Icon
               name="phone-line"
               size={20}
@@ -175,7 +175,7 @@ const ContactItem = ({
           <Text className="text-sm font-normal">{phone}</Text>
         </View>
         <View className="jenis flex-row items-center border-b">
-          <View className="bg-blue-800 p-2 rounded-tl-sm mr-3">
+          <View className="bg-blue-800 p-2 mr-3">
             <Icon
               name={`${isSubscriber ? "home-smile-2-line" : "user-3-line"}`}
               size={20}
@@ -185,7 +185,7 @@ const ContactItem = ({
           <Text className="text-sm font-normal">{isSubscriber ? "Warung" : "Customer"}</Text>
         </View>
         <View className="alamat flex-row items-center">
-          <View className="bg-blue-800 p-2 rounded-tl-sm mr-3">
+          <View className="bg-blue-800 p-2 rounded-bl-md mr-3">
             <Icon
               name="map-pin-2-line"
               size={20}

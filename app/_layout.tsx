@@ -17,11 +17,11 @@ const TabIcon = ({ icon, color, name, focused }: any) => {
       {/* <Image source={icon} resizeMode="contain" tintColor={color} className="w-6 h-6" /> */}
       <Icon
         name={`${icon}-${focused ? "fill" : "line"}`}
-        color={`${focused ? "#60a5fa" : "#4b5563"}`}
+        color={`${focused ? "#1943b4" : "#4b5563"}`}
         size={24}
       ></Icon>
       {/* #4b5563 */}
-      {/* #60a5fa */}
+      {/* #1943b4 */}
       <Text
         className={`${focused ? "font-semibold " : "font-pregular"} text-xs `}
         style={{ color: color }}
@@ -55,7 +55,7 @@ export default function RootLayout() {
               headerShown: false,
               tabBarShowLabel: false,
               tabBarHideOnKeyboard: true,
-              tabBarActiveTintColor: "#60a5fa",
+              tabBarActiveTintColor: "#1943b4",
               tabBarStyle: {
                 height: 60,
                 display: "flex",

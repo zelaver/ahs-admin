@@ -391,7 +391,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
   const [isLoading, setIsLoading] = useState(false);
 
   return (
-    <View className="pesanan-item border rounded-lg p-2.5 flex-row justify-between items-center mb-4">
+    <View className="pesanan-item border rounded-lg p-2.5 flex-row justify-between items-center mb-4 bg-white">
       {/* <View className="flex-row">
         <View className="bg-gray-200 rounded-full w-10 h-10 items-center justify-center">
           <Icon
@@ -458,6 +458,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                     }),
                   ]}
                   setSelected={(val: any) => {
+                    if(!val) return ToastAndroid.show("Customer tidak terpilih", ToastAndroid.SHORT);
                     handleSelected(val);
                   }}
                   defaultOption={{

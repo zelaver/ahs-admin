@@ -133,7 +133,7 @@ export default function Home() {
   };
 
   return (
-    <SafeAreaView>
+    <SafeAreaView className="bg-blue-100">
       <ScrollView
         refreshControl={
           <RefreshControl

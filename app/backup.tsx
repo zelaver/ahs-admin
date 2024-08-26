@@ -137,7 +137,7 @@ const backup = () => {
 
   return (
     <SafeAreaView>
-      <View className="main py-8">
+      <View className="main py-8 bg-blue-100">
         <View className="section-1 px-5 py-2">
           <Text className="text-2xl font-semibold">Backup</Text>
         </View>

@@ -84,11 +84,11 @@ const Histori = () => {
   }, [history]);
 
   return (
-    <SafeAreaView className="py-8 h-full">
+    <SafeAreaView className="pt-8 flex-1 bg-blue-100">
       <View className="section-1 px-5 py-2 flex-row items-center">
         <Text className="text-2xl font-bold mr-3">Histori</Text>
       </View>
-      <View className="h-full">
+      <View className="h-full mb-32">
         {isLoading ? (
           <View className="flex-1 justify-center items-center ">
             <ActivityIndicator
@@ -98,7 +98,8 @@ const Histori = () => {
           </View>
         ) : (
           <ScrollView
-            className="main "
+            className="main"
+            contentContainerStyle={{paddingBottom: 70}}
             nestedScrollEnabled
           >
             <View className="py-2 px-5 chart">
@@ -114,7 +115,7 @@ const Histori = () => {
                 rotateLabel
                 width={300}
                 hideDataPoints
-                spacing={10}
+                spacing={20}
                 color="#1943b4"
                 thickness={2}
                 startFillColor="rgba(25, 67, 180,0.3)"
@@ -123,7 +124,7 @@ const Histori = () => {
                 endOpacity={0.2}
                 initialSpacing={40}
                 noOfSections={6}
-                maxValue={chartData[chartData.length - 1].value + 600}
+                maxValue={chartData[chartData.length - 1].value + 1000}
                 yAxisColor="white"
                 yAxisThickness={0}
                 rulesType="solid"
@@ -132,7 +133,7 @@ const Histori = () => {
                 yAxisSide="right"
                 xAxisColor="lightgray"
                 pointerConfig={{
-                  pointerStripHeight: 160,
+                  pointerStripHeight: 100,
                   pointerStripColor: "#0481c6",
                   pointerStripWidth: 2,
                   pointerColor: "#0481c6",
@@ -148,9 +149,9 @@ const Histori = () => {
                           height: 90,
                           width: 100,
                           justifyContent: "center",
-                          marginTop: -20,
+                          marginTop: -10,
                           zIndex: 999,
-                          marginLeft: -40,
+                          marginLeft: -50,
                           display: items[0].value || items[0].value == 0 ? "flex" : "none",
                         }}
                       >
@@ -246,7 +247,7 @@ const RowData = ({ id, data }) => {
   // if()
   const dataRowBefore = data.find((item) => item.id == id - 1);
   return (
-    <View className="row-data px-2 py-2.5 ">
+    <View className="row-data px-2 py-2.5 bg-white">
       <View className="flex-row">
         <View className="flex-1 mr-2.5 flex-row ">
           <Text className=" text-gray-700 text-sm mr-2">{dataRow.stock_aqua}</Text>

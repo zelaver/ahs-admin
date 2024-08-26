@@ -206,7 +206,7 @@ const Pesanan = () => {
   };
 
   return (
-    <SafeAreaView className="py-8">
+    <SafeAreaView className="py-8 bg-blue-100 flex-1">
       <View className="header pb-1">
         <View className="section-1 px-5 py-2">
           <Text className="text-2xl font-semibold">Pesanan</Text>
@@ -221,8 +221,8 @@ const Pesanan = () => {
               className="mr-2"
             >
               <Text
-                className={`px-3 py-1 border font-semibold rounded-md w-min-[67px] text-center text-xs border-red-500 
-                    ${filterStatus == "hutang" ? "text-white bg-red-500" : "text-red-500"} `}
+                className={`px-3 py-1 border font-bold rounded-md w-min-[67px] text-center text-xs border-red-500 
+                    ${filterStatus == "hutang" ? "text-white bg-red-500" : "text-red-500 "} `}
               >
                 Hutang
               </Text>
@@ -235,7 +235,7 @@ const Pesanan = () => {
               className="mr-2"
             >
               <Text
-                className={`px-3 py-1 border rounded-md w-min-[67px] text-center text-xs border-yellow-500 font-semibold
+                className={`px-3 py-1 border rounded-md w-min-[67px] text-center text-xs border-yellow-500 font-bold
                     ${filterStatus == "pinjam" ? "text-white bg-yellow-500" : "text-yellow-500"}`}
               >
                 Pinjam
@@ -248,13 +248,16 @@ const Pesanan = () => {
               activeOpacity={1}
             >
               <Text
-                className={`px-3 py-1 border rounded-md w-min-[67px] text-center text-xs border-green-500 font-semibold
-                    ${filterStatus == "lunas" ? "text-white bg-green-500" : "text-green-500"}`}
+                className={`px-3 py-1 border rounded-md w-min-[67px] text-center text-xs border-green-500 font-bold
+                    ${filterStatus == "lunas" ? "text-white bg-green-500" : "text-green-500 "}`}
               >
                 Lunas
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setAscending(!ascending)} className="ml-3">
+            <TouchableOpacity
+              onPress={() => setAscending(!ascending)}
+              className="ml-3"
+            >
               <Icon
                 name={`${ascending ? "sort-desc" : "sort-asc"}`}
                 size={24}
@@ -316,7 +319,11 @@ const Pesanan = () => {
                       return { key: item.id, value: item.name };
                     }),
                   ]}
-                  setSelected={(val: any) => handleSelected(val)}
+                  setSelected={(val: any) => {
+                    // console.log(val)
+                    if(!val) return ToastAndroid.show("Customer tidak terpilih", ToastAndroid.SHORT);
+                    handleSelected(val);
+                  }}
                   placeholder="pilih pelanggan"
                   searchPlaceholder="cari pelanggan"
                 />

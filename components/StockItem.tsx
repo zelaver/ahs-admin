@@ -186,7 +186,7 @@ const StockItem = ({
 
   return (
     <View
-      className={`mini-box border-2 flex-col rounded-lg px-3 flex-1 gap-y-2 pb-2 ${otherStyles} `}
+      className={`mini-box border-2 flex-col rounded-lg px-3 flex-1 gap-y-2 pb-2 bg-blue-50 ${otherStyles} `}
     >
       <View className="flex-row justify-between items-center ">
         <Text className="text-xs text-gray-700 font-semibold">{name}</Text>

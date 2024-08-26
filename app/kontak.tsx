@@ -98,13 +98,13 @@ const Kontak = () => {
   };
 
   return (
-    <SafeAreaView className="pt-8 bg-white flex-1">
+    <SafeAreaView className="pt-8 bg-blue-100 flex-1">
       <View className="Header pb-3">
         <View className="section-1 px-5 py-2">
           <Text className="text-2xl font-semibold">Kontak</Text>
         </View>
         <View className="section-2 px-5 flex-row items-center justify-between">
-          <View className={`flex-row py-1 flex-1 px-2 mr-2 rounded-md items-center border`}>
+          <View className={`flex-row py-1 flex-1 px-2 mr-2 rounded-md items-center border bg-white`}>
             <TextInput
               className=" text-xs flex-1 font-normal mr-2 justify-center items-center"
               value={query}
@@ -125,7 +125,7 @@ const Kontak = () => {
           <TouchableOpacity
             activeOpacity={0.5}
             onPress={handlePresentModalPress}
-            className="bg-white rounded-full "
+            className=" rounded-full "
           >
             <Icon
               name="add-fill"
