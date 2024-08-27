@@ -182,6 +182,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
     // console.log("status", status);
     let parsedList = JSON.parse(orderList);
     // console.log(typeof orderList)
+    console.log('masuk sini')
     if (curStatus == "lunas" && status == "hutang") {
       await addHistory({
         saldo: history.saldo - total,
@@ -192,7 +193,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
           (aquaVal - parsedList[0].sum) +
           (isiUlangVal - parsedList[1].sum),
         stock_gas_12kg: history.stock_gas_12kg - (gasVal - parsedList[2].sum),
-        stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + (gasVal - parsedList[3].sum),
+        stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + (gasVal - parsedList[2].sum),
         stock_isi_ulang: history.stock_isi_ulang - (isiUlangVal - parsedList[1].sum),
         transactionId: id,
       });
@@ -211,7 +212,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
       });
     }
 
-    if (curStatus == "lunas" && status == "lunas") {
+    if (curStatus === "lunas" && status === "lunas") {
       await addHistory({
         saldo: history.saldo - (total_price - total),
         stock_aqua: history.stock_aqua - (aquaVal - parsedList[0].sum),
@@ -221,13 +222,14 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
           (aquaVal - parsedList[0].sum) +
           (isiUlangVal - parsedList[1].sum),
         stock_gas_12kg: history.stock_gas_12kg - (gasVal - parsedList[2].sum),
-        stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + (gasVal - parsedList[3].sum),
+        stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + (gasVal - parsedList[2].sum),
         stock_isi_ulang: history.stock_isi_ulang - (isiUlangVal - parsedList[1].sum),
         transactionId: id,
       });
     }
 
-    if (curStatus == "hutang" && status == "lunas") {
+    if (curStatus === "hutang" && status === "lunas") {
+      // console.log(gasVal)
       await addHistory({
         saldo: history.saldo + total,
         stock_aqua: history.stock_aqua - (aquaVal - parsedList[0].sum),
@@ -237,7 +239,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
           (aquaVal - parsedList[0].sum) +
           (isiUlangVal - parsedList[1].sum),
         stock_gas_12kg: history.stock_gas_12kg - (gasVal - parsedList[2].sum),
-        stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + (gasVal - parsedList[3].sum),
+        stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + (gasVal - parsedList[2].sum),
         stock_isi_ulang: history.stock_isi_ulang - (isiUlangVal - parsedList[1].sum),
         transactionId: id,
       });
@@ -250,7 +252,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
         stock_galon_kosong:
           history.stock_galon_kosong - galonKosongVal + parsedList[0].sum + parsedList[1].sum,
         stock_gas_12kg: history.stock_gas_12kg + parsedList[2].sum,
-        stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + parsedList[3].sum,
+        stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + parsedList[2].sum,
         stock_isi_ulang: history.stock_isi_ulang + parsedList[1].sum,
         transactionId: id,
       });
@@ -266,7 +268,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
           (aquaVal - parsedList[0].sum) +
           (isiUlangVal - parsedList[1].sum),
         stock_gas_12kg: history.stock_gas_12kg - (gasVal - parsedList[2].sum),
-        stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + (gasVal - parsedList[3].sum),
+        stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + (gasVal - parsedList[2].sum),
         stock_isi_ulang: history.stock_isi_ulang - (isiUlangVal - parsedList[1].sum),
         transactionId: id,
       });
@@ -458,7 +460,8 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                     }),
                   ]}
                   setSelected={(val: any) => {
-                    if(!val) return ToastAndroid.show("Customer tidak terpilih", ToastAndroid.SHORT);
+                    if (!val)
+                      return ToastAndroid.show("Customer tidak terpilih", ToastAndroid.SHORT);
                     handleSelected(val);
                   }}
                   defaultOption={{
@@ -647,7 +650,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                   activeOpacity={1}
                 >
                   <Text
-                    className={`px-3 py-1 border font-semibold rounded-md w-[67px] text-center text-xs border-red-500 
+                    className={`px-3 py-1 border font-semibold rounded-md w-min-[67px] text-center text-xs border-red-500 
                     ${status == "hutang" ? "text-white bg-red-500" : "text-red-500"} `}
                   >
                     Hutang
@@ -664,7 +667,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                   activeOpacity={1}
                 >
                   <Text
-                    className={`px-3 py-1 border rounded-md w-[67px] text-center text-xs border-yellow-500 font-semibold
+                    className={`px-3 py-1 border rounded-md w-min-[67px] text-center text-xs border-yellow-500 font-semibold
                     ${status == "pinjam" ? "text-white bg-yellow-500" : "text-yellow-500"}`}
                   >
                     Pinjam
@@ -683,7 +686,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                   activeOpacity={1}
                 >
                   <Text
-                    className={`px-3 py-1 border rounded-md w-[67px] text-center text-xs border-green-500 font-semibold
+                    className={`px-3 py-1 border rounded-md w-min-[67px] text-center text-xs border-green-500 font-semibold
                     ${status == "lunas" ? "text-white bg-green-500" : "text-green-500"}`}
                   >
                     Lunas
@@ -760,6 +763,7 @@ const CustomerComponent = ({ customerId, date }: { customerId: number; date: str
   const [customerName, setCustomerName] = useState<string>("");
   const [customerType, setCustomerType] = useState<number>();
   const [formatedDate, setFormatedDate] = useState(formatDate(date));
+  const { customers } = useGlobalContext();
 
   useEffect(() => {
     const fetchCustomer = async () => {
@@ -775,7 +779,7 @@ const CustomerComponent = ({ customerId, date }: { customerId: number; date: str
     };
     setFormatedDate(formatDate(date));
     fetchCustomer();
-  }, [customerId, date]); // Dependency array untuk men-trigger useEffect ketika customerId berubah
+  }, [customerId, date, customers]); // Dependency array untuk men-trigger useEffect ketika customerId berubah
 
   return (
     <View className="flex-row">

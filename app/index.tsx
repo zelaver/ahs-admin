@@ -133,7 +133,7 @@ export default function Home() {
   };
 
   return (
-    <SafeAreaView className="bg-blue-600">
+    <SafeAreaView className="bg-blue-600 flex-1">
       <ScrollView
         refreshControl={
           <RefreshControl
@@ -141,6 +141,9 @@ export default function Home() {
             onRefresh={onRefresh}
           />
         }
+        contentContainerStyle={{
+          paddingBottom: 70
+        }}
       >
         <View className="main py-8 ">
           <View className="section-1 px-5 py-2">

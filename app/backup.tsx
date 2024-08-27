@@ -139,7 +139,7 @@ const backup = () => {
     <SafeAreaView>
       <View className="main py-8 bg-blue-600">
         <View className="section-1 px-5 py-2">
-          <Text className="text-2xl font-semibold">Backup</Text>
+          <Text className="text-2xl font-semibold text-blue-50">Backup</Text>
         </View>
         <View className="section-2 px-5 py-2 h-full  justify-center items-center">
           <TouchableOpacity

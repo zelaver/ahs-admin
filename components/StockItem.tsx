@@ -106,12 +106,15 @@ const StockItem = ({
       return;
     }
     try {
-      if (!stockPrice && id != 3) {
+      if (!stockPrice && id && id != 3) {
         console.log(id);
         ToastAndroid.show("isi harga pembelian/barang", ToastAndroid.SHORT);
         return;
       }
-      if (!addStock || ((!stockPrice || stocks.saldo - addStock * stockPrice < 0) && id != 3)) {
+      if (
+        !addStock ||
+        ((!stockPrice || stocks.saldo - addStock * stockPrice < 0) && id && id != 3)
+      ) {
         ToastAndroid.show("Saldo tidak cukup", ToastAndroid.SHORT);
         return;
       } else if (name == "Aqua") {

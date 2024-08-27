@@ -100,6 +100,7 @@ const ContactItem = ({
         id
       );
       await fetchContacts();
+      await fetchTransactions()
       setIsLoading(false);
       handleClosePress();
     } catch (e) {
