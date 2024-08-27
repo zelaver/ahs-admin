@@ -84,108 +84,114 @@ const Histori = () => {
   }, [history]);
 
   return (
-    <SafeAreaView className="pt-8 flex-1 bg-blue-100">
+    <SafeAreaView className="pt-8 flex-1 bg-blue-600">
       <View className="section-1 px-5 py-2 flex-row items-center">
-        <Text className="text-2xl font-bold mr-3">Histori</Text>
+        <Text className="text-2xl font-bold mr-3 text-blue-50">Histori</Text>
       </View>
       <View className="h-full mb-32">
         {isLoading ? (
           <View className="flex-1 justify-center items-center ">
             <ActivityIndicator
               size={"large"}
-              color={"black"}
+              color={"white"}
             />
           </View>
         ) : (
           <ScrollView
             className="main"
-            contentContainerStyle={{paddingBottom: 70}}
+            contentContainerStyle={{ paddingBottom: 70 }}
             nestedScrollEnabled
           >
             <View className="py-2 px-5 chart">
               <View className="section-1 py-2 flex-row items-center">
-                <Text className="text-lg font-semibold mr-3">Saldo Harian</Text>
+                <Text className="text-lg font-semibold mr-3 text-blue-50">Saldo Harian</Text>
               </View>
-              <LineChart
-                areaChart
-                // isAnimated
-                curved
-                // animationDuration={2000}
-                data={chartData}
-                rotateLabel
-                width={300}
-                hideDataPoints
-                spacing={20}
-                color="#1943b4"
-                thickness={2}
-                startFillColor="rgba(25, 67, 180,0.3)"
-                endFillColor="rgba(25, 67, 180,0.01)"
-                startOpacity={0.9}
-                endOpacity={0.2}
-                initialSpacing={40}
-                noOfSections={6}
-                maxValue={chartData[chartData.length - 1].value + 1000}
-                yAxisColor="white"
-                yAxisThickness={0}
-                rulesType="solid"
-                rulesColor="rgba(25, 67, 180,0.3)"
-                yAxisTextStyle={{ color: "gray" }}
-                yAxisSide="right"
-                xAxisColor="lightgray"
-                pointerConfig={{
-                  pointerStripHeight: 100,
-                  pointerStripColor: "#0481c6",
-                  pointerStripWidth: 2,
-                  pointerColor: "#0481c6",
-                  radius: 6,
-                  pointerLabelWidth: 100,
-                  pointerLabelHeight: 90,
-                  activatePointersOnLongPress: true,
-                  autoAdjustPointerLabelPosition: false,
-                  pointerLabelComponent: (items) => {
-                    return (
-                      <View
-                        style={{
-                          height: 90,
-                          width: 100,
-                          justifyContent: "center",
-                          marginTop: -10,
-                          zIndex: 999,
-                          marginLeft: -50,
-                          display: items[0].value || items[0].value == 0 ? "flex" : "none",
-                        }}
-                      >
-                        <Text
-                          style={{
-                            color: "black",
-                            fontSize: 14,
-                            marginBottom: 6,
-                            marginTop: 6,
-                            textAlign: "center",
-                            fontWeight: "bold",
-                            minWidth: 120,
-                          }}
-                        >
-                          {items[0].date}
-                        </Text>
+              <View className="bg-white rounded-md py-2 border shadow-md">
+                <LineChart
+                  areaChart
+                  // isAnimated
+                  curved
+                  // animationDuration={2000}
+                  data={chartData}
+                  rotateLabel
+                  width={300}
+                  hideDataPoints
+                  spacing={20}
+                  color="#1943b4"
+                  thickness={2}
+                  startFillColor="rgba(25, 67, 180,0.3)"
+                  endFillColor="rgba(25, 67, 180,0.01)"
+                  // backgroundColor={"white"}
+                  endSpacing={-20}
+                  startOpacity={0.9}
+                  endOpacity={0.2}
+                  initialSpacing={40}
+                  noOfSections={6}
+                  maxValue={chartData[chartData.length - 1].value + 1000}
+                  yAxisColor="white"
+                  yAxisThickness={0}
+                  rulesType="solid"
+                  rulesColor="rgba(25, 67, 180,0.3)"
+                  yAxisTextStyle={{ color: "gray" }}
+                  yAxisSide="right"
+                  xAxisColor="lightgray"
+                  pointerConfig={{
+                    pointerStripHeight: 100,
+                    pointerStripColor: "#0481c6",
+                    pointerStripWidth: 2,
+                    pointerColor: "#0481c6",
+                    radius: 6,
+                    pointerLabelWidth: 100,
+                    pointerLabelHeight: 90,
+                    activatePointersOnLongPress: true,
+                    autoAdjustPointerLabelPosition: false,
+                    pointerLabelComponent: (items) => {
+                      return (
                         <View
                           style={{
-                            paddingHorizontal: 14,
-                            paddingVertical: 6,
-                            borderRadius: 16,
-                            backgroundColor: "#1e1e1e",
-                            minWidth: 120,
+                            height: 90,
+                            width: 100,
+                            justifyContent: "center",
+                            marginTop: -10,
+                            zIndex: 999,
+                            marginLeft: -50,
+                            display: items[0].value || items[0].value == 0 ? "flex" : "none",
                           }}
                         >
-                          <Text style={{ fontWeight: "bold", textAlign: "center", color: "white" }}>
-                            {"Rp" + items[0].saldo + ",00"}
+                          <Text
+                            style={{
+                              color: "black",
+                              fontSize: 14,
+                              marginBottom: 6,
+                              marginTop: 6,
+                              textAlign: "center",
+                              fontWeight: "bold",
+                              minWidth: 120,
+                            }}
+                          >
+                            {items[0].date}
                           </Text>
+                          <View
+                            style={{
+                              paddingHorizontal: 14,
+                              paddingVertical: 6,
+                              borderRadius: 16,
+                              backgroundColor: "#1e1e1e",
+                              minWidth: 120,
+                            }}
+                          >
+                            <Text
+                              style={{ fontWeight: "bold", textAlign: "center", color: "white" }}
+                            >
+                              {"Rp" + items[0].saldo + ",00"}
+                            </Text>
+                          </View>
                         </View>
-                      </View>
-                    );
-                  },
-                }}
-              />
+                      );
+                    },
+                  }}
+                />
+              </View>
               {/* <TouchableOpacity
               onPress={() => console.log(chartData[chartData.length - 1].value)}
             >
@@ -194,11 +200,12 @@ const Histori = () => {
             </View>
             <View className="section-2 px-5 table">
               <View className="section-1 py-2 flex-row items-center ">
-                <Text className="text-lg font-semibold mr-2.5">Stock</Text>
+                <Text className="text-lg font-semibold mr-2.5 text-blue-50">Stock</Text>
                 <TouchableOpacity onPress={() => setAscending(!ascending)}>
                   <Icon
                     name={`${ascending ? "sort-desc" : "sort-asc"}`}
                     size={20}
+                    color="white"
                   />
                 </TouchableOpacity>
               </View>

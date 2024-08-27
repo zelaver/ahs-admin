@@ -137,7 +137,7 @@ const backup = () => {
 
   return (
     <SafeAreaView>
-      <View className="main py-8 bg-blue-100">
+      <View className="main py-8 bg-blue-600">
         <View className="section-1 px-5 py-2">
           <Text className="text-2xl font-semibold">Backup</Text>
         </View>
@@ -164,7 +164,7 @@ const backup = () => {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            className={"border px-4 py-2 border-blue-800 rounded-md border-dashed min-w-[100px] justify-center items-center min-h-[50px]"}
+            className={"border px-4 py-2 border-blue-800 bg-blue-50 rounded-md border-dashed min-w-[100px] justify-center items-center min-h-[50px]"}
             activeOpacity={0.9}
             disabled={isLoading}
             onPress={() => {
@@ -175,13 +175,13 @@ const backup = () => {
           >
             <Text className="text-xl text-blue-800 font-semibold">Import</Text>
           </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             className="border px-4 py-2 border-blue-800 rounded-md border-dashed mt-20"
             activeOpacity={0.9}
             onPress={() => debug()}
           >
             <Text className="text-xl text-blue-800 font-semibold">Debug</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
     </SafeAreaView>

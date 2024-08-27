@@ -133,7 +133,7 @@ export default function Home() {
   };
 
   return (
-    <SafeAreaView className="bg-blue-100">
+    <SafeAreaView className="bg-blue-600">
       <ScrollView
         refreshControl={
           <RefreshControl
@@ -144,7 +144,7 @@ export default function Home() {
       >
         <View className="main py-8 ">
           <View className="section-1 px-5 py-2">
-            <Text className="text-2xl font-semibold">Home</Text>
+            <Text className="text-2xl font-semibold text-blue-50">Home</Text>
           </View>
           <View className="section-2 px-5 box-content gap-y-3 pb-3">
             <View className="profile flex-row justify-between items-center py-1.5">
@@ -152,15 +152,15 @@ export default function Home() {
                 <View className="pp bg-cyan-600 w-8 h-8 rounded-full justify-center items-center border">
                   <Text className="text-white text-xs font-medium">EM</Text>
                 </View>
-                <Text className="text-sm font-bold">Euis Marlina</Text>
+                <Text className="text-sm font-bold text-blue-50">Euis Marlina</Text>
               </View>
               <Icon
                 name="settings-line"
                 size={20}
-                color="#1e40af"
+                color="#fff"
               ></Icon>
             </View>
-            <View className="saldo px-3 py-2 bg-blue-800 rounded-lg flex-col box-content">
+            <View className="saldo px-3 py-2 bg-blue-800 rounded-lg flex-col box-content border border-blue-50">
               <View className="flex-row justify-between items-center mb-1">
                 <Text className="text-base font-bold text-white ">Saldo Toko</Text>
                 <Icon
@@ -189,7 +189,7 @@ export default function Home() {
             </View>
           </View>
           <View className="section-3 px-5 flex-col gap-y-2 ">
-            <Text className="text-sm font-bold text-gray-700 mb-2">Stok/Harga Galon</Text>
+            <Text className="text-sm font-bold text-blue-50 mb-2">Stok/Harga Galon</Text>
             <View className="stok-row-1 flex-row justify-between mb-4 ">
               <StockItem
                 id={products[0]?.id}

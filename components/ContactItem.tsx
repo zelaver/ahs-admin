@@ -149,7 +149,7 @@ const ContactItem = ({
   return (
     <View className="kontak-item py-1.5 ">
       <View className="flex-row justify-between items-center mb-2.5">
-        <Text className="text-base font-medium">
+        <Text className="text-base font-bold text-blue-50">
           {index + 1}. {name}
         </Text>
         <TouchableOpacity
@@ -160,10 +160,11 @@ const ContactItem = ({
           <Icon
             name="pencil-line"
             size={20}
+            color="white"
           />
         </TouchableOpacity>
       </View>
-      <View className="border rounded-lg bg-white">
+      <View className="border rounded-lg bg-white shadow-lg">
         <View className="phone flex-row items-center border-b">
           <View className="bg-blue-800 p-2 rounded-tl-md mr-3">
             <Icon

@@ -206,10 +206,10 @@ const Pesanan = () => {
   };
 
   return (
-    <SafeAreaView className="py-8 bg-blue-100 flex-1">
+    <SafeAreaView className="pt-8 bg-blue-600 flex-1">
       <View className="header pb-1">
         <View className="section-1 px-5 py-2">
-          <Text className="text-2xl font-semibold">Pesanan</Text>
+          <Text className="text-2xl font-semibold text-blue-50">Pesanan</Text>
         </View>
         <View className="section-2 px-5 flex-row items-center ">
           <View className={`flex-row py-1 flex-1 mr-2 rounded-md items-center `}>
@@ -261,13 +261,15 @@ const Pesanan = () => {
               <Icon
                 name={`${ascending ? "sort-desc" : "sort-asc"}`}
                 size={24}
+                color="white"
               />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={handlePresentModalPress}>
+          <TouchableOpacity onPress={handlePresentModalPress} className="bg-blue-800 rounded-full">
             <Icon
               name="add-fill"
               size={32}
+              color="white"
             ></Icon>
           </TouchableOpacity>
         </View>

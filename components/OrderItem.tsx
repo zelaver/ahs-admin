@@ -391,7 +391,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
   const [isLoading, setIsLoading] = useState(false);
 
   return (
-    <View className="pesanan-item border rounded-lg p-2.5 flex-row justify-between items-center mb-4 bg-white">
+    <View className="pesanan-item border rounded-lg p-2.5 flex-row justify-between items-center mb-4 bg-white shadow-lg">
       {/* <View className="flex-row">
         <View className="bg-gray-200 rounded-full w-10 h-10 items-center justify-center">
           <Icon
@@ -740,14 +740,14 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
                   Hapus
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 onPress={() => {
                   const test = customers.find((item) => item.id == curCustomerId);
                   console.log(test);
                 }}
               >
                 <Text>test</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
           </View>
         </BottomSheetScrollView>
@@ -779,10 +779,11 @@ const CustomerComponent = ({ customerId, date }: { customerId: number; date: str
 
   return (
     <View className="flex-row">
-      <View className="bg-gray-200 rounded-full w-10 h-10 items-center justify-center">
+      <View className="bg-blue-800 rounded-full w-10 h-10 items-center justify-center">
         <Icon
           name={`${customerType ? "home-smile-2-line" : "user-3-line"}`}
           size={24}
+          color="white"
         />
       </View>
       <View className="ml-4">
