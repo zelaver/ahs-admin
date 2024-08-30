@@ -1,5 +1,5 @@
 import { View, Text, Image, ToastAndroid } from "react-native";
-import React from "react";
+import React, { memo } from "react";
 import images from "@/constants/images";
 import Icon from "react-native-remix-icon";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -15,7 +15,7 @@ type CartItem = {
   stok: number | any;
 };
 
-const CartItem = ({ image, name, price = 0, val, setVal, setTotal, total, stok }: CartItem) => {
+const CartItem = memo(({ image, name, price = 0, val, setVal, setTotal, total, stok }: CartItem) => {
   return (
     <View className={`cart-item px-5 mb-4 ${!val && "hidden"}`}>
       <View className="py-4 flex-row justify-between border-b border-gray-500">
@@ -70,6 +70,6 @@ const CartItem = ({ image, name, price = 0, val, setVal, setTotal, total, stok }
       </View>
     </View>
   );
-};
+});
 
 export default CartItem;
