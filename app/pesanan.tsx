@@ -145,7 +145,6 @@ const Pesanan = () => {
     });
     const transaction: any[] = await getTransactions();
     const transactionId = transaction[transaction?.length - 1].id;
-    // console.log(transactionId);
     // INPUT DATA KE HISTORY
     await addHistory({
       saldo: history.saldo + (status == 0 ? 0 : total),
@@ -159,11 +158,6 @@ const Pesanan = () => {
     await fetchHistory();
     await fetchTransactions();
     handleClosePress();
-    // console.log("id customer:", customerId);
-    // console.log("status:", statusString);
-    // console.log(JSON.stringify(orderList, null, 2));
-    // console.log("total:", total);
-    // console.log(JSON.stringify(history[history.length - 1], null, 2));
   };
 
   const [refreshing, setRefreshing] = useState(false);

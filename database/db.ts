@@ -38,6 +38,7 @@ const initDB = async () => {
       stock_gas_12kg INTEGER,
       stock_gas_kosong INTEGER,
       saldo INTEGER,
+      note TEXT
       date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (transactionId) REFERENCES transactions(id)
     );
@@ -59,79 +60,8 @@ const initHistory = async () => {
       insert into history (saldo, stock_aqua, stock_galon_kosong, stock_gas_12kg, stock_gas_kosong, stock_isi_ulang, transactionId)
       values(0,0,0,0,0,0,null);
       `
-      // delete from transactions where id = 'trans001'
     );
     return result;
-  } catch (e) {
-    if (e instanceof Error) {
-      console.log(e);
-    }
-  }
-};
-
-const getQuery = async () => {
-  const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
-    useNewConnection: true,
-  });
-
-  try {
-    // const result: any = await db.getAllAsync("SELECT * FROM products");
-    const result: any = await db.getAllAsync("SELECT * FROM transactions;");
-    console.log(JSON.stringify(result, null, 2));
-    // console.log(result[result.length - 1])
-    // console.log(typeof JSON.parse(result[0].orderList)[0].productId);
-    // return result
-  } catch (e) {
-    if (e instanceof Error) {
-      console.log(e);
-    }
-  }
-};
-
-const getAllTables = async () => {
-  const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
-    useNewConnection: true,
-  });
-
-  try {
-    const result: any = await db.getAllAsync("SELECT name FROM sqlite_master WHERE type='table'; ");
-    console.log(result);
-    // console.log(JSON.stringify(result, 0, 2));
-    // return result
-  } catch (e) {
-    if (e instanceof Error) {
-      console.log(e);
-    }
-  }
-};
-
-const execQuery = async () => {
-  const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
-    useNewConnection: true,
-  });
-  // console.log(query)
-
-  try {
-    const orderListJson = JSON.stringify([
-      { productid: 1, sum: 3 },
-      { productid: 2, sum: 5 },
-    ]);
-
-    const customerId = 123; // contoh nilai customerId
-    const status = "lunas"; // contoh nilai status
-    const total_price = 100; // contoh nilai total_price
-    const result = await db.execAsync(
-      `
-      delete from transactions where customerId = 8
-      `
-      // insert into products (name, price, subs_price) values("Gas 12 kg", 220000, 220000);
-      // delete from products where id = 2
-      // insert into history (saldo, stock_aqua, stock_galon_kosong, stock_gas_12kg, stock_gas_kosong, stock_isi_ulang, transactionId)
-      // values(200000,0,300,0,20,0,null)
-      // [orderListJson, customerId, status, total_price]
-      // delete from customers where name = 'sigma skibid'
-    );
-    console.log(result);
   } catch (e) {
     if (e instanceof Error) {
       console.log(e);
@@ -263,6 +193,7 @@ const addHistory = async ({
   stock_gas_kosong,
   stock_isi_ulang,
   transactionId,
+  note
 }: any) => {
   const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
     useNewConnection: true,
@@ -270,8 +201,8 @@ const addHistory = async ({
   try {
     const result = await db.runAsync(
       `
-      insert into history (saldo, stock_aqua, stock_galon_kosong, stock_gas_12kg, stock_gas_kosong, stock_isi_ulang, transactionId)
-      values(?,?,?,?,?,?,?)
+      insert into history (saldo, stock_aqua, stock_galon_kosong, stock_gas_12kg, stock_gas_kosong, stock_isi_ulang, transactionId, note)
+      values(?,?,?,?,?,?,?,?)
       `,
       [
         saldo,
@@ -281,8 +212,8 @@ const addHistory = async ({
         stock_gas_kosong,
         stock_isi_ulang,
         transactionId,
+        note
       ]
-      // delete from transactions where id = 'trans001'
     );
     return result;
   } catch (e) {
@@ -440,9 +371,6 @@ const updateProductPrice = async (id: number, price: number, subs_price: number)
 export {
   initDB,
   initHistory,
-  getQuery,
-  getAllTables,
-  execQuery,
   addContact,
   getAllContacts,
   updateContact,

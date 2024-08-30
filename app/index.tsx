@@ -32,7 +32,7 @@ import { useGlobalContext } from "@/context/GlobalProvider";
 
 export default function Home() {
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-  const snapPoints = useMemo(() => ["25%", "40%"], []);
+  const snapPoints = useMemo(() => ["40%", "60%"], []);
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
     // console.log('kocak')
@@ -49,15 +49,62 @@ export default function Home() {
   const handleClosePress = useCallback(() => {
     bottomSheetModalRef.current?.close();
   }, []);
+  const renderBackdrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop
+        {...props}
+        appearsOnIndex={0}
+        disappearsOnIndex={-1}
+        pressBehavior={"close"}
+      />
+    ),
+    []
+  );
+
+  const {
+    lastHistory: stocks,
+    setHistory: setStocks,
+    products,
+    fetchHistory: fetchStocks,
+    // isLoading: isGlobalLoading,
+  } = useGlobalContext();
+  const [saldoInput, setSaldoInput] = useState<number | null>(null);
+  const [noteInput, setNoteInput] = useState<string>();
+
+  const [refreshing, setRefreshing] = useState(false);
+  const [debugMode, setDebugMode] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSave = async () => {
+    if (!saldoInput || !noteInput)
+      return ToastAndroid.show("Input tidak boleh kosong", ToastAndroid.SHORT);
+    if (stocks?.saldo + saldoInput < 0) {
+      return ToastAndroid.show("Saldo anda tidak cukup", ToastAndroid.SHORT);
+    }
+    setIsLoading(true);
+    await addHistory({ ...stocks, saldo: stocks?.saldo + saldoInput, note: noteInput });
+    await fetchStocks();
+    setIsLoading(false);
+    handleClosePress();
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchStocks();
+    setRefreshing(false);
+  };
 
   useEffect(() => {
+    setTimeout(() => {
+      setDebugMode(false);
+    }, 500);
+
+    // Back handling when bottom sheet is opened
     const backAction = () => {
       bottomSheetModalRef.current?.close();
       return true;
     };
-
     const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
-
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
       bottomSheetModalRef.current?.snapToIndex(1);
     });
@@ -72,65 +119,9 @@ export default function Home() {
     };
   }, []);
 
-  const renderBackdrop = useCallback(
-    (props: any) => (
-      <BottomSheetBackdrop
-        {...props}
-        appearsOnIndex={0}
-        disappearsOnIndex={-1}
-        pressBehavior={"close"}
-      />
-    ),
-    []
-  );
-
-  const [debugMode, setDebugMode] = useState<boolean>(false);
-  // const [stocks, setStocks] = useState<any>([]);
-  const {
-    lastHistory: stocks,
-    setHistory: setStocks,
-    products,
-    fetchHistory: fetchStocks,
-    // isLoading: isGlobalLoading,
-  } = useGlobalContext();
-  const [keteranganSaldo, setkKteranganSaldo] = useState();
-  const [saldoInput, setSaldoInput] = useState<number | null>(null);
-  const [refreshing, setRefreshing] = useState(false);
-
   if (debugMode) {
-    return <Redirect href={"/(tabs)/backup"} />;
+    return <Redirect href={"/debug"} />;
   }
-
-  // console.log(stocks.length)
-  // if (!stocks.length) {
-  //   return (
-  //     <View className="flex-1 justify-center items-center">
-  //       <ActivityIndicator
-  //         size={"small"}
-  //         color={"black"}
-  //       />
-  //     </View>
-  //   );
-  // }
-
-  const [isLoading, setIsLoading] = useState(false);
-  const handleSave = async () => {
-    if (!saldoInput) return ToastAndroid.show("Input saldo tidak boleh kosong", ToastAndroid.SHORT);
-    if (stocks?.saldo + saldoInput < 0) {
-      return ToastAndroid.show("Saldo anda tidak cukup", ToastAndroid.SHORT);
-    }
-    setIsLoading(true);
-    await addHistory({ ...stocks, saldo: stocks?.saldo + saldoInput });
-    await fetchStocks();
-    setIsLoading(false);
-    handleClosePress();
-  };
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await fetchStocks();
-    setRefreshing(false);
-  };
 
   return (
     <SafeAreaView className="bg-blue-600 flex-1">
@@ -142,7 +133,7 @@ export default function Home() {
           />
         }
         contentContainerStyle={{
-          paddingBottom: 70
+          paddingBottom: 70,
         }}
       >
         <View className="main py-8 ">
@@ -262,7 +253,7 @@ export default function Home() {
       >
         <BottomSheetScrollView>
           <View className="main py-3 gap-y-4">
-            <View className="nomor telepon px-3 ">
+            <View className="saldo-input px-3 ">
               <Text className="text-sm font-semibold mb-2.5">Jumlah Saldo:</Text>
               <View className="border-2 rounded-md px-3">
                 <CurrencyInput
@@ -280,7 +271,19 @@ export default function Home() {
                 />
               </View>
             </View>
-
+            <View className="note-input px-3 ">
+              <Text className="text-sm font-semibold mb-2.5">Note:</Text>
+              <View className="border-2 rounded-md px-3">
+                <TextInput
+                  multiline={true}
+                  numberOfLines={4}
+                  value={noteInput}
+                  onChangeText={(e) => {
+                    setNoteInput(e);
+                  }}
+                />
+              </View>
+            </View>
             <View className="action-button px-3">
               <TouchableOpacity
                 className={`rounded-lg ${

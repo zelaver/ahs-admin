@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
-import { execQuery, getAllContacts, getQuery } from "@/database/db";
+import { execQuery, getAllContacts, getQuery } from "@/database/debug";
 import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system";
 import * as DocumentPicker from "expo-document-picker";
@@ -15,7 +15,7 @@ import * as SQLite from "expo-sqlite";
 import JSZip from "jszip";
 import { useGlobalContext } from "@/context/GlobalProvider";
 
-const backup = () => {
+const Backup = () => {
   const { history, fetchHistory, fetchCustomers, fetchTransactions, fetchProducts } =
     useGlobalContext();
   const [isLoading, setIsLoading] = useState(false);
@@ -108,33 +108,6 @@ const backup = () => {
     }
   };
 
-  const debug = async () => {
-    await getQuery()
-
-    // const saldoTerakhirPerTanggal = history.reduce((acc, current) => {
-    //   const dateOnly = current.date.split(" ")[0]; // Pisahkan tanggal dari waktu
-    //   if (!acc.has(dateOnly)) {
-    //     acc.set(dateOnly, current); // Tambahkan entri pertama untuk tanggal ini
-    //   } else {
-    //     // Update jika entri ini lebih baru
-    //     const existingEntry = acc.get(dateOnly);
-    //     if (new Date(current.date) > new Date(existingEntry.date)) {
-    //       acc.set(dateOnly, current);
-    //     }
-    //   }
-    //   return acc;
-    // }, new Map());
-    // // @ts-ignore
-    // const saldoTerakhir = Array.from(saldoTerakhirPerTanggal.values()).map((entry) => ({
-    //   // @ts-ignore
-    //   date: entry.date.split(" ")[0],
-    //   // @ts-ignore
-    //   saldo: entry.saldo,
-    // }));
-
-    // console.log(saldoTerakhir);
-  };
-
   return (
     <SafeAreaView>
       <View className="main py-8 bg-blue-600">
@@ -164,7 +137,9 @@ const backup = () => {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            className={"border px-4 py-2 border-blue-800 bg-blue-50 rounded-md border-dashed min-w-[100px] justify-center items-center min-h-[50px]"}
+            className={
+              "border px-4 py-2 border-blue-800 bg-blue-50 rounded-md border-dashed min-w-[100px] justify-center items-center min-h-[50px]"
+            }
             activeOpacity={0.9}
             disabled={isLoading}
             onPress={() => {
@@ -175,17 +150,10 @@ const backup = () => {
           >
             <Text className="text-xl text-blue-800 font-semibold">Import</Text>
           </TouchableOpacity>
-          {/* <TouchableOpacity
-            className="border px-4 py-2 border-blue-800 rounded-md border-dashed mt-20"
-            activeOpacity={0.9}
-            onPress={() => debug()}
-          >
-            <Text className="text-xl text-blue-800 font-semibold">Debug</Text>
-          </TouchableOpacity> */}
         </View>
       </View>
     </SafeAreaView>
   );
 };
 
-export default backup;
+export default Backup;
