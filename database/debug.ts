@@ -22,8 +22,7 @@ const execQuery = async () => {
   try {
     const result = await db.execAsync(
       `
-      ALTER TABLE history
-      ADD COLUMN note TEXT;
+      delete from transactions
       `
     );
     console.log(result);

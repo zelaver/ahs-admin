@@ -25,6 +25,7 @@ const initDB = async () => {
       date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
       orderList TEXT NOT NULL, 
       customerId INTEGER, 
+      ongkir INTEGER, 
       status TEXT CHECK(status IN ('hutang', 'pinjam', 'lunas')) NOT NULL, 
       total_price DECIMAL(10, 2) NOT NULL, 
       FOREIGN KEY (customerId) REFERENCES customers(id)
@@ -159,7 +160,8 @@ const deleteContact = async (id: number) => {
       `
       DELETE FROM customers WHERE id = ${id};
       DELETE FROM transactions WHERE customerId = ${id};
-      `);
+      `
+    );
     // console.log(result[0])
     // console.log("masuk");
     return result;
@@ -193,7 +195,7 @@ const addHistory = async ({
   stock_gas_kosong,
   stock_isi_ulang,
   transactionId,
-  note
+  note,
 }: any) => {
   const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
     useNewConnection: true,
@@ -212,7 +214,7 @@ const addHistory = async ({
         stock_gas_kosong,
         stock_isi_ulang,
         transactionId,
-        note
+        note,
       ]
     );
     return result;
@@ -255,19 +257,28 @@ type Transaction = {
   customerId: number;
   status: string;
   total_price: number;
+  ongkir: number;
+  date: string;
 };
 
-const addTransaction = async ({ orderList, customerId, status, total_price }: Transaction) => {
+const addTransaction = async ({
+  orderList,
+  customerId,
+  status,
+  ongkir,
+  total_price,
+  date,
+}: Transaction) => {
   const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
     useNewConnection: true,
   });
   try {
     const result = await db.runAsync(
       `
-      insert into transactions (orderList, customerId, status, total_price)
-      values(?,?,?,?)
+      insert into transactions (date, orderList, customerId, status,ongkir, total_price)
+      values(?,?,?,?,?,?)
       `,
-      [JSON.stringify(orderList), customerId, status, total_price]
+      [date, JSON.stringify(orderList), customerId, status, ongkir, total_price]
       // delete from transactions where id = 'trans001'
     );
     return result;

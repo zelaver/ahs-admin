@@ -28,6 +28,7 @@ import images from "@/constants/images";
 import { useGlobalContext } from "@/context/GlobalProvider";
 import { filter } from "jszip";
 import CurrencyInput from "react-native-currency-input";
+import DateTimePicker, { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 
 const Pesanan = () => {
   // const [query, setQuery] = useState<string>();
@@ -170,8 +171,10 @@ const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
       setGasVal(0);
       setGasKosongVal(0);
       setCustomerId(null);
-      setTotal(0);
       setIsSubscriber(0);
+      setAntar(false);
+      setOngkir(0);
+      setTotal(0);
     }
   }, []);
   const handleClosePress = useCallback(() => {
@@ -209,6 +212,8 @@ const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
   const [total, setTotal] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
   const [ongkir, setOngkir] = useState<number | null>(1000);
+  const [antar, setAntar] = useState<boolean>(false);
+  const [date, setDate] = useState(new Date());
 
   const handleCustomerSelected = useCallback(
     async (id: number) => {
@@ -220,13 +225,15 @@ const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
         setTotal(
           aquaVal * products[0]?.price +
             isiUlangVal * products[1]?.price +
-            gasVal * products[2]?.price
+            gasVal * products[2]?.price +
+            (ongkir ? ongkir : 0)
         );
       } else {
         setTotal(
           aquaVal * products[0]?.subs_price +
             isiUlangVal * products[1]?.subs_price +
-            gasVal * products[2]?.price
+            gasVal * products[2]?.price +
+            (ongkir ? ongkir : 0)
         );
       }
     },
@@ -280,12 +287,24 @@ const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
       },
     ];
 
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // getMonth() menghasilkan bulan dengan indeks mulai dari 0
+    const day = String(date.getDate()).padStart(2, "0");
+
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
+    const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
     // INPUT DATA KE TRANSACTION DULU BIAR DAPET ID DARI TRANSACTION
     await addTransaction({
       orderList: orderList,
       customerId: customerId,
       status: statusString,
+      ongkir: ongkir ? ongkir : 0,
       total_price: total,
+      date: formattedDate
     });
 
     // INPUT DATA KE HISTORY
@@ -348,13 +367,22 @@ const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
             setGasKosongVal={setGasKosongVal}
             status={status}
           />
+
           <ShippingCostInput
             ongkir={ongkir}
             setOngkir={setOngkir}
+            total={total}
+            setTotal={setTotal}
+            antar={antar}
+            setAntar={setAntar}
           />
           <TotalBox
             status={status}
             total={total}
+          />
+          <DateInput
+            date={date}
+            setDate={setDate}
           />
           <StatusBox
             status={status}
@@ -364,6 +392,8 @@ const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
             setAquaVal={setAquaVal}
             setIsiUlangVal={setIsiUlangVal}
             setGasVal={setGasVal}
+            setAntar={setAntar}
+            setOngkir={setOngkir}
             setTotal={setTotal}
           />
           <ActionButton
@@ -568,14 +598,50 @@ const CartInput = memo(
     );
   }
 );
-const ShippingCostInput = ({ ongkir, setOngkir }: any) => {
-  const [antar, setAntar] = useState<boolean>(false);
+const DateInput = ({ date, setDate }) => {
+  const onDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate;
+    setDate(currentDate);
+  };
+
+  const showDateMode = (currentMode) => {
+    DateTimePickerAndroid.open({
+      value: date,
+      onChange: onDateChange,
+      mode: currentMode,
+      is24Hour: true,
+    });
+  };
+
+  const showDatepicker = () => {
+    showDateMode("date");
+  };
+
+  const showTimepicker = () => {
+    showDateMode("time");
+  };
+  return (
+    <View className="date px-3 mb-6">
+      <TouchableOpacity
+        className="py-2 px-3 flex-row justify-between items-center border border-blue-800 rounded-lg"
+        activeOpacity={0.8}
+        onPress={showDatepicker}
+      >
+        <Text className="text-sm font-semibold text-blue-800">Tanggal:</Text>
+        <Text className="text-sm font-semibold text-blue-800">{date.toLocaleDateString()}</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
+const ShippingCostInput = ({ ongkir, setOngkir, total, setTotal, antar, setAntar }: any) => {
   const handleAntar = () => {
     setAntar(!antar);
     if (antar) {
       setOngkir(0);
+      setTotal(total - ongkir);
     } else {
       setOngkir(1000);
+      setTotal(total + 1000);
     }
   };
   return (
@@ -593,7 +659,10 @@ const ShippingCostInput = ({ ongkir, setOngkir }: any) => {
           {/* <TextInput /> */}
           <CurrencyInput
             value={ongkir}
-            onChangeValue={(e) => setOngkir(e)}
+            onChangeValue={(e) => {
+              setTotal(total + e);
+              setOngkir(e);
+            }}
             prefix="Rp"
             placeholder="Masukan harga ongkir"
             precision={0}
@@ -621,6 +690,8 @@ const StatusBox = ({
   setAquaVal,
   setIsiUlangVal,
   setGasVal,
+  setAntar,
+  setOngkir,
   setTotal,
 }: any) => {
   return (
@@ -648,6 +719,8 @@ const StatusBox = ({
             setAquaVal(0);
             setIsiUlangVal(0);
             setGasVal(0);
+            setAntar(false);
+            setOngkir(0);
             setTotal(0);
           }}
           activeOpacity={1}
