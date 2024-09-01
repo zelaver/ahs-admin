@@ -32,6 +32,9 @@ import { useGlobalContext } from "@/context/GlobalProvider";
 
 export default function Home() {
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
 
   const { lastHistory: stocks, products, fetchHistory: fetchStocks } = useGlobalContext();
 
@@ -74,7 +77,7 @@ export default function Home() {
   }
 
   return (
-    <SafeAreaView className="bg-blue-600 flex-1 py-8">
+    <SafeAreaView className="bg-blue-600 flex-1 pt-8">
       <ScrollView
         refreshControl={
           <RefreshControl
@@ -87,7 +90,10 @@ export default function Home() {
         }}
       >
         <Header />
-        <Saldo stocks={stocks} />
+        <Saldo
+          stocks={stocks}
+          handlePresentModalPress={handlePresentModalPress}
+        />
         <Stock
           stocks={stocks}
           products={products}
