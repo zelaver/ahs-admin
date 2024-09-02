@@ -661,7 +661,7 @@ const ShippingCostInput = ({ ongkir, setOngkir, total, setTotal, antar, setAntar
           <CurrencyInput
             value={ongkir}
             onChangeValue={(e) => {
-              setTotal(total + e);
+              setTotal(total + (e - ongkir));
               setOngkir(e);
             }}
             prefix="Rp"
