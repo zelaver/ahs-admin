@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
+  ToastAndroid,
 } from "react-native";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Icon from "react-native-remix-icon";
@@ -37,44 +38,52 @@ const Histori = () => {
     setRefreshing(false);
   };
 
-  const formatData = (data) => {
-    const saldoTerakhirPerTanggal = data.reduce((acc, current) => {
-      const dateOnly = current.date.split(" ")[0]; // Pisahkan tanggal dari waktu
-      if (!acc.has(dateOnly)) {
-        acc.set(dateOnly, current); // Tambahkan entri pertama untuk tanggal ini
-      } else {
-        // Update jika entri ini lebih baru
-        const existingEntry = acc.get(dateOnly);
-        if (new Date(current.date) > new Date(existingEntry.date)) {
-          acc.set(dateOnly, current);
+  const formatData : (data: any)  => ChartData[] | undefined= (data) => {
+    try {
+      const saldoTerakhirPerTanggal = data?.reduce((acc, current) => {
+        const dateOnly = current?.date?.split(" ")[0]; // Pisahkan tanggal dari waktu
+        if (!acc.has(dateOnly)) {
+          acc.set(dateOnly, current); // Tambahkan entri pertama untuk tanggal ini
+        } else {
+          // Update jika entri ini lebih baru
+          const existingEntry = acc.get(dateOnly);
+          if (new Date(current.date) > new Date(existingEntry.date)) {
+            acc.set(dateOnly, current);
+          }
         }
+        return acc;
+      }, new Map());
+      // @ts-ignore
+      const saldoTerakhir = Array.from(saldoTerakhirPerTanggal.values()).map((entry) => ({
+        // @ts-ignore
+        date: entry?.date?.split(" ")[0],
+        // @ts-ignore
+        saldo: entry?.saldo,
+      }));
+
+      const formattedData = saldoTerakhir.map((item) => ({
+        value: item.saldo / 1000, // Convert saldo to thousands
+        saldo: item.saldo.toLocaleString("id-ID"), // Format saldo with thousands separator
+        date: new Date(item.date)
+          .toLocaleDateString("id-ID", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          })
+          .replace(/\./g, ""),
+      }));
+
+      return formattedData;
+    } catch (e) {
+      if (e instanceof Error) {
+        ToastAndroid.show(`error: ${e}`, ToastAndroid.SHORT);
+        const dummy : ChartData[] = [{value: 0, saldo: "", date: ''}]
+        return dummy
       }
-      return acc;
-    }, new Map());
-    // @ts-ignore
-    const saldoTerakhir = Array.from(saldoTerakhirPerTanggal.values()).map((entry) => ({
-      // @ts-ignore
-      date: entry.date.split(" ")[0],
-      // @ts-ignore
-      saldo: entry.saldo,
-    }));
-
-    const formattedData = saldoTerakhir.map((item) => ({
-      value: item.saldo / 1000, // Convert saldo to thousands
-      saldo: item.saldo.toLocaleString("id-ID"), // Format saldo with thousands separator
-      date: new Date(item.date)
-        .toLocaleDateString("id-ID", {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
-        })
-        .replace(/\./g, ""),
-    }));
-
-    return formattedData;
+    }
   };
 
-  const [chartData, setChartData] = useState<ChartData[]>(formatData(history));
+  const [chartData, setChartData] = useState<ChartData[] | undefined>([]);
 
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {

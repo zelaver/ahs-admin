@@ -58,8 +58,8 @@ const initHistory = async () => {
   try {
     const result = await db.execAsync(
       `
-      insert into history (saldo, stock_aqua, stock_galon_kosong, stock_gas_12kg, stock_gas_kosong, stock_isi_ulang, transactionId)
-      values(0,0,0,0,0,0,null);
+      insert into history (saldo, stock_aqua, stock_galon_kosong, stock_gas_12kg, stock_gas_kosong, stock_isi_ulang, transactionId, note)
+      values(0,0,0,0,0,0,null, "first  init");
       `
     );
     return result;
@@ -305,7 +305,7 @@ const getTransactions = async () => {
 };
 
 const updateTransaction = async (
-  { orderList, customerId, status, total_price ,date}: Transaction,
+  { orderList, customerId, status, total_price, date, ongkir }: Transaction,
   id: number
 ) => {
   const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
@@ -319,10 +319,10 @@ const updateTransaction = async (
     const result = await db.runAsync(
       `
       UPDATE transactions 
-      SET orderList = ?, customerId = ?, status = ?, total_price = ?, date = ?
+      SET orderList = ?, customerId = ?, status = ?, total_price = ?, date = ?, ongkir = ?
       WHERE id = ?;
       `,
-      [JSON.stringify(orderList), customerId, status, total_price, date, id]
+      [JSON.stringify(orderList), customerId, status, total_price, date, ongkir, id]
       // delete from transactions where id = 'trans001'
     );
     return result;
