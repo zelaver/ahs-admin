@@ -305,7 +305,7 @@ const getTransactions = async () => {
 };
 
 const updateTransaction = async (
-  { orderList, customerId, status, total_price }: Transaction,
+  { orderList, customerId, status, total_price ,date}: Transaction,
   id: number
 ) => {
   const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
@@ -319,10 +319,10 @@ const updateTransaction = async (
     const result = await db.runAsync(
       `
       UPDATE transactions 
-      SET orderList = ?, customerId = ?, status = ?, total_price = ? 
+      SET orderList = ?, customerId = ?, status = ?, total_price = ?, date = ?
       WHERE id = ?;
       `,
-      [JSON.stringify(orderList), customerId, status, total_price, id]
+      [JSON.stringify(orderList), customerId, status, total_price, date, id]
       // delete from transactions where id = 'trans001'
     );
     return result;
