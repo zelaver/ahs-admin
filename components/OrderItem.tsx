@@ -200,7 +200,6 @@ const BottomSheetOrderItem = ({
   const [ongkir, setOngkir] = useState<number | null>(curOngkir);
   const [antar, setAntar] = useState<boolean>(curOngkir ? true : false);
 
-  const [customerName, setCustomerName] = useState("");
   const [customerType, setCustomerType] = useState(0);
 
   const [status, setStatus] = useState<any>(curStatus);
@@ -234,7 +233,6 @@ const BottomSheetOrderItem = ({
     try {
       const data: any = await getContact(customerId);
       // console.log(data);
-      setCustomerName(data.name);
       setCustomerType(data.isSubscriber);
     } catch (e) {
       if (e instanceof Error) {
@@ -251,6 +249,8 @@ const BottomSheetOrderItem = ({
     setGalonKosongVal(parsedList[3].sum);
     setGasKosongVal(parsedList[4].sum);
     setDate(new Date(curDate));
+    setAntar(curOngkir ? true : false);
+    setOngkir(curOngkir);
     setTotal(total_price);
   };
 
@@ -510,13 +510,13 @@ const BottomSheetOrderItem = ({
       setTotal(
         aquaVal * products[0]?.price +
           isiUlangVal * products[1]?.price +
-          gasVal * products[2]?.price
+          gasVal * products[2]?.price + ongkir
       );
     } else {
       setTotal(
         aquaVal * products[0]?.subs_price +
           isiUlangVal * products[1]?.subs_price +
-          gasVal * products[2]?.price
+          gasVal * products[2]?.price + ongkir
       );
     }
   };
@@ -716,6 +716,7 @@ const BottomSheetOrderItem = ({
           <ShippingCostInput
             ongkir={ongkir}
             setOngkir={setOngkir}
+            curOngkir={curOngkir}
             total={total}
             setTotal={setTotal}
             antar={antar}
@@ -884,15 +885,23 @@ const DateInput = ({ date, setDate }) => {
     </View>
   );
 };
-const ShippingCostInput = ({ ongkir, setOngkir, total, setTotal, antar, setAntar }: any) => {
+const ShippingCostInput = ({
+  ongkir,
+  setOngkir,
+  curOngkir,
+  total,
+  setTotal,
+  antar,
+  setAntar,
+}: any) => {
   const handleAntar = () => {
     setAntar(!antar);
     if (antar) {
       setOngkir(0);
-      setTotal(total - ongkir);
+      setTotal(total - curOngkir);
     } else {
-      setOngkir(1000);
-      setTotal(total + 1000);
+      setOngkir(curOngkir);
+      setTotal(total + curOngkir);
     }
   };
   return (
@@ -911,7 +920,7 @@ const ShippingCostInput = ({ ongkir, setOngkir, total, setTotal, antar, setAntar
           <CurrencyInput
             value={ongkir}
             onChangeValue={(e) => {
-              setTotal(total + e);
+              setTotal(total + (e - ongkir));
               setOngkir(e);
             }}
             prefix="Rp"
