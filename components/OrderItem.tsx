@@ -6,6 +6,7 @@ import {
   ToastAndroid,
   Alert,
   ActivityIndicator,
+  Switch,
 } from "react-native";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Icon from "react-native-remix-icon";
@@ -24,6 +25,8 @@ import {
 import Popover from "react-native-popover-view";
 import images from "@/constants/images";
 import { SelectList } from "react-native-dropdown-select-list";
+import CurrencyInput from "react-native-currency-input";
+import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 
 type OrderItem = {
   id: number;
@@ -33,10 +36,143 @@ type OrderItem = {
   // curCustomerType: number;
   curStatus: string;
   total_price: number;
-  date: string;
+  curDate: string;
+  curOngkir: number;
 };
 
-const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date }: OrderItem) => {
+const OrderItem = ({
+  id,
+  orderList,
+  curCustomerId,
+  curStatus,
+  total_price,
+  curDate,
+  curOngkir,
+}: OrderItem) => {
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
+
+  // const [status, setStatus] = useState<any>(curStatus);
+  // const [date, setDate] = useState(new Date(curDate));
+
+  // const fetchStatusDate = () => {
+  //   setStatus(curStatus)
+  //   setDate(new Date(curDate))
+  // };
+
+  // useEffect(() => {
+  //   fetchStatusDate()
+  // }, [curStatus, curDate]);
+
+  const handleEdit = async () => {
+    handlePresentModalPress();
+  };
+
+  return (
+    <View className="pesanan-item border rounded-lg p-2.5 flex-row justify-between items-center mb-4 bg-white shadow-lg">
+      <CustomerLogo
+        customerId={curCustomerId}
+        date={curDate}
+      />
+      <StatusEdit
+        status={curStatus}
+        handleEdit={handleEdit}
+      />
+      <BottomSheetOrderItem
+        bottomSheetModalRef={bottomSheetModalRef}
+        id={id}
+        orderList={orderList}
+        curCustomerId={curCustomerId}
+        curStatus={curStatus}
+        curDate={curDate}
+        curOngkir={curOngkir}
+        total_price={total_price}
+      />
+    </View>
+  );
+};
+
+const CustomerLogo = ({ customerId, date }: { customerId: number; date: string }) => {
+  const [customerName, setCustomerName] = useState<string>("");
+  const [customerType, setCustomerType] = useState<number>();
+  const [formatedDate, setFormatedDate] = useState(formatDate(date));
+  const { customers } = useGlobalContext();
+  useEffect(() => {
+    const fetchCustomer = async () => {
+      try {
+        const data: any = await getContact(customerId);
+        setCustomerName(data.name);
+        setCustomerType(data.isSubscriber);
+      } catch (e) {
+        if (e instanceof Error) {
+          console.log("error", e);
+        }
+      }
+    };
+    setFormatedDate(formatDate(date));
+    fetchCustomer();
+  }, [customerId, date, customers]);
+
+  return (
+    <View className="flex-row">
+      <View className="bg-blue-800 rounded-full w-10 h-10 items-center justify-center">
+        <Icon
+          name={`${customerType ? "home-smile-2-line" : "user-3-line"}`}
+          size={24}
+          color="white"
+        />
+      </View>
+      <View className="ml-4">
+        <Text className="text-sm font-medium">{customerName}</Text>
+        <Text className="text-xs font-normal text-gray-400">{formatedDate}</Text>
+      </View>
+    </View>
+  );
+};
+
+const StatusEdit = ({ status, handleEdit }) => {
+  return (
+    <View className="flex-row items-center">
+      {status == "hutang" && (
+        <Text className="bg-red-500 text-gray-50 text-xs font-semibold px-3 py-1 rounded-md mr-2 w-[67px] text-center">
+          Hutang
+        </Text>
+      )}
+      {status == "pinjam" && (
+        <Text className="bg-yellow-500 text-gray-50 text-xs font-semibold px-3 py-1 rounded-md mr-2 w-[67px] text-center">
+          Pinjam
+        </Text>
+      )}
+      {status == "lunas" && (
+        <Text className="bg-green-500 text-gray-50 text-xs font-semibold px-3 py-1 rounded-md mr-2 w-[67px] text-center">
+          Lunas
+        </Text>
+      )}
+      <TouchableOpacity
+        onPress={handleEdit}
+        activeOpacity={0.9}
+      >
+        <Icon
+          name="pencil-line"
+          size={16}
+        />
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+const BottomSheetOrderItem = ({
+  bottomSheetModalRef,
+  id,
+  orderList,
+  curCustomerId,
+  curStatus,
+  curDate,
+  curOngkir,
+  total_price,
+}: any) => {
   type products = {
     id: number;
     name: string;
@@ -44,63 +180,33 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
     subs_price: number;
   };
 
-  const [status, setStatus] = useState<any>(curStatus);
-  const [aquaVal, setAquaVal] = useState(0);
-  const [isiUlangVal, setIsiUlangVal] = useState(0);
-  const [galonKosongVal, setGalonKosongVal] = useState(0);
-  const [gasVal, setGasVal] = useState(0);
-  const [gasKosongVal, setGasKosongVal] = useState(0);
-
-  // const [customers, setCustomers] = useState<any[]>([]);
   const [customerId, setCustomerId] = useState(curCustomerId);
-  const [total, setTotal] = useState<number>(total_price);
+
   const {
     lastHistory: history,
-    setHistory,
     fetchHistory,
     fetchTransactions,
     customers,
     products,
   } = useGlobalContext();
 
+  const [aquaVal, setAquaVal] = useState(0);
+  const [isiUlangVal, setIsiUlangVal] = useState(0);
+  const [galonKosongVal, setGalonKosongVal] = useState(0);
+  const [gasVal, setGasVal] = useState(0);
+  const [gasKosongVal, setGasKosongVal] = useState(0);
+  const [total, setTotal] = useState<number>(total_price);
+
+  const [ongkir, setOngkir] = useState<number | null>(curOngkir);
+  const [antar, setAntar] = useState<boolean>(curOngkir ? true : false);
+
   const [customerName, setCustomerName] = useState("");
-  const [customerType, setCustomerType] = useState("");
+  const [customerType, setCustomerType] = useState(0);
 
-  const fetchCustomer = async () => {
-    try {
-      const data: any = await getContact(customerId);
-      // console.log(data);
-      setCustomerName(data.name);
-      setCustomerType(data.isSubscriber);
-    } catch (e) {
-      if (e instanceof Error) {
-        console.log("error", e);
-      }
-    }
-  };
+  const [status, setStatus] = useState<any>(curStatus);
+  const [date, setDate] = useState(new Date(curDate));
 
-  const fetchOrderList = () => {
-    let parsedList = JSON.parse(orderList);
-    // console.log(parsedList[1].sum);
-    setAquaVal(parsedList[0].sum);
-    setIsiUlangVal(parsedList[1].sum);
-    setGasVal(parsedList[2].sum);
-    setGalonKosongVal(parsedList[3].sum);
-    setGasKosongVal(parsedList[4].sum);
-    setTotal(total_price);
-    setStatus(curStatus);
-  };
-
-  useEffect(() => {
-    fetchCustomer();
-    fetchOrderList();
-  }, [orderList, curCustomerId, curStatus, total_price, customers, customerId, date]);
-
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ["90%"], []);
-  const handlePresentModalPress = useCallback(() => {
-    bottomSheetModalRef.current?.present();
-  }, []);
   const handleSheetChanges = useCallback(
     (index: number) => {
       fetchOrderList();
@@ -124,10 +230,34 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
     []
   );
 
-  const handleEdit = async () => {
-    // console.log(curStatus)
-    handlePresentModalPress();
+  const fetchCustomer = async () => {
+    try {
+      const data: any = await getContact(customerId);
+      // console.log(data);
+      setCustomerName(data.name);
+      setCustomerType(data.isSubscriber);
+    } catch (e) {
+      if (e instanceof Error) {
+        console.log("error", e);
+      }
+    }
   };
+  const fetchOrderList = () => {
+    // @ts-ignore
+    let parsedList = JSON.parse(orderList);
+    setAquaVal(parsedList[0].sum);
+    setIsiUlangVal(parsedList[1].sum);
+    setGasVal(parsedList[2].sum);
+    setGalonKosongVal(parsedList[3].sum);
+    setGasKosongVal(parsedList[4].sum);
+    setDate(new Date(curDate));
+    setTotal(total_price);
+  };
+
+  useEffect(() => {
+    fetchCustomer();
+    fetchOrderList();
+  }, [orderList, curCustomerId, curStatus, total_price, customers, customerId]);
 
   const handleSave = async () => {
     if (!aquaVal && !isiUlangVal && !gasVal && !galonKosongVal && !gasKosongVal)
@@ -172,17 +302,30 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
       },
     ];
 
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
+    const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    // console.log(formattedDate)
     await updateTransaction(
-      { orderList: newOrderList, customerId, status, total_price: total },
+      {
+        orderList: newOrderList,
+        customerId,
+        status,
+        total_price: total,
+        date: formattedDate,
+        ongkir: ongkir ? ongkir : 0,
+      },
       id
     );
     await fetchTransactions();
 
-    // console.log("curStatus", curStatus);
-    // console.log("status", status);
     let parsedList = JSON.parse(orderList);
-    // console.log(typeof orderList)
-    console.log('masuk sini')
     if (curStatus == "lunas" && status == "hutang") {
       await addHistory({
         saldo: history.saldo - total,
@@ -317,16 +460,6 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
 
   const handleDelete = async () => {
     let parsedList = JSON.parse(orderList);
-    console.log("================");
-    console.log("id", id);
-    console.log("aqua:", parsedList[0].sum);
-    console.log("isi ulang:", parsedList[1].sum);
-    console.log("gas 12 kg:", parsedList[2].sum);
-    console.log("galon kosong:", parsedList[3].sum);
-    console.log("gas kosong:", parsedList[4].sum);
-    console.log("total_price:", total_price);
-    console.log("status:", curStatus);
-    console.log(curCustomerId);
     Alert.alert(
       "Yakin ingin menghapus?",
       "gak di balikin loh",
@@ -370,11 +503,9 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
   };
 
   const handleSelected = async (id: number) => {
-    // console.log(customerType)
     setCustomerId(id);
     const getCustomer: any = await getContact(id);
     setCustomerType(getCustomer.isSubscriber);
-    // console.log(getCustomer.isSubscriber)
     if (getCustomer.isSubscriber == 0) {
       setTotal(
         aquaVal * products[0]?.price +
@@ -393,357 +524,317 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
   const [isLoading, setIsLoading] = useState(false);
 
   return (
-    <View className="pesanan-item border rounded-lg p-2.5 flex-row justify-between items-center mb-4 bg-white shadow-lg">
-      {/* <View className="flex-row">
-        <View className="bg-gray-200 rounded-full w-10 h-10 items-center justify-center">
-          <Icon
-            name={`${customerType ? "home-smile-2-line" : "user-3-line"}`}
-            size={24}
-          />
-        </View>
-        <View className="ml-4">
-          <Text className="text-sm font-medium">{customerName}</Text>
-          <Text className="text-xs font-normal text-gray-400">{formatDate(date)}</Text>
-        </View>
-      </View> */}
-      <CustomerComponent
-        customerId={curCustomerId}
-        date={date}
-      />
-      <View className="flex-row items-center">
-        {status == "hutang" && (
-          <Text className="bg-red-500 text-gray-50 text-xs font-semibold px-3 py-1 rounded-md mr-2 w-[67px] text-center">
-            Hutang
-          </Text>
-        )}
-        {status == "pinjam" && (
-          <Text className="bg-yellow-500 text-gray-50 text-xs font-semibold px-3 py-1 rounded-md mr-2 w-[67px] text-center">
-            Pinjam
-          </Text>
-        )}
-        {status == "lunas" && (
-          <Text className="bg-green-500 text-gray-50 text-xs font-semibold px-3 py-1 rounded-md mr-2 w-[67px] text-center">
-            Lunas
-          </Text>
-        )}
+    <BottomSheetModal
+      ref={bottomSheetModalRef}
+      index={0}
+      snapPoints={snapPoints}
+      onChange={handleSheetChanges}
+      backdropComponent={renderBackdrop}
+      handleComponent={(props) => Handle({ ...props, HandleText: "Detail Pesanan" })}
+    >
+      <BottomSheetScrollView>
+        <View className="main py-3 gap-y-4">
+          <View className="customer px-3">
+            <Text className="text-sm font-semibold mb-2.5">Customer:</Text>
+            <View className="rounded-md px-3">
+              <SelectList
+                data={[
+                  ...customers.map((item, i) => {
+                    return { key: item.id, value: item.name };
+                  }),
+                ]}
+                setSelected={(val: any) => {
+                  if (!val) return ToastAndroid.show("Customer tidak terpilih", ToastAndroid.SHORT);
+                  handleSelected(val);
+                }}
+                defaultOption={{
+                  key: curCustomerId,
+                  value: customers?.find((item) => item.id == curCustomerId)?.name,
+                }}
+                // setSelected={val => console.log(val)}
 
-        {/* <Text className="bg-yellow-500 text-gray-50 text-xs font-semibold px-3 py-1 rounded-md mr-2">
-          Pinjam
-        </Text> */}
-        <TouchableOpacity
-          onPress={handleEdit}
-          activeOpacity={0.9}
-        >
-          <Icon
-            name="pencil-line"
-            size={16}
-          />
-        </TouchableOpacity>
-      </View>
-      <BottomSheetModal
-        ref={bottomSheetModalRef}
-        index={0}
-        snapPoints={snapPoints}
-        onChange={handleSheetChanges}
-        backdropComponent={renderBackdrop}
-        handleComponent={(props) => Handle({ ...props, HandleText: "Detail Pesanan" })}
-      >
-        <BottomSheetScrollView>
-          <View className="main py-3 gap-y-4">
-            <View className="customer px-3">
-              <Text className="text-sm font-semibold mb-2.5">Customer:</Text>
-              <View className="rounded-md px-3">
-                <SelectList
-                  data={[
-                    ...customers.map((item, i) => {
-                      return { key: item.id, value: item.name };
-                    }),
-                  ]}
-                  setSelected={(val: any) => {
-                    if (!val)
-                      return ToastAndroid.show("Customer tidak terpilih", ToastAndroid.SHORT);
-                    handleSelected(val);
-                  }}
-                  defaultOption={{
-                    key: curCustomerId,
-                    value: customers?.find((item) => item.id == curCustomerId)?.name,
-                  }}
-                  // setSelected={val => console.log(val)}
-
-                  placeholder="pilih pelanggan"
-                  searchPlaceholder="cari pelanggan"
-                />
-              </View>
+                placeholder="pilih pelanggan"
+                searchPlaceholder="cari pelanggan"
+              />
             </View>
-            <View className="cart border-t border-b py-4">
-              <CartItem
-                name="Aqua"
-                image={images.aqua}
-                price={customerType == 0 ? products[0]?.price : products[0]?.subs_price}
-                val={aquaVal}
-                setVal={setAquaVal}
-                setTotal={setTotal}
-                total={total}
-                stok={history?.stock_aqua}
-              />
-              <CartItem
-                name="Isi Ulang"
-                image={images.isiUlang}
-                price={customerType == 0 ? products[1]?.price : products[1]?.subs_price}
-                val={isiUlangVal}
-                setVal={setIsiUlangVal}
-                setTotal={setTotal}
-                total={total}
-                stok={history?.stock_isi_ulang}
-              />
-              <CartItem
-                name="Gas 12 kg"
-                image={images.gas12Kg}
-                price={customerType == 0 ? products[2]?.price : products[2]?.subs_price}
-                val={gasVal}
-                setVal={setGasVal}
-                setTotal={setTotal}
-                total={total}
-                stok={history?.stock_gas_12kg}
-              />
-              <CartItem
-                name="Galon Kosong"
-                image={images.galonKosong}
-                val={galonKosongVal}
-                setVal={setGalonKosongVal}
-                setTotal={setTotal}
-                total={total}
-                stok={history?.stock_galon_kosong}
-              />
-              <CartItem
-                name="Gas Kosong"
-                image={images.gasKosong}
-                val={gasKosongVal}
-                setVal={setGasKosongVal}
-                setTotal={setTotal}
-                total={total}
-                stok={history?.stock_gas_kosong}
-              />
-              <View className="px-5 add ">
-                <Popover
-                  animationConfig={{ duration: 200 }}
-                  arrowSize={{ width: 0, height: 0 }}
-                  backgroundStyle={{ opacity: 0 }}
-                  offset={-10}
-                  // debug
-                  // isVisible={isVisible}
-                  popoverStyle={{
-                    width: 200,
-                    borderWidth: 1,
-                    borderRadius: 12,
-                    backgroundColor: "#1943b4",
-                    // display: aquaVal && isiUlangVal && gasVal ? "none" : "flex"
-                  }}
-                  from={
-                    <TouchableOpacity
-                      className={`py-4 items-center ${aquaVal && isiUlangVal && gasVal && "hidden"}
+          </View>
+          <View className="cart border-t border-b py-4 mb-6">
+            <CartItem
+              name="Aqua"
+              image={images.aqua}
+              price={customerType == 0 ? products[0]?.price : products[0]?.subs_price}
+              val={aquaVal}
+              setVal={setAquaVal}
+              setTotal={setTotal}
+              total={total}
+              stok={history?.stock_aqua}
+            />
+            <CartItem
+              name="Isi Ulang"
+              image={images.isiUlang}
+              price={customerType == 0 ? products[1]?.price : products[1]?.subs_price}
+              val={isiUlangVal}
+              setVal={setIsiUlangVal}
+              setTotal={setTotal}
+              total={total}
+              stok={history?.stock_isi_ulang}
+            />
+            <CartItem
+              name="Gas 12 kg"
+              image={images.gas12Kg}
+              price={customerType == 0 ? products[2]?.price : products[2]?.subs_price}
+              val={gasVal}
+              setVal={setGasVal}
+              setTotal={setTotal}
+              total={total}
+              stok={history?.stock_gas_12kg}
+            />
+            <CartItem
+              name="Galon Kosong"
+              image={images.galonKosong}
+              val={galonKosongVal}
+              setVal={setGalonKosongVal}
+              setTotal={setTotal}
+              total={total}
+              stok={history?.stock_galon_kosong}
+            />
+            <CartItem
+              name="Gas Kosong"
+              image={images.gasKosong}
+              val={gasKosongVal}
+              setVal={setGasKosongVal}
+              setTotal={setTotal}
+              total={total}
+              stok={history?.stock_gas_kosong}
+            />
+            <View className="px-5 add ">
+              <Popover
+                animationConfig={{ duration: 200 }}
+                arrowSize={{ width: 0, height: 0 }}
+                backgroundStyle={{ opacity: 0 }}
+                offset={-10}
+                // debug
+                // isVisible={isVisible}
+                popoverStyle={{
+                  width: 200,
+                  borderWidth: 1,
+                  borderRadius: 12,
+                  backgroundColor: "#1943b4",
+                  // display: aquaVal && isiUlangVal && gasVal ? "none" : "flex"
+                }}
+                from={
+                  <TouchableOpacity
+                    className={`py-4 items-center ${aquaVal && isiUlangVal && gasVal && "hidden"}
                         ${galonKosongVal && gasKosongVal && "hidden"}
                       `}
-                    >
-                      <Icon
-                        name="add-circle-line"
-                        size={32}
-                      />
-                    </TouchableOpacity>
-                  }
+                  >
+                    <Icon
+                      name="add-circle-line"
+                      size={32}
+                    />
+                  </TouchableOpacity>
+                }
+              >
+                <TouchableOpacity
+                  onPress={() => {
+                    if (!history.stock_aqua)
+                      return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
+                    setAquaVal(1);
+                    console.log(customerType);
+                    setTotal(
+                      total + (!customerType ? products[0]?.price : products[0]?.subs_price)
+                    );
+                  }}
+                  className={`border px-4 py-2 ${aquaVal && "hidden"} ${status == 1 && "hidden"}`}
                 >
-                  <TouchableOpacity
-                    onPress={() => {
-                      if (!history.stock_aqua)
-                        return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
-                      setAquaVal(1);
-                      console.log(customerType);
-                      setTotal(
-                        total + (!customerType ? products[0]?.price : products[0]?.subs_price)
-                      );
-                    }}
-                    className={`border px-4 py-2 ${aquaVal && "hidden"} ${status == 1 && "hidden"}`}
-                  >
-                    <Text className="text-gray-50 font-semibold">aqua</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => {
-                      if (!history.stock_isi_ulang)
-                        return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
-                      setIsiUlangVal(1);
-                      setTotal(
-                        total + (!customerType ? products[1]?.price : products[1]?.subs_price)
-                      );
-                    }}
-                    className={`border px-4 py-2 ${isiUlangVal && "hidden"} ${
-                      status == 1 && "hidden"
-                    }`}
-                  >
-                    <Text className="text-gray-50 font-semibold">Isi Ulang</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => {
-                      if (!history.stock_gas_12kg)
-                        return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
-                      setGasVal(1);
-                      setTotal(
-                        total + (!customerType ? products[2]?.price : products[2]?.subs_price)
-                      );
-                    }}
-                    className={`border px-4 py-2 ${gasVal && "hidden"} ${status == 1 && "hidden"}`}
-                  >
-                    <Text className="text-gray-50 font-semibold">Gas 12 Kg</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => {
-                      if (!history.stock_galon_kosong)
-                        return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
-                      setGalonKosongVal(1);
-                    }}
-                    className={`border px-4 py-2 ${galonKosongVal && "hidden"} ${
-                      status != 1 && "hidden"
-                    }`}
-                    disabled={status != 1}
-                  >
-                    <Text className="text-gray-50 font-semibold">Galon Kosong</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => {
-                      if (!history.stock_gas_kosong)
-                        return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
-                      setGasKosongVal(1);
-                    }}
-                    className={`border px-4 py-2 ${gasKosongVal && "hidden"} ${
-                      status != 1 && "hidden"
-                    }`}
-                    disabled={status != 1}
-                  >
-                    <Text className="text-gray-50 font-semibold">Gas Kosong</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    className={`border px-4 py-2 hidden ${
-                      aquaVal && isiUlangVal && gasVal && "flex"
-                    }
+                  <Text className="text-gray-50 font-semibold">aqua</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    if (!history.stock_isi_ulang)
+                      return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
+                    setIsiUlangVal(1);
+                    setTotal(
+                      total + (!customerType ? products[1]?.price : products[1]?.subs_price)
+                    );
+                  }}
+                  className={`border px-4 py-2 ${isiUlangVal && "hidden"} ${
+                    status == 1 && "hidden"
+                  }`}
+                >
+                  <Text className="text-gray-50 font-semibold">Isi Ulang</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    if (!history.stock_gas_12kg)
+                      return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
+                    setGasVal(1);
+                    setTotal(
+                      total + (!customerType ? products[2]?.price : products[2]?.subs_price)
+                    );
+                  }}
+                  className={`border px-4 py-2 ${gasVal && "hidden"} ${status == 1 && "hidden"}`}
+                >
+                  <Text className="text-gray-50 font-semibold">Gas 12 Kg</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    if (!history.stock_galon_kosong)
+                      return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
+                    setGalonKosongVal(1);
+                  }}
+                  className={`border px-4 py-2 ${galonKosongVal && "hidden"} ${
+                    status != 1 && "hidden"
+                  }`}
+                  disabled={status != 1}
+                >
+                  <Text className="text-gray-50 font-semibold">Galon Kosong</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    if (!history.stock_gas_kosong)
+                      return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
+                    setGasKosongVal(1);
+                  }}
+                  className={`border px-4 py-2 ${gasKosongVal && "hidden"} ${
+                    status != 1 && "hidden"
+                  }`}
+                  disabled={status != 1}
+                >
+                  <Text className="text-gray-50 font-semibold">Gas Kosong</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  className={`border px-4 py-2 hidden ${aquaVal && isiUlangVal && gasVal && "flex"}
                     ${galonKosongVal && gasKosongVal && "flex"}
                     `}
-                  >
-                    <Text className="text-gray-200 font-semibold">Tekan Di luar untuk Tutup</Text>
-                  </TouchableOpacity>
-                </Popover>
-              </View>
-            </View>
-            <View className={`total px-3 ${status == 1 && "hidden"}`}>
-              <View className="py-2 px-3 flex-row justify-between items-center bg-blue-800 rounded-lg">
-                <Text className="text-base font-bold text-gray-50">Total pembayaran</Text>
-                <Text className="text-sm font-bold text-gray-50">{total.toLocaleString()}</Text>
-              </View>
-            </View>
-            <View className="status px-3">
-              <Text className="text-sm font-semibold mb-2.5">Status:</Text>
-              <View className="status-boxes self-center flex-row gap-x-3">
-                <TouchableOpacity
-                  onPress={() => {
-                    setStatus("hutang");
-                    setGalonKosongVal(0);
-                    setGasKosongVal(0);
-                  }}
-                  activeOpacity={1}
                 >
-                  <Text
-                    className={`px-3 py-1 border font-semibold rounded-md w-min-[67px] text-center text-xs border-red-500 
+                  <Text className="text-gray-200 font-semibold">Tekan Di luar untuk Tutup</Text>
+                </TouchableOpacity>
+              </Popover>
+            </View>
+          </View>
+          <ShippingCostInput
+            ongkir={ongkir}
+            setOngkir={setOngkir}
+            total={total}
+            setTotal={setTotal}
+            antar={antar}
+            setAntar={setAntar}
+          />
+          <View className={`total px-3 ${status == 1 && "hidden"} mb-6`}>
+            <View className="py-2 px-3 flex-row justify-between items-center bg-blue-800 rounded-lg">
+              <Text className="text-base font-bold text-gray-50">Total pembayaran</Text>
+              <Text className="text-sm font-bold text-gray-50">{total.toLocaleString()}</Text>
+            </View>
+          </View>
+          <DateInput
+            date={date}
+            setDate={setDate}
+          />
+          <View className="status px-3">
+            <Text className="text-sm font-semibold mb-2.5">Status:</Text>
+            <View className="status-boxes self-center flex-row gap-x-3">
+              <TouchableOpacity
+                onPress={() => {
+                  setStatus("hutang");
+                  setGalonKosongVal(0);
+                  setGasKosongVal(0);
+                }}
+                activeOpacity={1}
+              >
+                <Text
+                  className={`px-3 py-1 border font-semibold rounded-md w-min-[67px] text-center text-xs border-red-500 
                     ${status == "hutang" ? "text-white bg-red-500" : "text-red-500"} `}
-                  >
-                    Hutang
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    setStatus("pinjam");
-                    setAquaVal(0);
-                    setIsiUlangVal(0);
-                    setGasVal(0);
-                    setTotal(0);
-                  }}
-                  activeOpacity={1}
                 >
-                  <Text
-                    className={`px-3 py-1 border rounded-md w-min-[67px] text-center text-xs border-yellow-500 font-semibold
+                  Hutang
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setStatus("pinjam");
+                  setAquaVal(0);
+                  setIsiUlangVal(0);
+                  setGasVal(0);
+                  setTotal(0);
+                }}
+                activeOpacity={1}
+              >
+                <Text
+                  className={`px-3 py-1 border rounded-md w-min-[67px] text-center text-xs border-yellow-500 font-semibold
                     ${status == "pinjam" ? "text-white bg-yellow-500" : "text-yellow-500"}`}
-                  >
-                    Pinjam
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    if (curStatus == "pinjam") {
-                      setStatus("lunas");
-                      return;
-                    }
+                >
+                  Pinjam
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  if (curStatus == "pinjam") {
                     setStatus("lunas");
-                    setGalonKosongVal(0);
-                    setGasKosongVal(0);
-                  }}
-                  activeOpacity={1}
-                >
-                  <Text
-                    className={`px-3 py-1 border rounded-md w-min-[67px] text-center text-xs border-green-500 font-semibold
+                    return;
+                  }
+                  setStatus("lunas");
+                  setGalonKosongVal(0);
+                  setGasKosongVal(0);
+                }}
+                activeOpacity={1}
+              >
+                <Text
+                  className={`px-3 py-1 border rounded-md w-min-[67px] text-center text-xs border-green-500 font-semibold
                     ${status == "lunas" ? "text-white bg-green-500" : "text-green-500"}`}
-                  >
-                    Lunas
-                  </Text>
-                </TouchableOpacity>
-              </View>
+                >
+                  Lunas
+                </Text>
+              </TouchableOpacity>
             </View>
-            <View className="action-button px-3">
-              <TouchableOpacity
-                className={`rounded-lg ${
-                  isLoading ? "bg-blue-900" : "bg-blue-800"
-                } px-3 py-2 mb-2.5`}
-                activeOpacity={0.9}
-                disabled={isLoading}
-                onPress={async () => {
-                  setIsLoading(true);
-                  await handleSave();
-                  setIsLoading(false);
-                }}
+          </View>
+          <View className="action-button px-3">
+            <TouchableOpacity
+              className={`rounded-lg ${isLoading ? "bg-blue-900" : "bg-blue-800"} px-3 py-2 mb-2.5`}
+              activeOpacity={0.9}
+              disabled={isLoading}
+              onPress={async () => {
+                setIsLoading(true);
+                await handleSave();
+                setIsLoading(false);
+              }}
+            >
+              <ActivityIndicator
+                size={"small"}
+                color={"#ffff"}
+                className={`${!isLoading && "hidden"}`}
+              />
+              <Text
+                className={`text-center text-gray-100 text-xs font-semibold ${
+                  isLoading && "hidden"
+                }`}
               >
-                <ActivityIndicator
-                  size={"small"}
-                  color={"#ffff"}
-                  className={`${!isLoading && "hidden"}`}
-                />
-                <Text
-                  className={`text-center text-gray-100 text-xs font-semibold ${
-                    isLoading && "hidden"
-                  }`}
-                >
-                  Simpan
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                className={`rounded-lg ${isLoading ? "bg-red-600" : "bg-red-500"} px-3 py-2 border`}
-                activeOpacity={0.9}
-                disabled={isLoading}
-                onPress={async () => {
-                  setIsLoading(true);
-                  await handleDelete();
-                  setIsLoading(false);
-                }}
+                Simpan
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className={`rounded-lg ${isLoading ? "bg-red-600" : "bg-red-500"} px-3 py-2 border`}
+              activeOpacity={0.9}
+              disabled={isLoading}
+              onPress={async () => {
+                setIsLoading(true);
+                await handleDelete();
+                setIsLoading(false);
+              }}
+            >
+              <ActivityIndicator
+                size={"small"}
+                color={"#ffff"}
+                className={`${!isLoading && "hidden"}`}
+              />
+              <Text
+                className={`text-center text-gray-100 text-xs font-semibold ${
+                  isLoading && "hidden"
+                }`}
               >
-                <ActivityIndicator
-                  size={"small"}
-                  color={"#ffff"}
-                  className={`${!isLoading && "hidden"}`}
-                />
-                <Text
-                  className={`text-center text-gray-100 text-xs font-semibold ${
-                    isLoading && "hidden"
-                  }`}
-                >
-                  Hapus
-                </Text>
-              </TouchableOpacity>
-              {/* <TouchableOpacity
+                Hapus
+              </Text>
+            </TouchableOpacity>
+            {/* <TouchableOpacity
                 onPress={() => {
                   const test = customers.find((item) => item.id == curCustomerId);
                   console.log(test);
@@ -751,49 +842,84 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, date 
               >
                 <Text>test</Text>
               </TouchableOpacity> */}
-            </View>
           </View>
-        </BottomSheetScrollView>
-      </BottomSheetModal>
-    </View>
+        </View>
+      </BottomSheetScrollView>
+    </BottomSheetModal>
   );
 };
 
-const CustomerComponent = ({ customerId, date }: { customerId: number; date: string }) => {
-  const [customerName, setCustomerName] = useState<string>("");
-  const [customerType, setCustomerType] = useState<number>();
-  const [formatedDate, setFormatedDate] = useState(formatDate(date));
-  const { customers } = useGlobalContext();
+const DateInput = ({ date, setDate }) => {
+  const onDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate;
+    setDate(currentDate);
+  };
 
-  useEffect(() => {
-    const fetchCustomer = async () => {
-      try {
-        const data: any = await getContact(customerId);
-        setCustomerName(data.name);
-        setCustomerType(data.isSubscriber);
-      } catch (e) {
-        if (e instanceof Error) {
-          console.log("error", e);
-        }
-      }
-    };
-    setFormatedDate(formatDate(date));
-    fetchCustomer();
-  }, [customerId, date, customers]); // Dependency array untuk men-trigger useEffect ketika customerId berubah
+  const showDateMode = (currentMode) => {
+    DateTimePickerAndroid.open({
+      value: date,
+      onChange: onDateChange,
+      mode: currentMode,
+      is24Hour: true,
+    });
+  };
 
+  const showDatepicker = () => {
+    showDateMode("date");
+  };
+
+  const showTimepicker = () => {
+    showDateMode("time");
+  };
   return (
-    <View className="flex-row">
-      <View className="bg-blue-800 rounded-full w-10 h-10 items-center justify-center">
-        <Icon
-          name={`${customerType ? "home-smile-2-line" : "user-3-line"}`}
-          size={24}
-          color="white"
+    <View className="date px-3 mb-6">
+      <TouchableOpacity
+        className="py-2 px-3 flex-row justify-between items-center border border-blue-800 rounded-lg"
+        activeOpacity={0.8}
+        onPress={showDatepicker}
+      >
+        <Text className="text-sm font-semibold text-blue-800">Tanggal:</Text>
+        <Text className="text-sm font-semibold text-blue-800">{date.toLocaleDateString()}</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
+const ShippingCostInput = ({ ongkir, setOngkir, total, setTotal, antar, setAntar }: any) => {
+  const handleAntar = () => {
+    setAntar(!antar);
+    if (antar) {
+      setOngkir(0);
+      setTotal(total - ongkir);
+    } else {
+      setOngkir(1000);
+      setTotal(total + 1000);
+    }
+  };
+  return (
+    <View className="ongkir px-3 items-start mb-6">
+      <Text className="text-sm font-semibold ">Antar:</Text>
+      <View>
+        <Switch
+          thumbColor={antar ? "#55b8d4" : "gray"}
+          value={antar}
+          onChange={handleAntar}
         />
       </View>
-      <View className="ml-4">
-        <Text className="text-sm font-medium">{customerName}</Text>
-        <Text className="text-xs font-normal text-gray-400">{formatedDate}</Text>
-      </View>
+      {antar && (
+        <View className="input-value border w-full rounded-md pl-3 py-2">
+          {/* <TextInput /> */}
+          <CurrencyInput
+            value={ongkir}
+            onChangeValue={(e) => {
+              setTotal(total + e);
+              setOngkir(e);
+            }}
+            prefix="Rp"
+            placeholder="Masukan harga ongkir"
+            precision={0}
+          />
+        </View>
+      )}
     </View>
   );
 };
