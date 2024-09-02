@@ -146,7 +146,8 @@ const Pesanan = () => {
                   key={i}
                   curCustomerId={item.customerId}
                   curStatus={item.status}
-                  date={item.date}
+                  curDate={item.date}
+                  curOngkir={item.ongkir}
                   total_price={item.total_price}
                   id={item.id}
                   orderList={item.orderList}
@@ -211,7 +212,7 @@ const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
   const [status, setStatus] = useState<number>(2);
   const [total, setTotal] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [ongkir, setOngkir] = useState<number | null>(1000);
+  const [ongkir, setOngkir] = useState<number | null>(0);
   const [antar, setAntar] = useState<boolean>(false);
   const [date, setDate] = useState(new Date());
 
@@ -326,7 +327,7 @@ const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
       stock_gas_kosong: newStockGasKosong,
       stock_isi_ulang: newStockIsiUlang,
       transactionId: transactionId,
-      note: newNote,
+      // note: newNote,
     });
 
     await fetchHistory();
