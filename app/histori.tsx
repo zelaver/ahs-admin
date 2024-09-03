@@ -38,7 +38,7 @@ const Histori = () => {
     setRefreshing(false);
   };
 
-  const formatData : (data: any)  => ChartData[] | undefined= (data) => {
+  const formatData: (data: any) => ChartData[] | undefined = (data) => {
     try {
       const saldoTerakhirPerTanggal = data?.reduce((acc, current) => {
         const dateOnly = current?.date?.split(" ")[0]; // Pisahkan tanggal dari waktu
@@ -77,8 +77,8 @@ const Histori = () => {
     } catch (e) {
       if (e instanceof Error) {
         ToastAndroid.show(`error: ${e}`, ToastAndroid.SHORT);
-        const dummy : ChartData[] = [{value: 0, saldo: "", date: ''}]
-        return dummy
+        const dummy: ChartData[] = [{ value: 0, saldo: "", date: "" }];
+        return dummy;
       }
     }
   };
@@ -110,45 +110,60 @@ const Histori = () => {
             className="main"
             contentContainerStyle={{ paddingBottom: 70 }}
             nestedScrollEnabled
+            showsHorizontalScrollIndicator
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+              />
+            }
           >
             <View className="py-2 px-5 chart">
               <View className="section-1 py-2 flex-row items-center">
                 <Text className="text-lg font-semibold mr-3 text-blue-50">Saldo Harian</Text>
               </View>
-              <View className="bg-white rounded-md py-2 border shadow-md">
+              <ScrollView className="bg-white rounded-md py-2 border shadow-md">
                 <LineChart
-                  areaChart
                   // isAnimated
-                  curved
                   // animationDuration={2000}
+                  // height={200}
+                  areaChart
+                  curved
                   data={chartData}
                   rotateLabel
                   width={300}
-                  hideDataPoints
-                  spacing={20}
+                  // hideDataPoints
+                  initialSpacing={70}
+                  indicatorColor={"black"}
+                  spacing={30}
+                  endSpacing={50}
                   color="#1943b4"
-                  thickness={2}
+                  // thickness={2}
                   startFillColor="rgba(25, 67, 180,0.3)"
                   endFillColor="rgba(25, 67, 180,0.01)"
                   // backgroundColor={"white"}
-                  endSpacing={-20}
                   startOpacity={0.9}
                   endOpacity={0.2}
-                  initialSpacing={40}
                   noOfSections={6}
-                  maxValue={chartData[chartData.length - 1].value + 1000}
-                  yAxisColor="white"
+                  maxValue={
+                    chartData.reduce(
+                      (max, item) => (item.value > max ? item.value : max),
+                      chartData[0].value
+                    ) + 1500
+                  }
+                  yAxisColor="blue"
                   yAxisThickness={0}
                   rulesType="solid"
                   rulesColor="rgba(25, 67, 180,0.3)"
                   yAxisTextStyle={{ color: "gray" }}
                   yAxisSide="right"
-                  xAxisColor="lightgray"
+                  // xAxisColor="blue"
+                  xAxisLabelsVerticalShift={10}
                   pointerConfig={{
-                    pointerStripHeight: 100,
-                    pointerStripColor: "#0481c6",
+                    pointerStripHeight: 150,
+                    pointerStripColor: "black",
                     pointerStripWidth: 2,
-                    pointerColor: "#0481c6",
+                    pointerColor: "black",
                     radius: 6,
                     pointerLabelWidth: 100,
                     pointerLabelHeight: 90,
@@ -192,7 +207,7 @@ const Histori = () => {
                             <Text
                               style={{ fontWeight: "bold", textAlign: "center", color: "white" }}
                             >
-                              {"Rp" + items[0].saldo + ",00"}
+                              {"Rp" + items[0].saldo}
                             </Text>
                           </View>
                         </View>
@@ -200,7 +215,7 @@ const Histori = () => {
                     },
                   }}
                 />
-              </View>
+              </ScrollView>
               {/* <TouchableOpacity
               onPress={() => console.log(chartData[chartData.length - 1].value)}
             >
@@ -218,37 +233,46 @@ const Histori = () => {
                   />
                 </TouchableOpacity>
               </View>
-              <View className="header p-2 bg-blue-800 rounded-tl-md rounded-tr-md">
-                <View className="flex-row items-center">
-                  <Text className="text-sm text-white flex-1 font-semibold mr-2.5">Aqua</Text>
-                  <Text className="text-sm text-white flex-1 font-semibold mr-2.5">Isi Ulang</Text>
-                  <Text className="text-sm text-white flex-1 font-semibold mr-2.5">
-                    Galon Kosong
-                  </Text>
-                  <Text className="text-sm text-white flex-1 font-semibold mr-2.5">Gas 12 Kg</Text>
-                  <Text className="text-sm text-white flex-1 font-semibold">Gas Kosong</Text>
-                </View>
-              </View>
               <ScrollView
-                nestedScrollEnabled
-                // ref={scrollViewRef}
-                className="h-96 border-b border-blue-800"
-                refreshControl={
-                  <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                  />
-                }
+                horizontal
               >
-                {[...history]
-                  .sort((a, b) => sort(b.id, a.id))
-                  .map((item, i) => (
-                    <RowData
-                      key={i}
-                      id={item.id}
-                      data={history}
-                    />
-                  ))}
+                <View>
+                  <View className="header p-2 bg-blue-800 rounded-t-lg">
+                    <View className="flex-row items-center">
+                      <Text className="text-sm text-white flex-1 font-semibold  w-16">Aqua</Text>
+                      <Text className="text-sm text-white flex-1 font-semibold  w-16">
+                        Isi Ulang
+                      </Text>
+                      <Text className="text-sm text-white flex-1 font-semibold  w-20">
+                        Galon Kosong
+                      </Text>
+                      <Text className="text-sm text-white flex-1 font-semibold  w-16">
+                        Gas 12 Kg
+                      </Text>
+                      <Text className="text-sm text-white flex-1 font-semibold  w-16">
+                        Gas Kosong
+                      </Text>
+                      <Text className="text-sm text-white flex-1 font-semibold  w-36">Saldo</Text>
+                      <Text className="text-sm text-white flex-1 font-semibold  w-36">Note</Text>
+                      <Text className="text-sm text-white flex-1 font-semibold  w-20">Date</Text>
+                    </View>
+                  </View>
+                  <ScrollView
+                    nestedScrollEnabled
+                    // ref={scrollViewRef}
+                    className="h-96 border-b border-blue-800 bg-white "
+                  >
+                    {[...history]
+                      .sort((a, b) => sort(b.id, a.id))
+                      .map((item, i) => (
+                        <RowData
+                          key={i}
+                          id={item.id}
+                          data={history}
+                        />
+                      ))}
+                  </ScrollView>
+                </View>
               </ScrollView>
             </View>
           </ScrollView>
@@ -265,7 +289,7 @@ const RowData = ({ id, data }) => {
   return (
     <View className="row-data px-2 py-2.5 bg-white">
       <View className="flex-row">
-        <View className="flex-1 mr-2.5 flex-row ">
+        <View className="flex-row w-16">
           <Text className=" text-gray-700 text-sm mr-2">{dataRow.stock_aqua}</Text>
           <View className="flex-row">
             <Text
@@ -298,7 +322,7 @@ const RowData = ({ id, data }) => {
             </View>
           </View>
         </View>
-        <View className="flex-1 mr-2.5 flex-row ">
+        <View className="flex-row w-16">
           <Text className=" text-gray-700 text-sm mr-2">{dataRow.stock_isi_ulang}</Text>
           <View className="flex-row">
             <Text
@@ -333,7 +357,7 @@ const RowData = ({ id, data }) => {
             </View>
           </View>
         </View>
-        <View className="flex-1 mr-2.5 flex-row ">
+        <View className="flex-row w-20">
           <Text className=" text-gray-700 text-sm mr-2">{dataRow.stock_galon_kosong}</Text>
           <View className="flex-row">
             <Text
@@ -368,7 +392,7 @@ const RowData = ({ id, data }) => {
             </View>
           </View>
         </View>
-        <View className="flex-1 mr-2.5 flex-row ">
+        <View className="flex-row w-16">
           <Text className=" text-gray-700 text-sm mr-2">{dataRow.stock_gas_12kg}</Text>
           <View className="flex-row">
             <Text
@@ -401,7 +425,7 @@ const RowData = ({ id, data }) => {
             </View>
           </View>
         </View>
-        <View className="flex-1 mr-2.5 flex-row ">
+        <View className="flex-row w-16">
           <Text className=" text-gray-700 text-sm mr-2">{dataRow.stock_gas_kosong}</Text>
           <View className="flex-row">
             <Text
@@ -435,6 +459,61 @@ const RowData = ({ id, data }) => {
               />
             </View>
           </View>
+        </View>
+        <View className="flex-row w-36">
+          <Text className=" text-gray-700 text-sm mr-2">{dataRow.saldo.toLocaleString()}</Text>
+          <View className="flex-row">
+            <Text
+              className={`text-xs ${!dataRowBefore && "hidden"} ${
+                dataRow.saldo - dataRowBefore?.saldo == 0 && "hidden"
+              } ${dataRow.saldo - dataRowBefore?.saldo > 0 ? "text-green-500" : "text-red-500"}`}
+            >
+              {Math.abs(dataRow.saldo - dataRowBefore?.saldo).toLocaleString()}
+            </Text>
+            <View
+              className={`icon ${!dataRowBefore && "hidden"} ${
+                dataRow.saldo - dataRowBefore?.saldo == 0 && "hidden"
+              }`}
+            >
+              <Icon
+                name={`${
+                  dataRow.saldo - dataRowBefore?.saldo > 0 ? "arrow-up-line" : "arrow-down-line"
+                }`}
+                size={12}
+                color={`${dataRow.saldo - dataRowBefore?.saldo > 0 ? "#22c55e" : "#ef4444"}`}
+              />
+            </View>
+          </View>
+        </View>
+        <View className="flex-row w-36">
+          <Text className=" text-gray-700 text-sm mr-2">{dataRow.note}</Text>
+          {/* <View className="flex-row">
+            <Text
+              className={`text-xs ${!dataRowBefore && "hidden"} ${
+                dataRow.saldo - dataRowBefore?.saldo == 0 && "hidden"
+              } ${dataRow.saldo - dataRowBefore?.saldo > 0 ? "text-green-500" : "text-red-500"}`}
+            >
+              {Math.abs(dataRow.saldo - dataRowBefore?.saldo).toLocaleString()}
+            </Text>
+            <View
+              className={`icon ${!dataRowBefore && "hidden"} ${
+                dataRow.saldo - dataRowBefore?.saldo == 0 && "hidden"
+              }`}
+            >
+              <Icon
+                name={`${
+                  dataRow.saldo - dataRowBefore?.saldo > 0 ? "arrow-up-line" : "arrow-down-line"
+                }`}
+                size={12}
+                color={`${dataRow.saldo - dataRowBefore?.saldo > 0 ? "#22c55e" : "#ef4444"}`}
+              />
+            </View>
+          </View> */}
+        </View>
+        <View className="flex-row w-20">
+          <Text className=" text-gray-700 text-sm mr-2">
+            {new Date(dataRow.date).toLocaleDateString()}
+          </Text>
         </View>
       </View>
     </View>
