@@ -39,7 +39,7 @@ const initDB = async () => {
       stock_gas_12kg INTEGER,
       stock_gas_kosong INTEGER,
       saldo INTEGER,
-      note TEXT
+      note TEXT,
       date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (transactionId) REFERENCES transactions(id)
     );
@@ -59,7 +59,7 @@ const initHistory = async () => {
     const result = await db.execAsync(
       `
       insert into history (saldo, stock_aqua, stock_galon_kosong, stock_gas_12kg, stock_gas_kosong, stock_isi_ulang, transactionId, note)
-      values(0,0,0,0,0,0,null, "first  init");
+      values(0,0,0,0,0,0,null, "History pertama");
       `
     );
     return result;
