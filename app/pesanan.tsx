@@ -318,7 +318,7 @@ const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
     const newStockGasKosong = history.stock_gas_kosong - gasKosongVal + gasVal;
     const newStockIsiUlang = history.stock_isi_ulang - isiUlangVal;
     const newNote = `-`;
-    console.log(newSaldo);
+    
     await addHistory({
       saldo: newSaldo,
       stock_aqua: newStockAqua,

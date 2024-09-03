@@ -251,7 +251,8 @@ const BottomSheetOrderItem = ({
     setDate(new Date(curDate));
     setAntar(curOngkir ? true : false);
     setOngkir(curOngkir);
-    setTotal(total_price);
+    setStatus(curStatus);
+    setTotal(total_price + curOngkir);
   };
 
   useEffect(() => {
@@ -317,7 +318,7 @@ const BottomSheetOrderItem = ({
         orderList: newOrderList,
         customerId,
         status,
-        total_price: total,
+        total_price: total - (ongkir ? ongkir : 0),
         date: formattedDate,
         ongkir: ongkir ? ongkir : 0,
       },
@@ -339,12 +340,13 @@ const BottomSheetOrderItem = ({
         stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + (gasVal - parsedList[2].sum),
         stock_isi_ulang: history.stock_isi_ulang - (isiUlangVal - parsedList[1].sum),
         transactionId: id,
+        note: '-'
       });
     }
 
     if (curStatus == "lunas" && status == "pinjam") {
       await addHistory({
-        saldo: history.saldo - total_price,
+        saldo: history.saldo - total_price - curOngkir,
         stock_aqua: history.stock_aqua + parsedList[0].sum,
         stock_galon_kosong:
           history.stock_galon_kosong - galonKosongVal + parsedList[0].sum + parsedList[1].sum,
@@ -352,12 +354,13 @@ const BottomSheetOrderItem = ({
         stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + parsedList[3].sum,
         stock_isi_ulang: history.stock_isi_ulang + parsedList[1].sum,
         transactionId: id,
+        note: '-'
       });
     }
 
     if (curStatus === "lunas" && status === "lunas") {
       await addHistory({
-        saldo: history.saldo - (total_price - total),
+        saldo: history.saldo - ((total_price + curOngkir) - total) ,
         stock_aqua: history.stock_aqua - (aquaVal - parsedList[0].sum),
         stock_galon_kosong:
           history.stock_galon_kosong -
@@ -368,6 +371,7 @@ const BottomSheetOrderItem = ({
         stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + (gasVal - parsedList[2].sum),
         stock_isi_ulang: history.stock_isi_ulang - (isiUlangVal - parsedList[1].sum),
         transactionId: id,
+        note: '-'
       });
     }
 
@@ -385,12 +389,13 @@ const BottomSheetOrderItem = ({
         stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + (gasVal - parsedList[2].sum),
         stock_isi_ulang: history.stock_isi_ulang - (isiUlangVal - parsedList[1].sum),
         transactionId: id,
+        note: '-'
       });
     }
 
     if (curStatus == "hutang" && status == "pinjam") {
       await addHistory({
-        saldo: history.saldo - total_price,
+        saldo: history.saldo,
         stock_aqua: history.stock_aqua + parsedList[0].sum,
         stock_galon_kosong:
           history.stock_galon_kosong - galonKosongVal + parsedList[0].sum + parsedList[1].sum,
@@ -398,6 +403,7 @@ const BottomSheetOrderItem = ({
         stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + parsedList[2].sum,
         stock_isi_ulang: history.stock_isi_ulang + parsedList[1].sum,
         transactionId: id,
+        note: '-'
       });
     }
 
@@ -414,6 +420,7 @@ const BottomSheetOrderItem = ({
         stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + (gasVal - parsedList[2].sum),
         stock_isi_ulang: history.stock_isi_ulang - (isiUlangVal - parsedList[1].sum),
         transactionId: id,
+        note: '-'
       });
     }
 
@@ -426,6 +433,7 @@ const BottomSheetOrderItem = ({
         stock_gas_kosong: history.stock_gas_kosong + parsedList[4].sum + gasVal,
         stock_isi_ulang: history.stock_isi_ulang - isiUlangVal,
         transactionId: id,
+        note: '-'
       });
     }
 
@@ -438,6 +446,7 @@ const BottomSheetOrderItem = ({
         stock_gas_kosong: history.stock_gas_kosong + parsedList[4].sum + gasVal,
         stock_isi_ulang: history.stock_isi_ulang - isiUlangVal,
         transactionId: id,
+        note: '-'
       });
     }
 
@@ -451,6 +460,7 @@ const BottomSheetOrderItem = ({
         stock_gas_kosong: history.stock_gas_kosong - (gasKosongVal - parsedList[4].sum) + gasVal,
         stock_isi_ulang: history.stock_isi_ulang,
         transactionId: id,
+        note: '-'
       });
     }
 
@@ -474,7 +484,7 @@ const BottomSheetOrderItem = ({
           onPress: async () => {
             await deleteTransaction(id);
             await addHistory({
-              saldo: history.saldo - (curStatus == "hutang" ? 0 : total_price),
+              saldo: history.saldo - (curStatus == "hutang" ? 0 : total_price) - curOngkir,
               stock_aqua: history.stock_aqua + parsedList[0].sum,
               stock_galon_kosong:
                 history.stock_galon_kosong -
@@ -645,7 +655,7 @@ const BottomSheetOrderItem = ({
                       total + (!customerType ? products[0]?.price : products[0]?.subs_price)
                     );
                   }}
-                  className={`border px-4 py-2 ${aquaVal && "hidden"} ${status == 1 && "hidden"}`}
+                  className={`border px-4 py-2 ${aquaVal && "hidden"} ${status == "pinjam" && "hidden"}`}
                 >
                   <Text className="text-gray-50 font-semibold">aqua</Text>
                 </TouchableOpacity>
@@ -659,7 +669,7 @@ const BottomSheetOrderItem = ({
                     );
                   }}
                   className={`border px-4 py-2 ${isiUlangVal && "hidden"} ${
-                    status == 1 && "hidden"
+                    status == "pinjam" && "hidden"
                   }`}
                 >
                   <Text className="text-gray-50 font-semibold">Isi Ulang</Text>
@@ -673,7 +683,7 @@ const BottomSheetOrderItem = ({
                       total + (!customerType ? products[2]?.price : products[2]?.subs_price)
                     );
                   }}
-                  className={`border px-4 py-2 ${gasVal && "hidden"} ${status == 1 && "hidden"}`}
+                  className={`border px-4 py-2 ${gasVal && "hidden"} ${status == "pinjam" && "hidden"}`}
                 >
                   <Text className="text-gray-50 font-semibold">Gas 12 Kg</Text>
                 </TouchableOpacity>
@@ -684,9 +694,9 @@ const BottomSheetOrderItem = ({
                     setGalonKosongVal(1);
                   }}
                   className={`border px-4 py-2 ${galonKosongVal && "hidden"} ${
-                    status != 1 && "hidden"
+                    status != "pinjam" && "hidden"
                   }`}
-                  disabled={status != 1}
+                  disabled={status != "pinjam"}
                 >
                   <Text className="text-gray-50 font-semibold">Galon Kosong</Text>
                 </TouchableOpacity>
@@ -697,9 +707,9 @@ const BottomSheetOrderItem = ({
                     setGasKosongVal(1);
                   }}
                   className={`border px-4 py-2 ${gasKosongVal && "hidden"} ${
-                    status != 1 && "hidden"
+                    status != "pinjam" && "hidden"
                   }`}
-                  disabled={status != 1}
+                  disabled={status != "pinjam"}
                 >
                   <Text className="text-gray-50 font-semibold">Gas Kosong</Text>
                 </TouchableOpacity>
@@ -757,6 +767,8 @@ const BottomSheetOrderItem = ({
                   setIsiUlangVal(0);
                   setGasVal(0);
                   setTotal(0);
+                  setAntar(false)
+                  setOngkir(0)
                 }}
                 activeOpacity={1}
               >
