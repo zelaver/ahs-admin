@@ -126,6 +126,7 @@ const StockItem = ({
           stock_galon_kosong: stocks.stock_galon_kosong - addStock,
           saldo: stocks.saldo - addStock * stockPrice,
           transactionId: null,
+          note: `Tambah stock aqua: ${addStock}/${stockPrice}`,
         };
         await addHistory({ ...newStocks });
         await fetchStocks();
@@ -139,6 +140,7 @@ const StockItem = ({
           stock_isi_ulang: stock + addStock,
           stock_galon_kosong: stocks.stock_galon_kosong - addStock,
           transactionId: null,
+          note: `Tambah stock aqua: ${addStock}`,
         };
         await addHistory({ ...newStocks });
         await fetchStocks();
@@ -149,6 +151,7 @@ const StockItem = ({
           stock_galon_kosong: stock + addStock,
 
           transactionId: null,
+          note: `Tambah stock galon kosong: ${addStock}`,
         };
         await addHistory({ ...newStocks });
         await fetchStocks();
@@ -163,12 +166,18 @@ const StockItem = ({
           stock_gas_kosong: stocks.stock_gas_kosong - addStock,
           saldo: stocks.saldo - addStock * stockPrice,
           transactionId: null,
+          note: `Tambah stock gas: ${addStock}/Rp${stockPrice}`,
         };
         await addHistory({ ...newStocks });
         await fetchStocks();
         handleClosePress();
       } else if (name == "Gas Kosong") {
-        const newStocks = { ...stocks, stock_gas_kosong: stock + addStock, transactionId: null };
+        const newStocks = {
+          ...stocks,
+          stock_gas_kosong: stock + addStock,
+          transactionId: null,
+          note: `Tambah stock gas: ${addStock}`,
+        };
         await addHistory({ ...newStocks });
         await fetchStocks();
         handleClosePress();
