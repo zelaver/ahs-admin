@@ -304,21 +304,21 @@ const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
       customerId: customerId,
       status: statusString,
       ongkir: ongkir ? ongkir : 0,
-      total_price: total,
-      date: formattedDate
+      total_price: total - (ongkir ? ongkir : 0),
+      date: formattedDate,
     });
 
     // INPUT DATA KE HISTORY
     const transaction: any = await getTransactions();
     const transactionId = transaction[transaction?.length - 1].id;
-    const newSaldo = history.saldo + ongkir + (status == 0 ? 0 : total);
+    const newSaldo = history.saldo + (status == 0 ? 0 : total);
     const newStockAqua = history.stock_aqua - aquaVal;
     const newStockGalonKosong = history.stock_galon_kosong - galonKosongVal + aquaVal + isiUlangVal;
     const newStockGas12kg = history.stock_gas_12kg - gasVal;
     const newStockGasKosong = history.stock_gas_kosong - gasKosongVal + gasVal;
     const newStockIsiUlang = history.stock_isi_ulang - isiUlangVal;
-    const newNote = `${ongkir ? "Ongkir: " + ongkir : "Pelanggan ambil sendiri"}`;
-
+    const newNote = `-`;
+    console.log(newSaldo);
     await addHistory({
       saldo: newSaldo,
       stock_aqua: newStockAqua,
@@ -327,7 +327,7 @@ const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
       stock_gas_kosong: newStockGasKosong,
       stock_isi_ulang: newStockIsiUlang,
       transactionId: transactionId,
-      // note: newNote,
+      note: newNote,
     });
 
     await fetchHistory();
