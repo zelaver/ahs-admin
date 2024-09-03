@@ -264,7 +264,7 @@ const BottomSheetSaldo = ({ bottomSheetModalRef, stocks, fetchStocks }: any) => 
     await addHistory({
       ...stocks,
       saldo: stocks?.saldo + saldoInput,
-      note: `${noteInput} (Rp${saldoInput > 0 ? "+" : ""}${saldoInput.toLocaleString()})`,
+      note: `${noteInput}`,
     });
     await fetchStocks();
     setIsLoading(false);
