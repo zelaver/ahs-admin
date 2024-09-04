@@ -60,7 +60,7 @@ const initHistory = async () => {
       `
       insert into history (saldo, stock_aqua, stock_galon_kosong, stock_gas_12kg, stock_gas_kosong, stock_isi_ulang, transactionId, note)
       values(0,0,0,0,0,0,null, "History pertama");
-      `
+      `,
     );
     return result;
   } catch (e) {
@@ -88,7 +88,7 @@ const addContact = async ({ name, address, phone, isSubscriber }: contact) => {
       insert into customers (name, address, phone, isSubscriber) 
       values(?, ?, ?, ?);
       `,
-      [name, address, phone, isSubscriber]
+      [name, address, phone, isSubscriber],
       // delete from transactions where id = 'trans001'
     );
     return result;
@@ -110,7 +110,7 @@ const updateContact = async ({ name, address, phone, isSubscriber }: contact, id
       SET name = ?, address = ?, phone = ?, isSubscriber = ? 
       WHERE id = ?;
       `,
-      [name, address, phone, isSubscriber, id]
+      [name, address, phone, isSubscriber, id],
       // delete from transactions where id = 'trans001'
     );
     return result;
@@ -160,7 +160,7 @@ const deleteContact = async (id: number) => {
       `
       DELETE FROM customers WHERE id = ${id};
       DELETE FROM transactions WHERE customerId = ${id};
-      `
+      `,
     );
     // console.log(result[0])
     // console.log("masuk");
@@ -187,16 +187,7 @@ const getHistory = async () => {
   }
 };
 
-const addHistory = async ({
-  saldo,
-  stock_aqua,
-  stock_galon_kosong,
-  stock_gas_12kg,
-  stock_gas_kosong,
-  stock_isi_ulang,
-  transactionId,
-  note,
-}: any) => {
+const addHistory = async ({ saldo, stock_aqua, stock_galon_kosong, stock_gas_12kg, stock_gas_kosong, stock_isi_ulang, transactionId, note }: any) => {
   const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
     useNewConnection: true,
   });
@@ -206,16 +197,7 @@ const addHistory = async ({
       insert into history (saldo, stock_aqua, stock_galon_kosong, stock_gas_12kg, stock_gas_kosong, stock_isi_ulang, transactionId, note)
       values(?,?,?,?,?,?,?,?)
       `,
-      [
-        saldo,
-        stock_aqua,
-        stock_galon_kosong,
-        stock_gas_12kg,
-        stock_gas_kosong,
-        stock_isi_ulang,
-        transactionId,
-        note,
-      ]
+      [saldo, stock_aqua, stock_galon_kosong, stock_gas_12kg, stock_gas_kosong, stock_isi_ulang, transactionId, note],
     );
     return result;
   } catch (e) {
@@ -261,14 +243,7 @@ type Transaction = {
   date: string;
 };
 
-const addTransaction = async ({
-  orderList,
-  customerId,
-  status,
-  ongkir,
-  total_price,
-  date,
-}: Transaction) => {
+const addTransaction = async ({ orderList, customerId, status, ongkir, total_price, date }: Transaction) => {
   const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
     useNewConnection: true,
   });
@@ -278,7 +253,7 @@ const addTransaction = async ({
       insert into transactions (date, orderList, customerId, status,ongkir, total_price)
       values(?,?,?,?,?,?)
       `,
-      [date, JSON.stringify(orderList), customerId, status, ongkir, total_price]
+      [date, JSON.stringify(orderList), customerId, status, ongkir, total_price],
       // delete from transactions where id = 'trans001'
     );
     return result;
@@ -304,10 +279,7 @@ const getTransactions = async () => {
   }
 };
 
-const updateTransaction = async (
-  { orderList, customerId, status, total_price, date, ongkir }: Transaction,
-  id: number
-) => {
+const updateTransaction = async ({ orderList, customerId, status, total_price, date, ongkir }: Transaction, id: number) => {
   const db = await SQLite.openDatabaseAsync("ahs-admin.db", {
     useNewConnection: true,
   });
@@ -322,7 +294,7 @@ const updateTransaction = async (
       SET orderList = ?, customerId = ?, status = ?, total_price = ?, date = ?, ongkir = ?
       WHERE id = ?;
       `,
-      [JSON.stringify(orderList), customerId, status, total_price, date, ongkir, id]
+      [JSON.stringify(orderList), customerId, status, total_price, date, ongkir, id],
       // delete from transactions where id = 'trans001'
     );
     return result;
@@ -346,7 +318,7 @@ const deleteTransaction = async (id: number) => {
       `
       delete from transactions where id = ?
       `,
-      [id]
+      [id],
       // delete from transactions where id = 'trans001'
     );
     return result;
@@ -368,7 +340,7 @@ const updateProductPrice = async (id: number, price: number, subs_price: number)
       SET price = ?, subs_price = ?
       WHERE id = ?;
       `,
-      [price, subs_price, id]
+      [price, subs_price, id],
     );
 
     return true;

@@ -1,31 +1,40 @@
-import GlobalProvider, { useGlobalContext } from "@/context/GlobalProvider";
+import GlobalProvider, {
+  useGlobalContext,
+} from "@/context/GlobalProvider";
 import { useFonts } from "expo-font";
 import { SplashScreen } from "expo-router";
 import { useEffect } from "react";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { Tabs } from "expo-router";
-import { View, Text, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  ActivityIndicator,
+} from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Icon from "react-native-remix-icon";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 // SplashScreen.preventAutoHideAsync();
 
-const TabIcon = ({ icon, color, name, focused }: any) => {
+const TabIcon = ({
+  icon,
+  color,
+  name,
+  focused,
+}: any) => {
   return (
-    <View className="items-center justify-center w-14">
+    <View className="w-14 items-center justify-center">
       {/* <Image source={icon} resizeMode="contain" tintColor={color} className="w-6 h-6" /> */}
       <Icon
         name={`${icon}-${focused ? "fill" : "line"}`}
         color={`${focused ? "#1943b4" : "#4b5563"}`}
-        size={24}
-      ></Icon>
+        size={24}></Icon>
       {/* #4b5563 */}
       {/* #1943b4 */}
       <Text
-        className={`${focused ? "font-semibold " : "font-pregular"} text-xs `}
-        style={{ color: color }}
-      >
+        className={`${focused ? "font-semibold" : "font-pregular"} text-xs`}
+        style={{ color: color }}>
         {name}
       </Text>
     </View>
@@ -62,13 +71,15 @@ export default function RootLayout() {
                 borderTopColor: "#4b5563",
                 borderTopWidth: 1,
               },
-            }}
-          >
+            }}>
             <Tabs.Screen
               name="index"
               options={{
                 title: "Home",
-                tabBarIcon: ({ color, focused }) => (
+                tabBarIcon: ({
+                  color,
+                  focused,
+                }) => (
                   <TabIcon
                     icon={"home-4"}
                     color={color}
@@ -82,7 +93,10 @@ export default function RootLayout() {
               name="pesanan"
               options={{
                 title: "Pesanan",
-                tabBarIcon: ({ color, focused }) => (
+                tabBarIcon: ({
+                  color,
+                  focused,
+                }) => (
                   <TabIcon
                     icon={"file-list"}
                     color={color}
@@ -96,7 +110,10 @@ export default function RootLayout() {
               name="kontak"
               options={{
                 title: "kontak",
-                tabBarIcon: ({ color, focused }) => (
+                tabBarIcon: ({
+                  color,
+                  focused,
+                }) => (
                   <TabIcon
                     icon={"contacts-book-2"}
                     color={color}
@@ -110,7 +127,10 @@ export default function RootLayout() {
               name="histori"
               options={{
                 title: "histori",
-                tabBarIcon: ({ color, focused }) => (
+                tabBarIcon: ({
+                  color,
+                  focused,
+                }) => (
                   <TabIcon
                     icon={"history"}
                     color={color}
@@ -125,7 +145,10 @@ export default function RootLayout() {
               name="backup"
               options={{
                 title: "backup",
-                tabBarIcon: ({ color, focused }) => (
+                tabBarIcon: ({
+                  color,
+                  focused,
+                }) => (
                   <TabIcon
                     icon={"upload"}
                     color={color}
@@ -136,20 +159,23 @@ export default function RootLayout() {
               }}
             />
             <Tabs.Screen
-            name="debug"
-            options={{
-              title: "debug",
-              // href: null,
-              tabBarIcon: ({ color, focused }) => (
-                <TabIcon
-                  icon={"bug-2"}
-                  color={color}
-                  name="Debug"
-                  focused={focused}
-                />
-              ),
-            }}
-          />
+              name="debug"
+              options={{
+                title: "debug",
+                href: null,
+                tabBarIcon: ({
+                  color,
+                  focused,
+                }) => (
+                  <TabIcon
+                    icon={"bug-2"}
+                    color={color}
+                    name="Debug"
+                    focused={focused}
+                  />
+                ),
+              }}
+            />
           </Tabs>
         </BottomSheetModalProvider>
       </GestureHandlerRootView>

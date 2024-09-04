@@ -19,12 +19,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Redirect } from "expo-router";
 import StockItem from "@/components/StockItem";
 import { addHistory } from "@/database/db";
-import {
-  BottomSheetBackdrop,
-  BottomSheetModal,
-  BottomSheetScrollView,
-  BottomSheetTextInput,
-} from "@gorhom/bottom-sheet";
+import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView, BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import Handle from "@/components/CustomHandle";
 import CurrencyInput from "react-native-currency-input";
 import { RefreshControl } from "react-native-gesture-handler";
@@ -39,7 +34,7 @@ export default function Home() {
   const { lastHistory: stocks, products, fetchHistory: fetchStocks } = useGlobalContext();
 
   const [refreshing, setRefreshing] = useState(false);
-  const [debugMode, setDebugMode] = useState<boolean>(true);
+  const [debugMode, setDebugMode] = useState<boolean>(false);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -77,34 +72,17 @@ export default function Home() {
   }
 
   return (
-    <SafeAreaView className="bg-blue-600 flex-1 pt-8">
+    <SafeAreaView className="flex-1 bg-blue-600 pt-8">
       <ScrollView
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-          />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         contentContainerStyle={{
           paddingBottom: 70,
-        }}
-      >
+        }}>
         <Header />
-        <Saldo
-          stocks={stocks}
-          handlePresentModalPress={handlePresentModalPress}
-        />
-        <Stock
-          stocks={stocks}
-          products={products}
-          fetchStocks={fetchStocks}
-        />
+        <Saldo stocks={stocks} handlePresentModalPress={handlePresentModalPress} />
+        <Stock stocks={stocks} products={products} fetchStocks={fetchStocks} />
       </ScrollView>
-      <BottomSheetSaldo
-        bottomSheetModalRef={bottomSheetModalRef}
-        stocks={stocks}
-        fetchStocks={fetchStocks}
-      />
+      <BottomSheetSaldo bottomSheetModalRef={bottomSheetModalRef} stocks={stocks} fetchStocks={fetchStocks} />
     </SafeAreaView>
   );
 }
@@ -118,45 +96,28 @@ const Header = () => {
 };
 const Saldo = ({ stocks, handlePresentModalPress }: any) => {
   return (
-    <View className="section-2 px-5 box-content gap-y-3 pb-3">
-      <View className="profile flex-row justify-between items-center py-1.5">
+    <View className="section-2 box-content gap-y-3 px-5 pb-3">
+      <View className="profile flex-row items-center justify-between py-1.5">
         <View className="pp-name flex-row items-center gap-3">
-          <View className="pp bg-cyan-600 w-8 h-8 rounded-full justify-center items-center border">
-            <Text className="text-white text-xs font-medium">EM</Text>
+          <View className="pp h-8 w-8 items-center justify-center rounded-full border bg-cyan-600">
+            <Text className="text-xs font-medium text-white">EM</Text>
           </View>
           <Text className="text-sm font-bold text-blue-50">Euis Marlina</Text>
         </View>
-        <Icon
-          name="settings-line"
-          size={20}
-          color="#fff"
-        ></Icon>
+        <Icon name="settings-line" size={20} color="#fff"></Icon>
       </View>
-      <View className="saldo px-3 py-2 bg-blue-800 rounded-lg flex-col box-content border border-blue-50">
-        <View className="flex-row justify-between items-center mb-1">
-          <Text className="text-base font-bold text-white ">Saldo Toko</Text>
-          <Icon
-            name="more-2-fill"
-            color="white"
-            size={12}
-          ></Icon>
+      <View className="saldo box-content flex-col rounded-lg border border-blue-50 bg-blue-800 px-3 py-2">
+        <View className="mb-1 flex-row items-center justify-between">
+          <Text className="text-base font-bold text-white">Saldo Toko</Text>
+          <Icon name="more-2-fill" color="white" size={12}></Icon>
         </View>
-        <View className="flex-row mb-1">
+        <View className="mb-1 flex-row">
           <Text className="text-xs font-bold text-white">Rp</Text>
-          <Text className="text-xl font-bold text-white">
-            {stocks?.saldo?.toLocaleString("id-ID")},00
-          </Text>
+          <Text className="text-xl font-bold text-white">{stocks?.saldo?.toLocaleString("id-ID")},00</Text>
         </View>
-        <TouchableOpacity
-          className="flex-row items-center w-full py-1"
-          onPress={handlePresentModalPress}
-        >
+        <TouchableOpacity className="w-full flex-row items-center py-1" onPress={handlePresentModalPress}>
           <Text className="text-gray-100 opacity-50">Ubah Saldo</Text>
-          <Icon
-            name="arrow-right-s-line"
-            size={12}
-            color="#899ad3"
-          ></Icon>
+          <Icon name="arrow-right-s-line" size={12} color="#899ad3"></Icon>
         </TouchableOpacity>
       </View>
     </View>
@@ -164,9 +125,9 @@ const Saldo = ({ stocks, handlePresentModalPress }: any) => {
 };
 const Stock = ({ stocks, products, fetchStocks }: any) => {
   return (
-    <View className="section-3 px-5 flex-col gap-y-2 ">
-      <Text className="text-sm font-bold text-blue-50 mb-2">Stok/Harga Galon</Text>
-      <View className="stok-row-1 flex-row justify-between mb-4 ">
+    <View className="section-3 flex-col gap-y-2 px-5">
+      <Text className="mb-2 text-sm font-bold text-blue-50">Stok/Harga Galon</Text>
+      <View className="stok-row-1 mb-4 flex-row justify-between">
         <StockItem
           id={products[0]?.id}
           otherStyles="mr-2"
@@ -190,16 +151,10 @@ const Stock = ({ stocks, products, fetchStocks }: any) => {
         />
       </View>
 
-      <View className="stok-row-2 flex-row justify-between mb-4">
-        <StockItem
-          image={images.galonKosong}
-          name="Galon Kosong"
-          stock={stocks?.stock_galon_kosong}
-          stocks={stocks}
-          fetchStocks={fetchStocks}
-        />
+      <View className="stok-row-2 mb-4 flex-row justify-between">
+        <StockItem image={images.galonKosong} name="Galon Kosong" stock={stocks?.stock_galon_kosong} stocks={stocks} fetchStocks={fetchStocks} />
       </View>
-      <View className="stok-row-3 flex-row justify-between ">
+      <View className="stok-row-3 flex-row justify-between">
         <StockItem
           id={products[2]?.id}
           otherStyles="mr-2"
@@ -212,13 +167,7 @@ const Stock = ({ stocks, products, fetchStocks }: any) => {
           fetchStocks={fetchStocks}
         />
 
-        <StockItem
-          image={images.gasKosong}
-          name="Gas Kosong"
-          stock={stocks?.stock_gas_kosong}
-          stocks={stocks}
-          fetchStocks={fetchStocks}
-        />
+        <StockItem image={images.gasKosong} name="Gas Kosong" stock={stocks?.stock_gas_kosong} stocks={stocks} fetchStocks={fetchStocks} />
       </View>
     </View>
   );
@@ -239,15 +188,8 @@ const BottomSheetSaldo = ({ bottomSheetModalRef, stocks, fetchStocks }: any) => 
     bottomSheetModalRef.current?.close();
   }, []);
   const renderBackdrop = useCallback(
-    (props: any) => (
-      <BottomSheetBackdrop
-        {...props}
-        appearsOnIndex={0}
-        disappearsOnIndex={-1}
-        pressBehavior={"close"}
-      />
-    ),
-    []
+    (props: any) => <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} pressBehavior={"close"} />,
+    [],
   );
 
   const [saldoInput, setSaldoInput] = useState<number | null>(null);
@@ -255,8 +197,7 @@ const BottomSheetSaldo = ({ bottomSheetModalRef, stocks, fetchStocks }: any) => 
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSave = async () => {
-    if (!saldoInput || !noteInput)
-      return ToastAndroid.show("Input tidak boleh kosong", ToastAndroid.SHORT);
+    if (!saldoInput || !noteInput) return ToastAndroid.show("Input tidak boleh kosong", ToastAndroid.SHORT);
     if (stocks?.saldo + saldoInput < 0) {
       return ToastAndroid.show("Saldo anda tidak cukup", ToastAndroid.SHORT);
     }
@@ -280,13 +221,12 @@ const BottomSheetSaldo = ({ bottomSheetModalRef, stocks, fetchStocks }: any) => 
       backdropComponent={renderBackdrop}
       keyboardBehavior="interactive"
       keyboardBlurBehavior="restore"
-      handleComponent={(props) => Handle({ ...props, HandleText: "Ubah Saldo" })}
-    >
+      handleComponent={(props) => Handle({ ...props, HandleText: "Ubah Saldo" })}>
       <BottomSheetScrollView>
-        <View className="main py-3 gap-y-4">
-          <View className="saldo-input px-3 ">
-            <Text className="text-sm font-semibold mb-2.5">Jumlah Saldo:</Text>
-            <View className="border-2 rounded-md px-3">
+        <View className="main gap-y-4 py-3">
+          <View className="saldo-input px-3">
+            <Text className="mb-2.5 text-sm font-semibold">Jumlah Saldo:</Text>
+            <View className="rounded-md border-2 px-3">
               <CurrencyInput
                 onFocus={() => handleSnapPress(1)}
                 onBlur={() => handleSnapPress(0)}
@@ -301,9 +241,9 @@ const BottomSheetSaldo = ({ bottomSheetModalRef, stocks, fetchStocks }: any) => 
               />
             </View>
           </View>
-          <View className="note-input px-3 ">
-            <Text className="text-sm font-semibold mb-2.5">Note:</Text>
-            <View className="border-2 rounded-md px-3">
+          <View className="note-input px-3">
+            <Text className="mb-2.5 text-sm font-semibold">Note:</Text>
+            <View className="rounded-md border-2 px-3">
               <TextInput
                 multiline={true}
                 numberOfLines={4}
@@ -317,25 +257,12 @@ const BottomSheetSaldo = ({ bottomSheetModalRef, stocks, fetchStocks }: any) => 
           </View>
           <View className="action-button px-3">
             <TouchableOpacity
-              className={`rounded-lg ${
-                isLoading ? "bg-blue-900" : "bg-blue-800"
-              }  px-3 py-2 mb-2.5`}
+              className={`rounded-lg ${isLoading ? "bg-blue-900" : "bg-blue-800"} mb-2.5 px-3 py-2`}
               activeOpacity={0.9}
               onPress={handleSave}
-              disabled={isLoading}
-            >
-              <ActivityIndicator
-                size={"small"}
-                color={"#ffff"}
-                className={`${!isLoading && "hidden"}`}
-              />
-              <Text
-                className={`text-center text-gray-100 text-xs font-semibold ${
-                  isLoading && "hidden"
-                }`}
-              >
-                Simpan
-              </Text>
+              disabled={isLoading}>
+              <ActivityIndicator size={"small"} color={"#ffff"} className={`${!isLoading && "hidden"}`} />
+              <Text className={`text-center text-xs font-semibold text-gray-100 ${isLoading && "hidden"}`}>Simpan</Text>
             </TouchableOpacity>
           </View>
         </View>

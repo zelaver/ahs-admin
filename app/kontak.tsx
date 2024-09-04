@@ -1,14 +1,4 @@
-import {
-  View,
-  Text,
-  SafeAreaView,
-  ScrollView,
-  TextInput,
-  BackHandler,
-  ToastAndroid,
-  RefreshControl,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, SafeAreaView, ScrollView, TextInput, BackHandler, ToastAndroid, RefreshControl, ActivityIndicator } from "react-native";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import SearchInput from "@/components/SearchInput";
 import Icon from "react-native-remix-icon";
@@ -43,7 +33,7 @@ const Kontak = () => {
         setStatus(0);
       }
     },
-    [name, phone, address, status]
+    [name, phone, address, status],
   );
   const handleClosePress = useCallback(() => {
     bottomSheetModalRef.current?.close();
@@ -59,7 +49,7 @@ const Kontak = () => {
         // onPress={handleClosePress}
       />
     ),
-    []
+    [],
   );
 
   const [isLoading, setIsLoading] = useState(false);
@@ -98,15 +88,15 @@ const Kontak = () => {
   };
 
   return (
-    <SafeAreaView className="pt-8 bg-blue-600 flex-1">
+    <SafeAreaView className="flex-1 bg-blue-600 pt-8">
       <View className="Header pb-3">
         <View className="section-1 px-5 py-2">
           <Text className="text-2xl font-semibold text-blue-50">Kontak</Text>
         </View>
-        <View className="section-2 px-5 flex-row items-center justify-between">
-          <View className={`flex-row py-1 flex-1 px-2 mr-2 rounded-md items-center border bg-white`}>
+        <View className="section-2 flex-row items-center justify-between px-5">
+          <View className={`mr-2 flex-1 flex-row items-center rounded-md border bg-white px-2 py-1`}>
             <TextInput
-              className=" text-xs flex-1 font-normal mr-2 justify-center items-center"
+              className="mr-2 flex-1 items-center justify-center text-xs font-normal"
               value={query}
               placeholder={"Cari Kontak"}
               placeholderTextColor={"#CDCDE0"}
@@ -116,41 +106,20 @@ const Kontak = () => {
               }}
             />
             <TouchableOpacity>
-              <Icon
-                name="search-2-line"
-                size={16}
-              ></Icon>
+              <Icon name="search-2-line" size={16}></Icon>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            activeOpacity={0.5}
-            onPress={handlePresentModalPress}
-            className=" rounded-full bg-blue-800"
-          >
-            <Icon
-              name="add-fill"
-              size={32}
-              color="white"
-            />
+          <TouchableOpacity activeOpacity={0.5} onPress={handlePresentModalPress} className="rounded-full bg-blue-800">
+            <Icon name="add-fill" size={32} color="white" />
           </TouchableOpacity>
         </View>
       </View>
-      <ScrollView
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-          />
-        }
-      >
+      <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         <View className="main pb-16">
           <View className="section-3 px-5 py-1.5">
             {[...contacts]
               .filter((item) =>
-                query
-                  ? item.name.toLowerCase().includes(query.toLowerCase()) ||
-                    item.address.toLowerCase().includes(query.toLowerCase())
-                  : item
+                query ? item.name.toLowerCase().includes(query.toLowerCase()) || item.address.toLowerCase().includes(query.toLowerCase()) : item,
               )
               .map(({ id, name, address, phone, isSubscriber }, i) => {
                 return (
@@ -175,22 +144,18 @@ const Kontak = () => {
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
         backdropComponent={renderBackdrop}
-        handleComponent={(props) => Handle({ ...props, HandleText: "Detail Kontak" })}
-      >
+        handleComponent={(props) => Handle({ ...props, HandleText: "Detail Kontak" })}>
         <BottomSheetScrollView>
-          <View className="main py-3 gap-y-4">
+          <View className="main gap-y-4 py-3">
             <View className="customer px-3">
-              <Text className="text-sm font-semibold mb-2.5">Nama:</Text>
-              <View className="border-2 rounded-md px-3">
-                <TextInput
-                  placeholder="isi nama Customer"
-                  onChangeText={(input) => setName(input)}
-                />
+              <Text className="mb-2.5 text-sm font-semibold">Nama:</Text>
+              <View className="rounded-md border-2 px-3">
+                <TextInput placeholder="isi nama Customer" onChangeText={(input) => setName(input)} />
               </View>
             </View>
-            <View className="tanggal px-3 ">
-              <Text className="text-sm font-semibold mb-2.5">Nomor Telepon:</Text>
-              <View className="border-2 rounded-md px-3">
+            <View className="tanggal px-3">
+              <Text className="mb-2.5 text-sm font-semibold">Nomor Telepon:</Text>
+              <View className="rounded-md border-2 px-3">
                 <TextInput
                   placeholder="Masukan nomor telepon"
                   keyboardType="number-pad"
@@ -200,75 +165,41 @@ const Kontak = () => {
                 />
               </View>
             </View>
-            <View className="alamat px-3 ">
-              <Text className="text-sm font-semibold mb-2.5">Alamat:</Text>
-              <View className="border-2 rounded-md px-3 ">
-                <TextInput
-                  placeholder="Isi Alamat"
-                  onChangeText={(input) => setAddress(input)}
-                />
+            <View className="alamat px-3">
+              <Text className="mb-2.5 text-sm font-semibold">Alamat:</Text>
+              <View className="rounded-md border-2 px-3">
+                <TextInput placeholder="Isi Alamat" onChangeText={(input) => setAddress(input)} />
               </View>
             </View>
             <View className="tipe-pelanggan px-3">
-              <Text className="text-sm font-semibold mb-2.5">Status:</Text>
-              <View className="status-boxes self-center flex-row gap-x-3">
+              <Text className="mb-2.5 text-sm font-semibold">Status:</Text>
+              <View className="status-boxes flex-row gap-x-3 self-center">
                 <TouchableOpacity
                   activeOpacity={1}
-                  className={`px-3 py-1 border rounded-md ${
-                    status && "bg-blue-800"
-                  } border-blue-800`}
-                  onPress={() => setStatus(1)}
-                >
-                  <Text
-                    className={`text-center text-xs ${
-                      status ? "text-white" : "text-blue-800"
-                    } font-semibold`}
-                  >
-                    Warung
-                  </Text>
+                  className={`rounded-md border px-3 py-1 ${status && "bg-blue-800"} border-blue-800`}
+                  onPress={() => setStatus(1)}>
+                  <Text className={`text-center text-xs ${status ? "text-white" : "text-blue-800"} font-semibold`}>Warung</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   activeOpacity={1}
-                  className={`px-3 py-1 rounded-md ${
-                    !status && "bg-blue-800"
-                  } border-blue-800 border`}
-                  onPress={() => setStatus(0)}
-                >
-                  <Text
-                    className={`text-center text-xs ${
-                      !status ? "text-white" : "text-blue-800"
-                    } font-semibold`}
-                  >
-                    Customer
-                  </Text>
+                  className={`rounded-md px-3 py-1 ${!status && "bg-blue-800"} border border-blue-800`}
+                  onPress={() => setStatus(0)}>
+                  <Text className={`text-center text-xs ${!status ? "text-white" : "text-blue-800"} font-semibold`}>Customer</Text>
                 </TouchableOpacity>
               </View>
             </View>
             <View className="action-button px-3">
               <TouchableOpacity
-                className={`rounded-lg ${
-                  isLoading ? "bg-blue-900" : "bg-blue-800"
-                }  px-3 py-2 mb-2.5`}
+                className={`rounded-lg ${isLoading ? "bg-blue-900" : "bg-blue-800"} mb-2.5 px-3 py-2`}
                 activeOpacity={0.9}
                 onPress={async () => {
                   setIsLoading(true);
                   await handleSave();
                   setIsLoading(false);
                 }}
-                disabled={isLoading}
-              >
-                <ActivityIndicator
-                  size={"small"}
-                  color={"#ffff"}
-                  className={`${!isLoading && "hidden"}`}
-                />
-                <Text
-                  className={`text-center text-gray-100 text-xs font-semibold ${
-                    isLoading && "hidden"
-                  }`}
-                >
-                  Simpan
-                </Text>
+                disabled={isLoading}>
+                <ActivityIndicator size={"small"} color={"#ffff"} className={`${!isLoading && "hidden"}`} />
+                <Text className={`text-center text-xs font-semibold text-gray-100 ${isLoading && "hidden"}`}>Simpan</Text>
               </TouchableOpacity>
               {/* <TouchableOpacity
                 className={`rounded-lg ${isLoading ? "bg-red-600" : "bg-red-500"} px-3 py-2 border`}

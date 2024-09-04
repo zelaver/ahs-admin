@@ -7,9 +7,9 @@ interface HandleProps extends BottomSheetHandleProps {
   HandleText?: string;
 }
 
-const Handle: React.FC<HandleProps> = ({ style, HandleText , animatedIndex }) => {
+const Handle: React.FC<HandleProps> = ({ style, HandleText, animatedIndex }) => {
   return (
-    <View className="bg-blue-800 rounded-t-xl py-3">
+    <View className="rounded-t-xl bg-blue-800 py-3">
       {/* <Animated.View
         style={[containerStyle, containerAnimatedStyle]}
         renderToHardwareTextureAndroid={true}
@@ -17,10 +17,8 @@ const Handle: React.FC<HandleProps> = ({ style, HandleText , animatedIndex }) =>
         <Animated.View style={[leftIndicatorStyle, leftIndicatorAnimatedStyle]} />
         <Animated.View style={[rightIndicatorStyle, rightIndicatorAnimatedStyle]} />
       </Animated.View> */}
-      <View className="w-16 h-1.5 bg-gray-300 mx-auto mb-2.5 rounded-full"></View>
-      <Text className="text-center text-gray-100 text-base font-bold">
-        {HandleText}
-      </Text>
+      <View className="mx-auto mb-2.5 h-1.5 w-16 rounded-full bg-gray-300"></View>
+      <Text className="text-center text-base font-bold text-gray-100">{HandleText}</Text>
     </View>
   );
 };

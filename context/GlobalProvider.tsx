@@ -1,12 +1,5 @@
 import images from "@/constants/images";
-import {
-  getAllContacts,
-  getHistory,
-  getProducts,
-  getTransactions,
-  initDB,
-  initHistory,
-} from "@/database/db";
+import { getAllContacts, getHistory, getProducts, getTransactions, initDB, initHistory } from "@/database/db";
 import { createContext, useContext, useEffect, useState } from "react";
 import { ActivityIndicator, Image } from "react-native";
 import { View } from "react-native";
@@ -131,15 +124,10 @@ const GlobalProvider = ({ children }: any) => {
         fetchTransactions,
         fetchCustomers,
         fetchProducts,
-      }}
-    >
+      }}>
       {isLoading ? (
-        <View className="flex-1 justify-center h-full items-center">
-          <Image
-            source={images.logo}
-            className="w-[300px]"
-            resizeMode="contain"
-          />
+        <View className="h-full flex-1 items-center justify-center">
+          <Image source={images.logo} className="w-[300px]" resizeMode="contain" />
         </View>
       ) : (
         children

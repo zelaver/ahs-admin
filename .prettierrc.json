@@ -1,0 +1,17 @@
+{
+  "plugins": ["prettier-plugin-tailwindcss"],
+  "bracketSameLine": true,
+  "printWidth": 120,
+  "trailingComma": "es5",
+  "singleAttributePerLine": false,
+  "singleQuote": true,
+  "experimentalTernaries": true,
+  "overrides": [
+    {
+    "files": "./app/_layout.tsx",
+    "options": {
+      "printWidth": 50
+    }
+    }
+  ]
+}

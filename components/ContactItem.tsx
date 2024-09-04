@@ -1,12 +1,4 @@
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ToastAndroid,
-  Alert,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, TextInput, TouchableOpacity, ToastAndroid, Alert, ActivityIndicator } from "react-native";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Icon from "react-native-remix-icon";
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
@@ -26,15 +18,7 @@ type ContactItem = {
   fetchContacts: () => Promise<void>;
 };
 
-const ContactItem = ({
-  index,
-  name,
-  address,
-  phone,
-  isSubscriber,
-  id,
-  fetchContacts,
-}: ContactItem) => {
+const ContactItem = ({ index, name, address, phone, isSubscriber, id, fetchContacts }: ContactItem) => {
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ["60%"], []);
   const handlePresentModalPress = useCallback(() => {
@@ -49,7 +33,7 @@ const ContactItem = ({
         setEditStatus(isSubscriber);
       }
     },
-    [name, phone, address, isSubscriber]
+    [name, phone, address, isSubscriber],
   );
   const handleClosePress = useCallback(() => {
     bottomSheetModalRef.current?.close();
@@ -66,7 +50,7 @@ const ContactItem = ({
         // onPress={handleClosePress}
       />
     ),
-    []
+    [],
   );
 
   const [editName, setEditName] = useState<string>();
@@ -97,10 +81,10 @@ const ContactItem = ({
           phone: editPhone,
           isSubscriber: editStatus,
         },
-        id
+        id,
       );
       await fetchContacts();
-      await fetchTransactions()
+      await fetchTransactions();
       setIsLoading(false);
       handleClosePress();
     } catch (e) {
@@ -138,7 +122,7 @@ const ContactItem = ({
           onDismiss() {
             setIsLoading(false);
           },
-        }
+        },
       );
     } catch (e) {
       if (e instanceof Error) {
@@ -148,51 +132,31 @@ const ContactItem = ({
   };
 
   return (
-    <View className="kontak-item py-1.5 ">
-      <View className="flex-row justify-between items-center mb-2.5">
+    <View className="kontak-item py-1.5">
+      <View className="mb-2.5 flex-row items-center justify-between">
         <Text className="text-base font-bold text-blue-50">
           {index + 1}. {name}
         </Text>
-        <TouchableOpacity
-          onPress={handlePresentModalPress}
-          className="pl-6"
-          activeOpacity={0.9}
-        >
-          <Icon
-            name="pencil-line"
-            size={20}
-            color="white"
-          />
+        <TouchableOpacity onPress={handlePresentModalPress} className="pl-6" activeOpacity={0.9}>
+          <Icon name="pencil-line" size={20} color="white" />
         </TouchableOpacity>
       </View>
-      <View className="border rounded-lg bg-white shadow-lg">
+      <View className="rounded-lg border bg-white shadow-lg">
         <View className="phone flex-row items-center border-b">
-          <View className="bg-blue-800 p-2 rounded-tl-md mr-3">
-            <Icon
-              name="phone-line"
-              size={20}
-              color="white"
-            />
+          <View className="mr-3 rounded-tl-md bg-blue-800 p-2">
+            <Icon name="phone-line" size={20} color="white" />
           </View>
           <Text className="text-sm font-normal">{phone}</Text>
         </View>
         <View className="jenis flex-row items-center border-b">
-          <View className="bg-blue-800 p-2 mr-3">
-            <Icon
-              name={`${isSubscriber ? "home-smile-2-line" : "user-3-line"}`}
-              size={20}
-              color="white"
-            />
+          <View className="mr-3 bg-blue-800 p-2">
+            <Icon name={`${isSubscriber ? "home-smile-2-line" : "user-3-line"}`} size={20} color="white" />
           </View>
           <Text className="text-sm font-normal">{isSubscriber ? "Warung" : "Customer"}</Text>
         </View>
         <View className="alamat flex-row items-center">
-          <View className="bg-blue-800 p-2 rounded-bl-md mr-3">
-            <Icon
-              name="map-pin-2-line"
-              size={20}
-              color="white"
-            />
+          <View className="mr-3 rounded-bl-md bg-blue-800 p-2">
+            <Icon name="map-pin-2-line" size={20} color="white" />
           </View>
           <Text className="text-sm font-normal">{address}</Text>
         </View>
@@ -203,115 +167,60 @@ const ContactItem = ({
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
         backdropComponent={renderBackdrop}
-        handleComponent={(props) => Handle({ ...props, HandleText: "Detail Kontak" })}
-      >
+        handleComponent={(props) => Handle({ ...props, HandleText: "Detail Kontak" })}>
         <BottomSheetScrollView>
-          <View className="main py-3 gap-y-4">
+          <View className="main gap-y-4 py-3">
             <View className="customer px-3">
-              <Text className="text-sm font-semibold mb-2.5">Nama:</Text>
-              <View className="border-2 rounded-md px-3">
-                <TextInput
-                  placeholder="isi nama Customer"
-                  value={editName}
-                  onChangeText={(text) => setEditName(text)}
-                />
+              <Text className="mb-2.5 text-sm font-semibold">Nama:</Text>
+              <View className="rounded-md border-2 px-3">
+                <TextInput placeholder="isi nama Customer" value={editName} onChangeText={(text) => setEditName(text)} />
               </View>
             </View>
-            <View className="nomor telepon px-3 ">
-              <Text className="text-sm font-semibold mb-2.5">Nomor Telepon:</Text>
-              <View className="border-2 rounded-md px-3">
-                <TextInput
-                  placeholder="Masukan nomor telepon"
-                  value={editPhone}
-                  onChangeText={(text) => setEditPhone(text)}
-                />
+            <View className="nomor telepon px-3">
+              <Text className="mb-2.5 text-sm font-semibold">Nomor Telepon:</Text>
+              <View className="rounded-md border-2 px-3">
+                <TextInput placeholder="Masukan nomor telepon" value={editPhone} onChangeText={(text) => setEditPhone(text)} />
               </View>
             </View>
-            <View className="alamat px-3 ">
-              <Text className="text-sm font-semibold mb-2.5">Alamat:</Text>
-              <View className="border-2 rounded-md px-3">
-                <TextInput
-                  placeholder="Isi Alamat"
-                  value={editAddress}
-                  onChangeText={(text) => setEditAddress(text)}
-                />
+            <View className="alamat px-3">
+              <Text className="mb-2.5 text-sm font-semibold">Alamat:</Text>
+              <View className="rounded-md border-2 px-3">
+                <TextInput placeholder="Isi Alamat" value={editAddress} onChangeText={(text) => setEditAddress(text)} />
               </View>
             </View>
             <View className="tipe-pelanggan px-3">
-              <Text className="text-sm font-semibold mb-2.5">Status:</Text>
-              <View className="status-boxes self-center flex-row gap-x-3">
+              <Text className="mb-2.5 text-sm font-semibold">Status:</Text>
+              <View className="status-boxes flex-row gap-x-3 self-center">
                 <TouchableOpacity
                   activeOpacity={1}
-                  className={`px-3 py-1 border rounded-md ${
-                    editStatus && "bg-blue-800"
-                  } border-blue-800`}
-                  onPress={() => setEditStatus(1)}
-                >
-                  <Text
-                    className={`text-center text-xs ${
-                      editStatus ? "text-white" : "text-blue-800"
-                    } font-semibold`}
-                  >
-                    Warung
-                  </Text>
+                  className={`rounded-md border px-3 py-1 ${editStatus && "bg-blue-800"} border-blue-800`}
+                  onPress={() => setEditStatus(1)}>
+                  <Text className={`text-center text-xs ${editStatus ? "text-white" : "text-blue-800"} font-semibold`}>Warung</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   activeOpacity={1}
-                  className={`px-3 py-1 rounded-md ${
-                    !editStatus && "bg-blue-800"
-                  } border-blue-800 border`}
-                  onPress={() => setEditStatus(0)}
-                >
-                  <Text
-                    className={`text-center text-xs ${
-                      !editStatus ? "text-white" : "text-blue-800"
-                    } font-semibold`}
-                  >
-                    Customer
-                  </Text>
+                  className={`rounded-md px-3 py-1 ${!editStatus && "bg-blue-800"} border border-blue-800`}
+                  onPress={() => setEditStatus(0)}>
+                  <Text className={`text-center text-xs ${!editStatus ? "text-white" : "text-blue-800"} font-semibold`}>Customer</Text>
                 </TouchableOpacity>
               </View>
             </View>
             <View className="action-button px-3">
               <TouchableOpacity
-                className={`rounded-lg ${
-                  isLoading ? "bg-blue-900" : "bg-blue-800"
-                }  px-3 py-2 mb-2.5`}
+                className={`rounded-lg ${isLoading ? "bg-blue-900" : "bg-blue-800"} mb-2.5 px-3 py-2`}
                 activeOpacity={0.9}
                 onPress={handleSave}
-                disabled={isLoading}
-              >
-                <ActivityIndicator
-                  size={"small"}
-                  color={"#ffff"}
-                  className={`${!isLoading && "hidden"}`}
-                />
-                <Text
-                  className={`text-center text-gray-100 text-xs font-semibold ${
-                    isLoading && "hidden"
-                  }`}
-                >
-                  Simpan
-                </Text>
+                disabled={isLoading}>
+                <ActivityIndicator size={"small"} color={"#ffff"} className={`${!isLoading && "hidden"}`} />
+                <Text className={`text-center text-xs font-semibold text-gray-100 ${isLoading && "hidden"}`}>Simpan</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                className={`rounded-lg ${isLoading ? "bg-red-600" : "bg-red-500"} px-3 py-2 border`}
+                className={`rounded-lg ${isLoading ? "bg-red-600" : "bg-red-500"} border px-3 py-2`}
                 activeOpacity={0.9}
                 onPress={handleDelete}
-                disabled={isLoading}
-              >
-                <ActivityIndicator
-                  size={"small"}
-                  color={"#ffff"}
-                  className={`${!isLoading && "hidden"}`}
-                />
-                <Text
-                  className={`text-center text-gray-100 text-xs font-semibold ${
-                    isLoading && "hidden"
-                  }`}
-                >
-                  Hapus
-                </Text>
+                disabled={isLoading}>
+                <ActivityIndicator size={"small"} color={"#ffff"} className={`${!isLoading && "hidden"}`} />
+                <Text className={`text-center text-xs font-semibold text-gray-100 ${isLoading && "hidden"}`}>Hapus</Text>
               </TouchableOpacity>
             </View>
           </View>

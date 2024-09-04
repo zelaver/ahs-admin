@@ -1,11 +1,4 @@
-import {
-  View,
-  Text,
-  SafeAreaView,
-  TouchableOpacity,
-  ToastAndroid,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, SafeAreaView, TouchableOpacity, ToastAndroid, ActivityIndicator } from "react-native";
 import React, { useState } from "react";
 import { execQuery, getAllContacts, getQuery } from "@/database/debug";
 import * as Sharing from "expo-sharing";
@@ -16,8 +9,7 @@ import JSZip from "jszip";
 import { useGlobalContext } from "@/context/GlobalProvider";
 
 const Backup = () => {
-  const { history, fetchHistory, fetchCustomers, fetchTransactions, fetchProducts } =
-    useGlobalContext();
+  const { history, fetchHistory, fetchCustomers, fetchTransactions, fetchProducts } = useGlobalContext();
   const [isLoading, setIsLoading] = useState(false);
   const exportDatabase = async () => {
     try {
@@ -110,35 +102,28 @@ const Backup = () => {
 
   return (
     <SafeAreaView>
-      <View className="main py-8 bg-blue-600">
+      <View className="main bg-blue-600 py-8">
         <View className="section-1 px-5 py-2">
           <Text className="text-2xl font-semibold text-blue-50">Backup</Text>
         </View>
-        <View className="section-2 px-5 py-2 h-full  justify-center items-center">
+        <View className="section-2 h-full items-center justify-center px-5 py-2">
           <TouchableOpacity
             className={`${
               isLoading ? "bg-blue-900" : "bg-blue-800"
-            } px-4 py-2 mb-4 min-w-[100px] rounded-md border border-blue-800 justify-center items-center min-h-[50px]`}
+            } mb-4 min-h-[50px] min-w-[100px] items-center justify-center rounded-md border border-blue-800 px-4 py-2`}
             activeOpacity={0.9}
             disabled={isLoading}
             onPress={async () => {
               setIsLoading(true);
               await exportDatabase();
               setIsLoading(false);
-            }}
-          >
-            <ActivityIndicator
-              size={"small"}
-              color={"white"}
-              className={`${!isLoading && "hidden"}`}
-            />
-            <Text className={`text-xl text-blue-50 font-semibold ${isLoading && "hidden"}`}>
-              Export
-            </Text>
+            }}>
+            <ActivityIndicator size={"small"} color={"white"} className={`${!isLoading && "hidden"}`} />
+            <Text className={`text-xl font-semibold text-blue-50 ${isLoading && "hidden"}`}>Export</Text>
           </TouchableOpacity>
           <TouchableOpacity
             className={
-              "border px-4 py-2 border-blue-800 bg-blue-50 rounded-md border-dashed min-w-[100px] justify-center items-center min-h-[50px]"
+              "min-h-[50px] min-w-[100px] items-center justify-center rounded-md border border-dashed border-blue-800 bg-blue-50 px-4 py-2"
             }
             activeOpacity={0.9}
             disabled={isLoading}
@@ -146,9 +131,8 @@ const Backup = () => {
               setIsLoading(true);
               importAndExtractZip();
               setIsLoading(false);
-            }}
-          >
-            <Text className="text-xl text-blue-800 font-semibold">Import</Text>
+            }}>
+            <Text className="text-xl font-semibold text-blue-800">Import</Text>
           </TouchableOpacity>
         </View>
       </View>

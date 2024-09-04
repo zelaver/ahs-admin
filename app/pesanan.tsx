@@ -57,24 +57,21 @@ const Pesanan = () => {
   };
 
   return (
-    <SafeAreaView className="pt-8 bg-blue-600 flex-1">
+    <SafeAreaView className="flex-1 bg-blue-600 pt-8">
       <View className="header pb-1">
         <View className="section-1 px-5 py-2">
           <Text className="text-2xl font-semibold text-blue-50">Pesanan</Text>
         </View>
-        <View className="section-2 px-5 flex-row items-center ">
-          <View className={`flex-row py-1 flex-1 mr-2 rounded-md items-center `}>
+        <View className="section-2 flex-row items-center px-5">
+          <View className={`mr-2 flex-1 flex-row items-center rounded-md py-1`}>
             <TouchableOpacity
               onPress={() => {
                 setFilterStatus("hutang");
               }}
               activeOpacity={1}
-              className="mr-2"
-            >
+              className="mr-2">
               <Text
-                className={`px-3 py-1 border font-bold rounded-md w-min-[67px] text-center text-xs border-red-500 
-                    ${filterStatus == "hutang" ? "text-white bg-red-500" : "text-red-500 "} `}
-              >
+                className={`w-min-[67px] rounded-md border border-red-500 px-3 py-1 text-center text-xs font-bold ${filterStatus == "hutang" ? "bg-red-500 text-white" : "text-red-500"} `}>
                 Hutang
               </Text>
             </TouchableOpacity>
@@ -83,12 +80,9 @@ const Pesanan = () => {
                 setFilterStatus("pinjam");
               }}
               activeOpacity={1}
-              className="mr-2"
-            >
+              className="mr-2">
               <Text
-                className={`px-3 py-1 border rounded-md w-min-[67px] text-center text-xs border-yellow-500 font-bold
-                    ${filterStatus == "pinjam" ? "text-white bg-yellow-500" : "text-yellow-500"}`}
-              >
+                className={`w-min-[67px] rounded-md border border-yellow-500 px-3 py-1 text-center text-xs font-bold ${filterStatus == "pinjam" ? "bg-yellow-500 text-white" : "text-yellow-500"}`}>
                 Pinjam
               </Text>
             </TouchableOpacity>
@@ -96,48 +90,24 @@ const Pesanan = () => {
               onPress={() => {
                 setFilterStatus("lunas");
               }}
-              activeOpacity={1}
-            >
+              activeOpacity={1}>
               <Text
-                className={`px-3 py-1 border rounded-md w-min-[67px] text-center text-xs border-green-500 font-bold
-                    ${filterStatus == "lunas" ? "text-white bg-green-500" : "text-green-500 "}`}
-              >
+                className={`w-min-[67px] rounded-md border border-green-500 px-3 py-1 text-center text-xs font-bold ${filterStatus == "lunas" ? "bg-green-500 text-white" : "text-green-500"}`}>
                 Lunas
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setAscending(!ascending)}
-              className="ml-3"
-            >
-              <Icon
-                name={`${ascending ? "sort-desc" : "sort-asc"}`}
-                size={24}
-                color="white"
-              />
+            <TouchableOpacity onPress={() => setAscending(!ascending)} className="ml-3">
+              <Icon name={`${ascending ? "sort-desc" : "sort-asc"}`} size={24} color="white" />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            onPress={handlePresentModalPress}
-            className="bg-blue-800 rounded-full"
-          >
-            <Icon
-              name="add-fill"
-              size={32}
-              color="white"
-            ></Icon>
+          <TouchableOpacity onPress={handlePresentModalPress} className="rounded-full bg-blue-800">
+            <Icon name="add-fill" size={32} color="white"></Icon>
           </TouchableOpacity>
         </View>
       </View>
-      <ScrollView
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-          />
-        }
-      >
+      <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         <View className="main pb-16">
-          <View className="section-3 px-5 py-3 ">
+          <View className="section-3 px-5 py-3">
             {[...transactions]
               .filter((item) => item.status == filterStatus)
               .sort((a, b) => sort(b.id, a.id))
@@ -192,16 +162,10 @@ const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
         // onPress={handleClosePress}
       />
     ),
-    []
+    [],
   );
 
-  const {
-    lastHistory: history,
-    fetchHistory,
-    fetchTransactions,
-    customers,
-    products,
-  } = useGlobalContext();
+  const { lastHistory: history, fetchHistory, fetchTransactions, customers, products } = useGlobalContext();
   const [customerId, setCustomerId] = useState<number | null>(null);
   const [isSubscriber, setIsSubscriber] = useState(0);
   const [aquaVal, setAquaVal] = useState(0);
@@ -223,27 +187,16 @@ const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
       setIsSubscriber(getCustomer.isSubscriber);
       // console.log(getCustomer.isSubscriber);
       if (getCustomer.isSubscriber == 0) {
-        setTotal(
-          aquaVal * products[0]?.price +
-            isiUlangVal * products[1]?.price +
-            gasVal * products[2]?.price +
-            (ongkir ? ongkir : 0)
-        );
+        setTotal(aquaVal * products[0]?.price + isiUlangVal * products[1]?.price + gasVal * products[2]?.price + (ongkir ? ongkir : 0));
       } else {
-        setTotal(
-          aquaVal * products[0]?.subs_price +
-            isiUlangVal * products[1]?.subs_price +
-            gasVal * products[2]?.price +
-            (ongkir ? ongkir : 0)
-        );
+        setTotal(aquaVal * products[0]?.subs_price + isiUlangVal * products[1]?.subs_price + gasVal * products[2]?.price + (ongkir ? ongkir : 0));
       }
     },
-    [customerId, total]
+    [customerId, total],
   );
 
   const handleSave = async () => {
-    if (!aquaVal && !isiUlangVal && !gasVal && !galonKosongVal && !gasKosongVal)
-      return ToastAndroid.show("Isi Cart!", ToastAndroid.SHORT);
+    if (!aquaVal && !isiUlangVal && !gasVal && !galonKosongVal && !gasKosongVal) return ToastAndroid.show("Isi Cart!", ToastAndroid.SHORT);
     if (!customerId) {
       ToastAndroid.show("Pilih Customer!", ToastAndroid.SHORT);
       return;
@@ -318,7 +271,7 @@ const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
     const newStockGasKosong = history.stock_gas_kosong - gasKosongVal + gasVal;
     const newStockIsiUlang = history.stock_isi_ulang - isiUlangVal;
     const newNote = `-`;
-    
+
     await addHistory({
       saldo: newSaldo,
       stock_aqua: newStockAqua,
@@ -342,14 +295,10 @@ const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
       snapPoints={snapPoints}
       onChange={handleSheetChanges}
       backdropComponent={renderBackdrop}
-      handleComponent={(props) => Handle({ ...props, HandleText: "Detail Pesanan" })}
-    >
+      handleComponent={(props) => Handle({ ...props, HandleText: "Detail Pesanan" })}>
       <BottomSheetScrollView>
-        <View className="main py-6 gap-y-4">
-          <CustomerInput
-            customers={customers}
-            handleCustomerSelected={handleCustomerSelected}
-          />
+        <View className="main gap-y-4 py-6">
+          <CustomerInput customers={customers} handleCustomerSelected={handleCustomerSelected} />
           <CartInput
             products={products}
             history={history}
@@ -369,22 +318,9 @@ const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
             status={status}
           />
 
-          <ShippingCostInput
-            ongkir={ongkir}
-            setOngkir={setOngkir}
-            total={total}
-            setTotal={setTotal}
-            antar={antar}
-            setAntar={setAntar}
-          />
-          <TotalBox
-            status={status}
-            total={total}
-          />
-          <DateInput
-            date={date}
-            setDate={setDate}
-          />
+          <ShippingCostInput ongkir={ongkir} setOngkir={setOngkir} total={total} setTotal={setTotal} antar={antar} setAntar={setAntar} />
+          <TotalBox status={status} total={total} />
+          <DateInput date={date} setDate={setDate} />
           <StatusBox
             status={status}
             setStatus={setStatus}
@@ -397,11 +333,7 @@ const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
             setOngkir={setOngkir}
             setTotal={setTotal}
           />
-          <ActionButton
-            isLoading={isLoading}
-            setIsLoading={setIsLoading}
-            handleSave={handleSave}
-          />
+          <ActionButton isLoading={isLoading} setIsLoading={setIsLoading} handleSave={handleSave} />
         </View>
       </BottomSheetScrollView>
     </BottomSheetModal>
@@ -409,8 +341,8 @@ const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
 };
 const CustomerInput = memo(({ customers, handleCustomerSelected }: any) => {
   return (
-    <View className="customer px-3 mb-6">
-      <Text className="text-sm font-semibold mb-2.5">Customer:</Text>
+    <View className="customer mb-6 px-3">
+      <Text className="mb-2.5 text-sm font-semibold">Customer:</Text>
       <View className="rounded-md px-3">
         {/* <TextInput placeholder="isi nama Customer" /> */}
         <SelectList
@@ -451,7 +383,7 @@ const CartInput = memo(
     status,
   }: any) => {
     return (
-      <View className="cart border-t border-b py-4 mb-6">
+      <View className="cart mb-6 border-b border-t py-4">
         <CartItem
           name="Aqua"
           image={images.aqua}
@@ -500,7 +432,7 @@ const CartInput = memo(
           total={total}
           stok={history?.stock_gas_kosong}
         />
-        <View className="px-5 add ">
+        <View className="add px-5">
           <Popover
             animationConfig={{ duration: 200 }}
             arrowSize={{ width: 0, height: 0 }}
@@ -517,87 +449,65 @@ const CartInput = memo(
             }}
             from={
               <TouchableOpacity
-                className={`py-4 items-center ${aquaVal && isiUlangVal && gasVal && "hidden"}
-                        ${galonKosongVal && gasKosongVal && "hidden"}
-                      `}
-              >
-                <Icon
-                  name="add-circle-line"
-                  size={32}
-                />
+                className={`items-center py-4 ${aquaVal && isiUlangVal && gasVal && "hidden"} ${galonKosongVal && gasKosongVal && "hidden"} `}>
+                <Icon name="add-circle-line" size={32} />
               </TouchableOpacity>
-            }
-          >
+            }>
             <TouchableOpacity
               onPress={() => {
-                if (!history.stock_aqua)
-                  return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
+                if (!history.stock_aqua) return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                 setAquaVal(1);
                 // console.log(isSubscriber);
                 setTotal(total + (!isSubscriber ? products[0]?.price : products[0]?.subs_price));
               }}
-              className={`border px-4 py-2 ${aquaVal && "hidden"} ${status == 1 && "hidden"}`}
-            >
-              <Text className="text-gray-50 font-semibold">aqua</Text>
+              className={`border px-4 py-2 ${aquaVal && "hidden"} ${status == 1 && "hidden"}`}>
+              <Text className="font-semibold text-gray-50">aqua</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                if (!history.stock_isi_ulang)
-                  return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
+                if (!history.stock_isi_ulang) return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                 setIsiUlangVal(1);
                 setTotal(total + (!isSubscriber ? products[1]?.price : products[1]?.subs_price));
               }}
-              className={`border px-4 py-2 ${isiUlangVal && "hidden"} ${status == 1 && "hidden"}`}
-            >
-              <Text className="text-gray-50 font-semibold">Isi Ulang</Text>
+              className={`border px-4 py-2 ${isiUlangVal && "hidden"} ${status == 1 && "hidden"}`}>
+              <Text className="font-semibold text-gray-50">Isi Ulang</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                if (!history.stock_gas_12kg)
-                  return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
+                if (!history.stock_gas_12kg) return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                 setGasVal(1);
                 setTotal(total + (!isSubscriber ? products[2]?.price : products[2]?.subs_price));
               }}
-              className={`border px-4 py-2 ${gasVal && "hidden"} ${status == 1 && "hidden"}`}
-            >
-              <Text className="text-gray-50 font-semibold">Gas 12 Kg</Text>
+              className={`border px-4 py-2 ${gasVal && "hidden"} ${status == 1 && "hidden"}`}>
+              <Text className="font-semibold text-gray-50">Gas 12 Kg</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                if (!history.stock_galon_kosong)
-                  return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
+                if (!history.stock_galon_kosong) return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                 setGalonKosongVal(1);
               }}
-              className={`border px-4 py-2 ${galonKosongVal && "hidden"} ${
-                status != 1 && "hidden"
-              }`}
-              disabled={status != 1}
-            >
-              <Text className="text-gray-50 font-semibold">Galon Kosong</Text>
+              className={`border px-4 py-2 ${galonKosongVal && "hidden"} ${status != 1 && "hidden"}`}
+              disabled={status != 1}>
+              <Text className="font-semibold text-gray-50">Galon Kosong</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                if (!history.stock_gas_kosong)
-                  return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
+                if (!history.stock_gas_kosong) return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                 setGasKosongVal(1);
               }}
               className={`border px-4 py-2 ${gasKosongVal && "hidden"} ${status != 1 && "hidden"}`}
-              disabled={status != 1}
-            >
-              <Text className="text-gray-50 font-semibold">Gas Kosong</Text>
+              disabled={status != 1}>
+              <Text className="font-semibold text-gray-50">Gas Kosong</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className={`border px-4 py-2 hidden ${aquaVal && isiUlangVal && gasVal && "flex"}
-                    ${galonKosongVal && gasKosongVal && "flex"}
-                    `}
-            >
-              <Text className="text-gray-200 font-semibold">Tekan Di luar untuk Tutup</Text>
+              className={`hidden border px-4 py-2 ${aquaVal && isiUlangVal && gasVal && "flex"} ${galonKosongVal && gasKosongVal && "flex"} `}>
+              <Text className="font-semibold text-gray-200">Tekan Di luar untuk Tutup</Text>
             </TouchableOpacity>
           </Popover>
         </View>
       </View>
     );
-  }
+  },
 );
 const DateInput = ({ date, setDate }) => {
   const onDateChange = (event, selectedDate) => {
@@ -622,12 +532,11 @@ const DateInput = ({ date, setDate }) => {
     showDateMode("time");
   };
   return (
-    <View className="date px-3 mb-6">
+    <View className="date mb-6 px-3">
       <TouchableOpacity
-        className="py-2 px-3 flex-row justify-between items-center border border-blue-800 rounded-lg"
+        className="flex-row items-center justify-between rounded-lg border border-blue-800 px-3 py-2"
         activeOpacity={0.8}
-        onPress={showDatepicker}
-      >
+        onPress={showDatepicker}>
         <Text className="text-sm font-semibold text-blue-800">Tanggal:</Text>
         <Text className="text-sm font-semibold text-blue-800">{date.toLocaleDateString()}</Text>
       </TouchableOpacity>
@@ -646,17 +555,13 @@ const ShippingCostInput = ({ ongkir, setOngkir, total, setTotal, antar, setAntar
     }
   };
   return (
-    <View className="ongkir px-3 items-start mb-6">
-      <Text className="text-sm font-semibold ">Antar:</Text>
+    <View className="ongkir mb-6 items-start px-3">
+      <Text className="text-sm font-semibold">Antar:</Text>
       <View>
-        <Switch
-          thumbColor={antar ? "#55b8d4" : "gray"}
-          value={antar}
-          onChange={handleAntar}
-        />
+        <Switch thumbColor={antar ? "#55b8d4" : "gray"} value={antar} onChange={handleAntar} />
       </View>
       {antar && (
-        <View className="input-value border w-full rounded-md pl-3 py-2">
+        <View className="input-value w-full rounded-md border py-2 pl-3">
           {/* <TextInput /> */}
           <CurrencyInput
             value={ongkir}
@@ -675,8 +580,8 @@ const ShippingCostInput = ({ ongkir, setOngkir, total, setTotal, antar, setAntar
 };
 const TotalBox = ({ status, total }: any) => {
   return (
-    <View className={`total px-3 mb-6 ${status == 1 && "hidden"}`}>
-      <View className="py-2 px-3 flex-row justify-between items-center bg-blue-800 rounded-lg">
+    <View className={`total mb-6 px-3 ${status == 1 && "hidden"}`}>
+      <View className="flex-row items-center justify-between rounded-lg bg-blue-800 px-3 py-2">
         <Text className="text-base font-bold text-gray-50">Total pembayaran</Text>
         <Text className="text-sm font-bold text-gray-50">{total.toLocaleString()}</Text>
       </View>
@@ -696,21 +601,18 @@ const StatusBox = ({
   setTotal,
 }: any) => {
   return (
-    <View className="status px-3 mb-6">
-      <Text className="text-sm font-semibold mb-2.5">Status:</Text>
-      <View className="status-boxes self-center flex-row gap-x-3">
+    <View className="status mb-6 px-3">
+      <Text className="mb-2.5 text-sm font-semibold">Status:</Text>
+      <View className="status-boxes flex-row gap-x-3 self-center">
         <TouchableOpacity
           onPress={() => {
             setStatus(0);
             setGalonKosongVal(0);
             setGasKosongVal(0);
           }}
-          activeOpacity={1}
-        >
+          activeOpacity={1}>
           <Text
-            className={`px-3 py-1 border font-semibold rounded-md w-min-[67px] text-center text-xs border-red-500 
-                    ${!status ? "text-white bg-red-500" : "text-red-500"} `}
-          >
+            className={`w-min-[67px] rounded-md border border-red-500 px-3 py-1 text-center text-xs font-semibold ${!status ? "bg-red-500 text-white" : "text-red-500"} `}>
             Hutang
           </Text>
         </TouchableOpacity>
@@ -724,12 +626,9 @@ const StatusBox = ({
             setOngkir(0);
             setTotal(0);
           }}
-          activeOpacity={1}
-        >
+          activeOpacity={1}>
           <Text
-            className={`px-3 py-1 border rounded-md w-min-[67px] text-center text-xs border-yellow-500 font-semibold
-                    ${status == 1 ? "text-white bg-yellow-500" : "text-yellow-500"}`}
-          >
+            className={`w-min-[67px] rounded-md border border-yellow-500 px-3 py-1 text-center text-xs font-semibold ${status == 1 ? "bg-yellow-500 text-white" : "text-yellow-500"}`}>
             Pinjam
           </Text>
         </TouchableOpacity>
@@ -739,12 +638,9 @@ const StatusBox = ({
             setGalonKosongVal(0);
             setGasKosongVal(0);
           }}
-          activeOpacity={1}
-        >
+          activeOpacity={1}>
           <Text
-            className={`px-3 py-1 border rounded-md w-min-[67px] text-center text-xs border-green-500 font-semibold
-                    ${status == 2 ? "text-white bg-green-500" : "text-green-500"}`}
-          >
+            className={`w-min-[67px] rounded-md border border-green-500 px-3 py-1 text-center text-xs font-semibold ${status == 2 ? "bg-green-500 text-white" : "text-green-500"}`}>
             Lunas
           </Text>
         </TouchableOpacity>
@@ -756,25 +652,16 @@ const ActionButton = ({ isLoading, setIsLoading, handleSave }: any) => {
   return (
     <View className="action-button px-3">
       <TouchableOpacity
-        className={`rounded-lg px-3 py-2 mb-2.5 ${isLoading ? "bg-blue-900" : "bg-blue-800"}`}
+        className={`mb-2.5 rounded-lg px-3 py-2 ${isLoading ? "bg-blue-900" : "bg-blue-800"}`}
         activeOpacity={0.9}
         disabled={isLoading}
         onPress={async () => {
           setIsLoading(true);
           await handleSave();
           setIsLoading(false);
-        }}
-      >
-        <ActivityIndicator
-          size={"small"}
-          color={"#ffff"}
-          className={`${!isLoading && "hidden"}`}
-        />
-        <Text
-          className={`text-center text-gray-100 text-xs font-semibold ${isLoading && "hidden"}`}
-        >
-          Simpan
-        </Text>
+        }}>
+        <ActivityIndicator size={"small"} color={"#ffff"} className={`${!isLoading && "hidden"}`} />
+        <Text className={`text-center text-xs font-semibold text-gray-100 ${isLoading && "hidden"}`}>Simpan</Text>
       </TouchableOpacity>
     </View>
   );

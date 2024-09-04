@@ -6,7 +6,7 @@ const getQuery = async () => {
   });
 
   try {
-    const result: any = await db.getAllAsync("SELECT * FROM history;");
+    const result: any = await db.getAllAsync("SELECT * FROM transactions;");
     console.log(JSON.stringify(result, null, 2));
   } catch (e) {
     if (e instanceof Error) {
@@ -23,7 +23,7 @@ const execQuery = async () => {
     const result = await db.execAsync(
       `
       delete from transactions
-      `
+      `,
     );
     console.log(result);
   } catch (e) {
