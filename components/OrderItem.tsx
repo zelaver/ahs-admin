@@ -309,7 +309,7 @@ const BottomSheetOrderItem = ({
       await addHistory({
         saldo: history.saldo - total_price - curOngkir,
         stock_aqua: history.stock_aqua + parsedList[0].sum,
-        stock_galon_kosong: history.stock_galon_kosong - galonKosongVal + parsedList[0].sum + parsedList[1].sum,
+        stock_galon_kosong: history.stock_galon_kosong - galonKosongVal - parsedList[0].sum - parsedList[1].sum,
         stock_gas_12kg: history.stock_gas_12kg + parsedList[2].sum,
         stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + parsedList[3].sum,
         stock_isi_ulang: history.stock_isi_ulang + parsedList[1].sum,
@@ -357,7 +357,7 @@ const BottomSheetOrderItem = ({
       await addHistory({
         saldo: history.saldo,
         stock_aqua: history.stock_aqua + parsedList[0].sum,
-        stock_galon_kosong: history.stock_galon_kosong - galonKosongVal + parsedList[0].sum + parsedList[1].sum,
+        stock_galon_kosong: history.stock_galon_kosong - galonKosongVal - parsedList[0].sum - parsedList[1].sum,
         stock_gas_12kg: history.stock_gas_12kg + parsedList[2].sum,
         stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + parsedList[2].sum,
         stock_isi_ulang: history.stock_isi_ulang + parsedList[1].sum,
@@ -398,7 +398,7 @@ const BottomSheetOrderItem = ({
 
     if (curStatus == 'pinjam' && status == 'hutang') {
       await addHistory({
-        saldo: history.saldo - total,
+        saldo: history.saldo,
         stock_aqua: history.stock_aqua - aquaVal,
         stock_galon_kosong: history.stock_galon_kosong + parsedList[3].sum + aquaVal + isiUlangVal,
         stock_gas_12kg: history.stock_gas_12kg - gasVal,
