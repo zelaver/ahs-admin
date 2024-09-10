@@ -1,19 +1,17 @@
+import { useGlobalContext } from "@/context/GlobalProvider";
+import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  Button,
+  ActivityIndicator,
+  RefreshControl,
   SafeAreaView,
   ScrollView,
-  TouchableOpacity,
-  RefreshControl,
-  ActivityIndicator,
+  Text,
   ToastAndroid,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { LineChart } from "react-native-gifted-charts";
 import Icon from "react-native-remix-icon";
-import { useGlobalContext } from "@/context/GlobalProvider";
-import { LineChart, LineChartPropsType } from "react-native-gifted-charts";
 
 type ChartData = {
   value: number;
@@ -86,9 +84,10 @@ const Histori = () => {
   }, [history]);
 
   return (
-    <SafeAreaView className="flex-1 bg-blue-600 pt-8">
+    <SafeAreaView className="flex-1 bg-blue-100 pt-8">
       <View className="section-1 flex-row items-center px-5 py-2">
-        <Text className="mr-3 text-2xl font-bold text-blue-50">Histori</Text>
+        <Icon name="history-fill" color="#172554" size={26} />
+        <Text className="ml-2 text-2xl font-semibold text-blue-950">Histori</Text>
       </View>
       <View className="mb-32 h-full">
         {isLoading ?
@@ -114,19 +113,19 @@ const Chart = ({ chartData }) => {
   return (
     <View className="chart px-5 py-2">
       <View className="section-1 flex-row items-center py-2">
-        <Text className="mr-3 text-lg font-semibold text-blue-50">Saldo Harian</Text>
+        <Text className="mr-3 text-lg font-semibold text-blue-950">Saldo Harian</Text>
       </View>
       <ScrollView className="rounded-md border bg-white py-2 shadow-md">
         <LineChart
-          // isAnimated
-          // animationDuration={2000}
+          isAnimated
+          animationDuration={5000}
           // height={200}
           areaChart
           curved
           data={chartData}
           rotateLabel
           width={300}
-          // hideDataPoints
+          hideDataPoints
           initialSpacing={70}
           indicatorColor={"black"}
           spacing={30}
@@ -231,7 +230,7 @@ const Table = ({ history }) => {
   const getPaginatedItems = (items: any[]) => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    console.log(currentPage);
+    // console.log(currentPage);
     return items.slice(startIndex, endIndex);
   };
 
@@ -243,44 +242,40 @@ const Table = ({ history }) => {
     <View className="section-2 table px-5">
       <View className="section-1 flex-row items-center justify-between py-2">
         <View className="flex-row items-center">
-          <Text className="mr-2.5 text-lg font-semibold text-blue-50">Stock</Text>
+          <Text className="mr-2.5 text-lg font-semibold text-blue-950">Stock</Text>
           <TouchableOpacity onPress={() => setAscending(!ascending)}>
-            <Icon name={`${ascending ? "sort-desc" : "sort-asc"}`} size={20} color="white" />
+            <Icon name={`${ascending ? "sort-desc" : "sort-asc"}`} size={20} color="#172554" />
           </TouchableOpacity>
         </View>
-        {/* <View className="flex-row items-center">
-          <TouchableOpacity
-            className="mr-4"
-            disabled={currentPage == 1}
-            onPress={() => {
-              if (currentPage == 1) return ToastAndroid.show(`sudah history paling awal`, ToastAndroid.SHORT);
-              setCurrentPage(currentPage - 1);
-            }}>
-            <Icon name="arrow-left-line" color={`${currentPage == 1 ? 'gray' : 'white'}`} />
-          </TouchableOpacity>
-          <Text className="mr-4 text-lg font-semibold text-white underline">{currentPage}</Text>
-          <TouchableOpacity
-            disabled={currentPage == totalPage}
-            onPress={() => {
-              if (currentPage == totalPage) return ToastAndroid.show(`sudah history paling akhir`, ToastAndroid.SHORT);
-              setCurrentPage(currentPage + 1);
-            }}>
-            <Icon name="arrow-right-line" color={`${currentPage == totalPage ? 'gray' : 'white'}`} />
-          </TouchableOpacity>
-        </View> */}
       </View>
       <ScrollView horizontal>
         <View>
-          <View className="header rounded-t-lg bg-blue-800 p-2">
+          <View className="header rounded-t-lg bg-blue-800 px-2">
             <View className="flex-row items-center">
-              <Text className="w-16 flex-1 text-sm font-semibold text-white">Aqua</Text>
-              <Text className="w-16 flex-1 text-sm font-semibold text-white">Isi Ulang</Text>
-              <Text className="w-20 flex-1 text-sm font-semibold text-white">Galon Kosong</Text>
-              <Text className="w-16 flex-1 text-sm font-semibold text-white">Gas 12 Kg</Text>
-              <Text className="w-16 flex-1 text-sm font-semibold text-white">Gas Kosong</Text>
-              <Text className="w-36 flex-1 text-sm font-semibold text-white">Saldo</Text>
-              <Text className="w-36 flex-1 text-sm font-semibold text-white">Note</Text>
-              <Text className="w-20 flex-1 text-sm font-semibold text-white">Date</Text>
+              <View className="w-24 flex-row justify-center py-2.5 pl-2">
+                <Text className="text-center text-sm font-semibold text-white">Tanggal</Text>
+              </View>
+              <View className="w-20 flex-row justify-center py-2.5 pl-2">
+                <Text className="text-center text-sm font-semibold text-white">Aqua</Text>
+              </View>
+              <View className="w-20 flex-row justify-center py-2.5 pl-2">
+                <Text className="w-20 text-center text-sm font-semibold text-white">Isi Ulang</Text>
+              </View>
+              <View className="w-20 flex-row justify-center py-2.5 pl-2">
+                <Text className="text-center text-sm font-semibold text-white">Galon Kosong</Text>
+              </View>
+              <View className="w-20 flex-row justify-center py-2.5 pl-2">
+                <Text className="text-center text-sm font-semibold text-white">Gas 12 Kg</Text>
+              </View>
+              <View className="w-20 flex-row justify-center py-2.5 pl-2">
+                <Text className="text-center text-sm font-semibold text-white">Gas Kosong</Text>
+              </View>
+              <View className="w-36 flex-row justify-center py-2.5 pl-2">
+                <Text className="text-center text-sm font-semibold text-white">Saldo</Text>
+              </View>
+              <View className="w-36 flex-row justify-center py-2.5 pl-2">
+                <Text className="text-center text-sm font-semibold text-white">Note</Text>
+              </View>
             </View>
           </View>
           <ScrollView
@@ -303,7 +298,7 @@ const Table = ({ history }) => {
             if (currentPage == 1) return ToastAndroid.show(`sudah history paling awal`, ToastAndroid.SHORT);
             setCurrentPage(currentPage - 1);
           }}>
-          <Icon name="arrow-left-line" color={`${currentPage == 1 ? "gray" : "white"}`} />
+          <Icon name="arrow-left-s-line" color={`${currentPage == 1 ? "gray" : "white"}`} />
         </TouchableOpacity>
         <Text className="mr-4 text-lg font-semibold text-white">{currentPage}</Text>
         <TouchableOpacity
@@ -312,7 +307,7 @@ const Table = ({ history }) => {
             if (currentPage == totalPage) return ToastAndroid.show(`sudah history paling akhir`, ToastAndroid.SHORT);
             setCurrentPage(currentPage + 1);
           }}>
-          <Icon name="arrow-right-line" color={`${currentPage == totalPage ? "gray" : "white"}`} />
+          <Icon name="arrow-right-s-line" color={`${currentPage == totalPage ? "gray" : "white"}`} />
         </TouchableOpacity>
       </View>
     </View>
@@ -324,9 +319,12 @@ const RowData = ({ id, data }) => {
   // if()
   const dataRowBefore = data.find((item) => item.id == id - 1);
   return (
-    <View className="row-data bg-white px-2 py-2.5">
+    <View className="row-data border-b bg-white px-2">
       <View className="flex-row">
-        <View className="w-16 flex-row">
+        <View className="w-24 flex-row border-r py-2.5 pl-2">
+          <Text className="mr-2 text-sm text-gray-700">{new Date(dataRow.date).toLocaleDateString()}</Text>
+        </View>
+        <View className="w-20 flex-row border-r py-2.5 pl-2">
           <Text className="mr-2 text-sm text-gray-700">{dataRow.stock_aqua}</Text>
           <View className="flex-row">
             <Text
@@ -345,7 +343,7 @@ const RowData = ({ id, data }) => {
             </View>
           </View>
         </View>
-        <View className="w-16 flex-row">
+        <View className="w-20 flex-row border-r py-2.5 pl-2">
           <Text className="mr-2 text-sm text-gray-700">{dataRow.stock_isi_ulang}</Text>
           <View className="flex-row">
             <Text
@@ -364,7 +362,7 @@ const RowData = ({ id, data }) => {
             </View>
           </View>
         </View>
-        <View className="w-20 flex-row">
+        <View className="w-20 flex-row border-r py-2.5 pl-2">
           <Text className="mr-2 text-sm text-gray-700">{dataRow.stock_galon_kosong}</Text>
           <View className="flex-row">
             <Text
@@ -383,7 +381,7 @@ const RowData = ({ id, data }) => {
             </View>
           </View>
         </View>
-        <View className="w-16 flex-row">
+        <View className="w-20 flex-row border-r py-2.5 pl-2">
           <Text className="mr-2 text-sm text-gray-700">{dataRow.stock_gas_12kg}</Text>
           <View className="flex-row">
             <Text
@@ -402,7 +400,7 @@ const RowData = ({ id, data }) => {
             </View>
           </View>
         </View>
-        <View className="w-16 flex-row">
+        <View className="w-20 flex-row border-r py-2.5 pl-2">
           <Text className="mr-2 text-sm text-gray-700">{dataRow.stock_gas_kosong}</Text>
           <View className="flex-row">
             <Text
@@ -421,7 +419,7 @@ const RowData = ({ id, data }) => {
             </View>
           </View>
         </View>
-        <View className="w-36 flex-row">
+        <View className="w-36 flex-row border-r py-2.5 pl-2">
           <Text className="mr-2 text-sm text-gray-700">{dataRow.saldo.toLocaleString()}</Text>
           <View className="flex-row">
             <Text
@@ -440,11 +438,8 @@ const RowData = ({ id, data }) => {
             </View>
           </View>
         </View>
-        <View className="w-36 flex-row">
+        <View className="w-36 flex-row py-2.5 pl-2">
           <Text className="mr-2 text-sm text-gray-700">{dataRow.note}</Text>
-        </View>
-        <View className="w-20 flex-row">
-          <Text className="mr-2 text-sm text-gray-700">{new Date(dataRow.date).toLocaleDateString()}</Text>
         </View>
       </View>
     </View>

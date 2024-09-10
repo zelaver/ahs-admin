@@ -1,23 +1,16 @@
-import { View, Text, TextInput, TouchableOpacity, ToastAndroid, Alert, ActivityIndicator, Switch } from 'react-native';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import Icon from 'react-native-remix-icon';
-import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import Handle from '@/components/CustomHandle';
-import CartItem from '@/components/CartItem';
-import { useGlobalContext } from '@/context/GlobalProvider';
-import {
-  addHistory,
-  deleteTransaction,
-  getAllContacts,
-  getContact,
-  getProducts,
-  updateTransaction,
-} from '@/database/db';
-import Popover from 'react-native-popover-view';
-import images from '@/constants/images';
-import { SelectList } from 'react-native-dropdown-select-list';
-import CurrencyInput from 'react-native-currency-input';
-import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
+import CartItem from "@/components/CartItem";
+import Handle from "@/components/CustomHandle";
+import images from "@/constants/images";
+import { useGlobalContext } from "@/context/GlobalProvider";
+import { addHistory, deleteTransaction, getContact, updateTransaction } from "@/database/db";
+import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ActivityIndicator, Alert, Switch, Text, ToastAndroid, TouchableOpacity, View } from "react-native";
+import CurrencyInput from "react-native-currency-input";
+import { SelectList } from "react-native-dropdown-select-list";
+import Popover from "react-native-popover-view";
+import Icon from "react-native-remix-icon";
 
 type OrderItem = {
   id: number;
@@ -72,7 +65,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, curDa
 };
 
 const CustomerLogo = ({ customerId, date }: { customerId: number; date: string }) => {
-  const [customerName, setCustomerName] = useState<string>('');
+  const [customerName, setCustomerName] = useState<string>("");
   const [customerType, setCustomerType] = useState<number>();
   const [formatedDate, setFormatedDate] = useState(formatDate(date));
   const { customers } = useGlobalContext();
@@ -84,7 +77,7 @@ const CustomerLogo = ({ customerId, date }: { customerId: number; date: string }
         setCustomerType(data.isSubscriber);
       } catch (e) {
         if (e instanceof Error) {
-          console.log('error', e);
+          console.log("error", e);
         }
       }
     };
@@ -95,7 +88,7 @@ const CustomerLogo = ({ customerId, date }: { customerId: number; date: string }
   return (
     <View className="flex-row">
       <View className="h-10 w-10 items-center justify-center rounded-full bg-blue-800">
-        <Icon name={`${customerType ? 'home-smile-2-line' : 'user-3-line'}`} size={24} color="white" />
+        <Icon name={`${customerType ? "home-smile-2-line" : "user-3-line"}`} size={24} color="white" />
       </View>
       <View className="ml-4">
         <Text className="text-sm font-medium">{customerName}</Text>
@@ -108,17 +101,17 @@ const CustomerLogo = ({ customerId, date }: { customerId: number; date: string }
 const StatusEdit = ({ status, handleEdit }) => {
   return (
     <View className="flex-row items-center">
-      {status == 'hutang' && (
+      {status == "hutang" && (
         <Text className="mr-2 w-[67px] rounded-md bg-red-500 px-3 py-1 text-center text-xs font-semibold text-gray-50">
           Hutang
         </Text>
       )}
-      {status == 'pinjam' && (
+      {status == "pinjam" && (
         <Text className="mr-2 w-[67px] rounded-md bg-yellow-500 px-3 py-1 text-center text-xs font-semibold text-gray-50">
           Pinjam
         </Text>
       )}
-      {status == 'lunas' && (
+      {status == "lunas" && (
         <Text className="mr-2 w-[67px] rounded-md bg-green-500 px-3 py-1 text-center text-xs font-semibold text-gray-50">
           Lunas
         </Text>
@@ -166,7 +159,7 @@ const BottomSheetOrderItem = ({
   const [status, setStatus] = useState<any>(curStatus);
   const [date, setDate] = useState(new Date(curDate));
 
-  const snapPoints = useMemo(() => ['90%'], []);
+  const snapPoints = useMemo(() => ["90%"], []);
   const handleSheetChanges = useCallback(
     (index: number) => {
       fetchOrderList();
@@ -182,7 +175,7 @@ const BottomSheetOrderItem = ({
         {...props}
         appearsOnIndex={0}
         disappearsOnIndex={-1}
-        pressBehavior={'close'}
+        pressBehavior={"close"}
 
         // onPress={handleClosePress}
       />
@@ -197,7 +190,7 @@ const BottomSheetOrderItem = ({
       setCustomerType(data.isSubscriber);
     } catch (e) {
       if (e instanceof Error) {
-        console.log('error', e);
+        console.log("error", e);
       }
     }
   };
@@ -223,9 +216,9 @@ const BottomSheetOrderItem = ({
 
   const handleSave = async () => {
     if (!aquaVal && !isiUlangVal && !gasVal && !galonKosongVal && !gasKosongVal)
-      return ToastAndroid.show('Isi Cart!', ToastAndroid.SHORT);
+      return ToastAndroid.show("Isi Cart!", ToastAndroid.SHORT);
     if (!customerId) {
-      ToastAndroid.show('Pilih Customer!', ToastAndroid.SHORT);
+      ToastAndroid.show("Pilih Customer!", ToastAndroid.SHORT);
       return;
     }
     type orderList = {
@@ -265,12 +258,12 @@ const BottomSheetOrderItem = ({
     ];
 
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
 
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const seconds = String(date.getSeconds()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
 
     const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     // console.log(formattedDate)
@@ -288,7 +281,7 @@ const BottomSheetOrderItem = ({
     await fetchTransactions();
 
     let parsedList = JSON.parse(orderList);
-    if (curStatus == 'lunas' && status == 'hutang') {
+    if (curStatus == "lunas" && status == "hutang") {
       await addHistory({
         saldo: history.saldo - total,
         stock_aqua: history.stock_aqua - (aquaVal - parsedList[0].sum),
@@ -301,11 +294,11 @@ const BottomSheetOrderItem = ({
         stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + (gasVal - parsedList[2].sum),
         stock_isi_ulang: history.stock_isi_ulang - (isiUlangVal - parsedList[1].sum),
         transactionId: id,
-        note: '-',
+        note: "-",
       });
     }
 
-    if (curStatus == 'lunas' && status == 'pinjam') {
+    if (curStatus == "lunas" && status == "pinjam") {
       await addHistory({
         saldo: history.saldo - total_price - curOngkir,
         stock_aqua: history.stock_aqua + parsedList[0].sum,
@@ -314,11 +307,11 @@ const BottomSheetOrderItem = ({
         stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + parsedList[3].sum,
         stock_isi_ulang: history.stock_isi_ulang + parsedList[1].sum,
         transactionId: id,
-        note: '-',
+        note: "-",
       });
     }
 
-    if (curStatus === 'lunas' && status === 'lunas') {
+    if (curStatus === "lunas" && status === "lunas") {
       await addHistory({
         saldo: history.saldo - (total_price + curOngkir - total),
         stock_aqua: history.stock_aqua - (aquaVal - parsedList[0].sum),
@@ -331,11 +324,11 @@ const BottomSheetOrderItem = ({
         stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + (gasVal - parsedList[2].sum),
         stock_isi_ulang: history.stock_isi_ulang - (isiUlangVal - parsedList[1].sum),
         transactionId: id,
-        note: '-',
+        note: "-",
       });
     }
 
-    if (curStatus === 'hutang' && status === 'lunas') {
+    if (curStatus === "hutang" && status === "lunas") {
       // console.log(gasVal)
       await addHistory({
         saldo: history.saldo + total,
@@ -349,11 +342,11 @@ const BottomSheetOrderItem = ({
         stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + (gasVal - parsedList[2].sum),
         stock_isi_ulang: history.stock_isi_ulang - (isiUlangVal - parsedList[1].sum),
         transactionId: id,
-        note: '-',
+        note: "-",
       });
     }
 
-    if (curStatus == 'hutang' && status == 'pinjam') {
+    if (curStatus == "hutang" && status == "pinjam") {
       await addHistory({
         saldo: history.saldo,
         stock_aqua: history.stock_aqua + parsedList[0].sum,
@@ -362,11 +355,11 @@ const BottomSheetOrderItem = ({
         stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + parsedList[2].sum,
         stock_isi_ulang: history.stock_isi_ulang + parsedList[1].sum,
         transactionId: id,
-        note: '-',
+        note: "-",
       });
     }
 
-    if (curStatus == 'hutang' && status == 'hutang') {
+    if (curStatus == "hutang" && status == "hutang") {
       await addHistory({
         saldo: history.saldo + (total_price - total),
         stock_aqua: history.stock_aqua - (aquaVal - parsedList[0].sum),
@@ -379,11 +372,11 @@ const BottomSheetOrderItem = ({
         stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + (gasVal - parsedList[2].sum),
         stock_isi_ulang: history.stock_isi_ulang - (isiUlangVal - parsedList[1].sum),
         transactionId: id,
-        note: '-',
+        note: "-",
       });
     }
 
-    if (curStatus == 'pinjam' && status == 'lunas') {
+    if (curStatus == "pinjam" && status == "lunas") {
       await addHistory({
         saldo: history.saldo + total,
         stock_aqua: history.stock_aqua - aquaVal,
@@ -392,11 +385,11 @@ const BottomSheetOrderItem = ({
         stock_gas_kosong: history.stock_gas_kosong + parsedList[4].sum + gasVal,
         stock_isi_ulang: history.stock_isi_ulang - isiUlangVal,
         transactionId: id,
-        note: '-',
+        note: "-",
       });
     }
 
-    if (curStatus == 'pinjam' && status == 'hutang') {
+    if (curStatus == "pinjam" && status == "hutang") {
       await addHistory({
         saldo: history.saldo,
         stock_aqua: history.stock_aqua - aquaVal,
@@ -405,11 +398,11 @@ const BottomSheetOrderItem = ({
         stock_gas_kosong: history.stock_gas_kosong + parsedList[4].sum + gasVal,
         stock_isi_ulang: history.stock_isi_ulang - isiUlangVal,
         transactionId: id,
-        note: '-',
+        note: "-",
       });
     }
 
-    if (curStatus == 'pinjam' && status == 'pinjam') {
+    if (curStatus == "pinjam" && status == "pinjam") {
       await addHistory({
         saldo: history.saldo,
         stock_aqua: history.stock_aqua,
@@ -418,7 +411,7 @@ const BottomSheetOrderItem = ({
         stock_gas_kosong: history.stock_gas_kosong - (gasKosongVal - parsedList[4].sum) + gasVal,
         stock_isi_ulang: history.stock_isi_ulang,
         transactionId: id,
-        note: '-',
+        note: "-",
       });
     }
 
@@ -429,30 +422,30 @@ const BottomSheetOrderItem = ({
   const handleDelete = async () => {
     let parsedList = JSON.parse(orderList);
     Alert.alert(
-      'Yakin ingin menghapus?',
-      'gak di balikin loh',
+      "Yakin ingin menghapus?",
+      "gak di balikin loh",
       [
         {
-          text: 'batal',
+          text: "batal",
           onPress: () => false,
-          style: 'cancel',
+          style: "cancel",
         },
         {
-          text: 'hapus',
+          text: "hapus",
           onPress: async () => {
             await deleteTransaction(id);
             await addHistory({
-              saldo: history.saldo - (curStatus == 'hutang' ? 0 : total_price) - curOngkir,
+              saldo: history.saldo - (curStatus == "hutang" ? 0 : total_price) - curOngkir,
               stock_aqua: history.stock_aqua + parsedList[0].sum,
               stock_galon_kosong:
                 history.stock_galon_kosong -
-                (curStatus == 'pinjam' ? -parsedList[3].sum : parsedList[3].sum) -
+                (curStatus == "pinjam" ? -parsedList[3].sum : parsedList[3].sum) -
                 parsedList[0].sum -
                 parsedList[1].sum,
               stock_gas_12kg: history.stock_gas_12kg + parsedList[2].sum,
               stock_gas_kosong:
                 history.stock_gas_kosong -
-                (curStatus == 'pinjam' ? -parsedList[4].sum : parsedList[4].sum) -
+                (curStatus == "pinjam" ? -parsedList[4].sum : parsedList[4].sum) -
                 parsedList[2].sum,
               stock_isi_ulang: history.stock_isi_ulang + parsedList[1].sum,
               transactionId: null,
@@ -492,7 +485,7 @@ const BottomSheetOrderItem = ({
       snapPoints={snapPoints}
       onChange={handleSheetChanges}
       backdropComponent={renderBackdrop}
-      handleComponent={(props) => Handle({ ...props, HandleText: 'Detail Pesanan' })}>
+      handleComponent={(props) => Handle({ ...props, HandleText: "Detail Pesanan" })}>
       <BottomSheetScrollView>
         <View className="main gap-y-4 py-3">
           <View className="customer px-3">
@@ -505,7 +498,7 @@ const BottomSheetOrderItem = ({
                   }),
                 ]}
                 setSelected={(val: any) => {
-                  if (!val) return ToastAndroid.show('Customer tidak terpilih', ToastAndroid.SHORT);
+                  if (!val) return ToastAndroid.show("Customer tidak terpilih", ToastAndroid.SHORT);
                   handleSelected(val);
                 }}
                 defaultOption={{
@@ -580,63 +573,63 @@ const BottomSheetOrderItem = ({
                   width: 200,
                   borderWidth: 1,
                   borderRadius: 12,
-                  backgroundColor: '#1943b4',
+                  backgroundColor: "#1943b4",
                   // display: aquaVal && isiUlangVal && gasVal ? "none" : "flex"
                 }}
                 from={
                   <TouchableOpacity
-                    className={`items-center py-4 ${aquaVal && isiUlangVal && gasVal && 'hidden'} ${galonKosongVal && gasKosongVal && 'hidden'} `}>
+                    className={`items-center py-4 ${aquaVal && isiUlangVal && gasVal && "hidden"} ${galonKosongVal && gasKosongVal && "hidden"} `}>
                     <Icon name="add-circle-line" size={32} />
                   </TouchableOpacity>
                 }>
                 <TouchableOpacity
                   onPress={() => {
-                    if (!history.stock_aqua) return ToastAndroid.show('Stok kosong!', ToastAndroid.SHORT);
+                    if (!history.stock_aqua) return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                     setAquaVal(1);
                     console.log(customerType);
                     setTotal(total + (!customerType ? products[0]?.price : products[0]?.subs_price));
                   }}
-                  className={`border px-4 py-2 ${aquaVal && 'hidden'} ${status == 'pinjam' && 'hidden'}`}>
+                  className={`border px-4 py-2 ${aquaVal && "hidden"} ${status == "pinjam" && "hidden"}`}>
                   <Text className="font-semibold text-gray-50">aqua</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => {
-                    if (!history.stock_isi_ulang) return ToastAndroid.show('Stok kosong!', ToastAndroid.SHORT);
+                    if (!history.stock_isi_ulang) return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                     setIsiUlangVal(1);
                     setTotal(total + (!customerType ? products[1]?.price : products[1]?.subs_price));
                   }}
-                  className={`border px-4 py-2 ${isiUlangVal && 'hidden'} ${status == 'pinjam' && 'hidden'}`}>
+                  className={`border px-4 py-2 ${isiUlangVal && "hidden"} ${status == "pinjam" && "hidden"}`}>
                   <Text className="font-semibold text-gray-50">Isi Ulang</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => {
-                    if (!history.stock_gas_12kg) return ToastAndroid.show('Stok kosong!', ToastAndroid.SHORT);
+                    if (!history.stock_gas_12kg) return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                     setGasVal(1);
                     setTotal(total + (!customerType ? products[2]?.price : products[2]?.subs_price));
                   }}
-                  className={`border px-4 py-2 ${gasVal && 'hidden'} ${status == 'pinjam' && 'hidden'}`}>
+                  className={`border px-4 py-2 ${gasVal && "hidden"} ${status == "pinjam" && "hidden"}`}>
                   <Text className="font-semibold text-gray-50">Gas 12 Kg</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => {
-                    if (!history.stock_galon_kosong) return ToastAndroid.show('Stok kosong!', ToastAndroid.SHORT);
+                    if (!history.stock_galon_kosong) return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                     setGalonKosongVal(1);
                   }}
-                  className={`border px-4 py-2 ${galonKosongVal && 'hidden'} ${status != 'pinjam' && 'hidden'}`}
-                  disabled={status != 'pinjam'}>
+                  className={`border px-4 py-2 ${galonKosongVal && "hidden"} ${status != "pinjam" && "hidden"}`}
+                  disabled={status != "pinjam"}>
                   <Text className="font-semibold text-gray-50">Galon Kosong</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => {
-                    if (!history.stock_gas_kosong) return ToastAndroid.show('Stok kosong!', ToastAndroid.SHORT);
+                    if (!history.stock_gas_kosong) return ToastAndroid.show("Stok kosong!", ToastAndroid.SHORT);
                     setGasKosongVal(1);
                   }}
-                  className={`border px-4 py-2 ${gasKosongVal && 'hidden'} ${status != 'pinjam' && 'hidden'}`}
-                  disabled={status != 'pinjam'}>
+                  className={`border px-4 py-2 ${gasKosongVal && "hidden"} ${status != "pinjam" && "hidden"}`}
+                  disabled={status != "pinjam"}>
                   <Text className="font-semibold text-gray-50">Gas Kosong</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  className={`hidden border px-4 py-2 ${aquaVal && isiUlangVal && gasVal && 'flex'} ${galonKosongVal && gasKosongVal && 'flex'} `}>
+                  className={`hidden border px-4 py-2 ${aquaVal && isiUlangVal && gasVal && "flex"} ${galonKosongVal && gasKosongVal && "flex"} `}>
                   <Text className="font-semibold text-gray-200">Tekan Di luar untuk Tutup</Text>
                 </TouchableOpacity>
               </Popover>
@@ -651,7 +644,7 @@ const BottomSheetOrderItem = ({
             antar={antar}
             setAntar={setAntar}
           />
-          <View className={`total px-3 ${status == 1 && 'hidden'} mb-6`}>
+          <View className={`total px-3 ${status == 1 && "hidden"} mb-6`}>
             <View className="flex-row items-center justify-between rounded-lg bg-blue-800 px-3 py-2">
               <Text className="text-base font-bold text-gray-50">Total pembayaran</Text>
               <Text className="text-sm font-bold text-gray-50">{total.toLocaleString()}</Text>
@@ -663,19 +656,19 @@ const BottomSheetOrderItem = ({
             <View className="status-boxes flex-row gap-x-3 self-center">
               <TouchableOpacity
                 onPress={() => {
-                  setStatus('hutang');
+                  setStatus("hutang");
                   setGalonKosongVal(0);
                   setGasKosongVal(0);
                 }}
                 activeOpacity={1}>
                 <Text
-                  className={`w-min-[67px] rounded-md border border-red-500 px-3 py-1 text-center text-xs font-semibold ${status == 'hutang' ? 'bg-red-500 text-white' : 'text-red-500'} `}>
+                  className={`w-min-[67px] rounded-md border border-red-500 px-3 py-1 text-center text-xs font-semibold ${status == "hutang" ? "bg-red-500 text-white" : "text-red-500"} `}>
                   Hutang
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
-                  setStatus('pinjam');
+                  setStatus("pinjam");
                   setAquaVal(0);
                   setIsiUlangVal(0);
                   setGasVal(0);
@@ -685,23 +678,23 @@ const BottomSheetOrderItem = ({
                 }}
                 activeOpacity={1}>
                 <Text
-                  className={`w-min-[67px] rounded-md border border-yellow-500 px-3 py-1 text-center text-xs font-semibold ${status == 'pinjam' ? 'bg-yellow-500 text-white' : 'text-yellow-500'}`}>
+                  className={`w-min-[67px] rounded-md border border-yellow-500 px-3 py-1 text-center text-xs font-semibold ${status == "pinjam" ? "bg-yellow-500 text-white" : "text-yellow-500"}`}>
                   Pinjam
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
-                  if (curStatus == 'pinjam') {
-                    setStatus('lunas');
+                  if (curStatus == "pinjam") {
+                    setStatus("lunas");
                     return;
                   }
-                  setStatus('lunas');
+                  setStatus("lunas");
                   setGalonKosongVal(0);
                   setGasKosongVal(0);
                 }}
                 activeOpacity={1}>
                 <Text
-                  className={`w-min-[67px] rounded-md border border-green-500 px-3 py-1 text-center text-xs font-semibold ${status == 'lunas' ? 'bg-green-500 text-white' : 'text-green-500'}`}>
+                  className={`w-min-[67px] rounded-md border border-green-500 px-3 py-1 text-center text-xs font-semibold ${status == "lunas" ? "bg-green-500 text-white" : "text-green-500"}`}>
                   Lunas
                 </Text>
               </TouchableOpacity>
@@ -709,7 +702,7 @@ const BottomSheetOrderItem = ({
           </View>
           <View className="action-button px-3">
             <TouchableOpacity
-              className={`rounded-lg ${isLoading ? 'bg-blue-900' : 'bg-blue-800'} mb-2.5 px-3 py-2`}
+              className={`rounded-lg ${isLoading ? "bg-blue-900" : "bg-blue-800"} mb-2.5 px-3 py-2`}
               activeOpacity={0.9}
               disabled={isLoading}
               onPress={async () => {
@@ -717,11 +710,11 @@ const BottomSheetOrderItem = ({
                 await handleSave();
                 setIsLoading(false);
               }}>
-              <ActivityIndicator size={'small'} color={'#ffff'} className={`${!isLoading && 'hidden'}`} />
-              <Text className={`text-center text-xs font-semibold text-gray-100 ${isLoading && 'hidden'}`}>Simpan</Text>
+              <ActivityIndicator size={"small"} color={"#ffff"} className={`${!isLoading && "hidden"}`} />
+              <Text className={`text-center text-xs font-semibold text-gray-100 ${isLoading && "hidden"}`}>Simpan</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className={`rounded-lg ${isLoading ? 'bg-red-600' : 'bg-red-500'} border px-3 py-2`}
+              className={`rounded-lg ${isLoading ? "bg-red-600" : "bg-red-500"} border px-3 py-2`}
               activeOpacity={0.9}
               disabled={isLoading}
               onPress={async () => {
@@ -729,8 +722,8 @@ const BottomSheetOrderItem = ({
                 await handleDelete();
                 setIsLoading(false);
               }}>
-              <ActivityIndicator size={'small'} color={'#ffff'} className={`${!isLoading && 'hidden'}`} />
-              <Text className={`text-center text-xs font-semibold text-gray-100 ${isLoading && 'hidden'}`}>Hapus</Text>
+              <ActivityIndicator size={"small"} color={"#ffff"} className={`${!isLoading && "hidden"}`} />
+              <Text className={`text-center text-xs font-semibold text-gray-100 ${isLoading && "hidden"}`}>Hapus</Text>
             </TouchableOpacity>
             {/* <TouchableOpacity
                 onPress={() => {
@@ -763,11 +756,11 @@ const DateInput = ({ date, setDate }) => {
   };
 
   const showDatepicker = () => {
-    showDateMode('date');
+    showDateMode("date");
   };
 
   const showTimepicker = () => {
-    showDateMode('time');
+    showDateMode("time");
   };
   return (
     <View className="date mb-6 px-3">
@@ -796,7 +789,7 @@ const ShippingCostInput = ({ ongkir, setOngkir, curOngkir, total, setTotal, anta
     <View className="ongkir mb-6 items-start px-3">
       <Text className="text-sm font-semibold">Antar:</Text>
       <View>
-        <Switch thumbColor={antar ? '#55b8d4' : 'gray'} value={antar} onChange={handleAntar} />
+        <Switch thumbColor={antar ? "#55b8d4" : "gray"} value={antar} onChange={handleAntar} />
       </View>
       {antar && (
         <View className="input-value w-full rounded-md border py-2 pl-3">
@@ -823,18 +816,18 @@ const formatDate = (timestamp) => {
 
   // Membuat array bulan dalam bahasa Indonesia
   const months = [
-    'Januari',
-    'Februari',
-    'Maret',
-    'April',
-    'Mei',
-    'Juni',
-    'Juli',
-    'Agustus',
-    'September',
-    'Oktober',
-    'November',
-    'Desember',
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
   ];
 
   // Mendapatkan hari, bulan, dan tahun

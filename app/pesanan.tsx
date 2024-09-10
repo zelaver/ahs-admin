@@ -1,34 +1,27 @@
-import {
-  View,
-  Text,
-  SafeAreaView,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-  Touchable,
-  Easing,
-  ToastAndroid,
-  RefreshControl,
-  ActivityIndicator,
-  Switch,
-} from "react-native";
-import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import SearchInput from "@/components/SearchInput";
-import Icon from "react-native-remix-icon";
-import OrderItem from "@/components/OrderItem";
-import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import CartItem from "@/components/CartItem";
 import Handle from "@/components/CustomHandle";
-import { addHistory, addTransaction, getContact, getTransactions } from "@/database/db";
-import { SelectList } from "react-native-dropdown-select-list";
-import { UnknownOutputParams } from "expo-router";
-import Popover from "react-native-popover-view/dist/Popover";
-import { PopoverPlacement } from "react-native-popover-view";
+import OrderItem from "@/components/OrderItem";
 import images from "@/constants/images";
 import { useGlobalContext } from "@/context/GlobalProvider";
-import { filter } from "jszip";
+import { addHistory, addTransaction, getContact, getTransactions } from "@/database/db";
+import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
+import React, { memo, useCallback, useMemo, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  RefreshControl,
+  SafeAreaView,
+  ScrollView,
+  Switch,
+  Text,
+  ToastAndroid,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import CurrencyInput from "react-native-currency-input";
-import DateTimePicker, { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
+import { SelectList } from "react-native-dropdown-select-list";
+import Popover from "react-native-popover-view/dist/Popover";
+import Icon from "react-native-remix-icon";
 
 const Pesanan = () => {
   // const [query, setQuery] = useState<string>();
@@ -57,10 +50,11 @@ const Pesanan = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-blue-600 pt-8">
-      <View className="header pb-1">
-        <View className="section-1 px-5 py-2">
-          <Text className="text-2xl font-semibold text-blue-50">Pesanan</Text>
+    <SafeAreaView className="flex-1 bg-blue-50 pt-8">
+      <View className="header border-b border-gray-500 pb-4">
+        <View className="section-1 flex-row items-center px-5 py-2">
+          <Icon name="file-list-fill" color="#172554" size={26} />
+          <Text className="ml-2 text-2xl font-semibold text-blue-950">Pesanan</Text>
         </View>
         <View className="section-2 flex-row items-center px-5">
           <View className={`mr-2 flex-1 flex-row items-center rounded-md py-1`}>
@@ -71,7 +65,7 @@ const Pesanan = () => {
               activeOpacity={1}
               className="mr-2">
               <Text
-                className={`w-min-[67px] rounded-md border border-red-500 px-3 py-1 text-center text-xs font-bold ${filterStatus == "hutang" ? "bg-red-500 text-white" : "text-red-500"} `}>
+                className={`w-min-[67px] rounded-md border border-red-500 px-3 py-1 text-center text-sm font-bold ${filterStatus == "hutang" ? "bg-red-500 text-white" : "bg-red-100 text-red-600"} `}>
                 Hutang
               </Text>
             </TouchableOpacity>
@@ -82,7 +76,7 @@ const Pesanan = () => {
               activeOpacity={1}
               className="mr-2">
               <Text
-                className={`w-min-[67px] rounded-md border border-yellow-500 px-3 py-1 text-center text-xs font-bold ${filterStatus == "pinjam" ? "bg-yellow-500 text-white" : "text-yellow-500"}`}>
+                className={`w-min-[67px] rounded-md border border-yellow-500 px-3 py-1 text-center text-sm font-bold ${filterStatus == "pinjam" ? "bg-yellow-500 text-white" : "bg-yellow-100 text-yellow-500"}`}>
                 Pinjam
               </Text>
             </TouchableOpacity>
@@ -92,20 +86,19 @@ const Pesanan = () => {
               }}
               activeOpacity={1}>
               <Text
-                className={`w-min-[67px] rounded-md border border-green-500 px-3 py-1 text-center text-xs font-bold ${filterStatus == "lunas" ? "bg-green-500 text-white" : "text-green-500"}`}>
+                className={`w-min-[67px] rounded-md border border-green-500 px-3 py-1 text-center text-sm font-bold ${filterStatus == "lunas" ? "bg-green-500 text-white" : "bg-green-100 text-green-600"}`}>
                 Lunas
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setAscending(!ascending)} className="ml-3">
-              <Icon name={`${ascending ? "sort-desc" : "sort-asc"}`} size={24} color="white" />
-            </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={handlePresentModalPress} className="rounded-full bg-blue-800">
-            <Icon name="add-fill" size={32} color="white"></Icon>
+          <TouchableOpacity onPress={() => setAscending(!ascending)} className="ml-3">
+            <Icon name={`${ascending ? "sort-desc" : "sort-asc"}`} size={24} color="#172554" />
           </TouchableOpacity>
         </View>
       </View>
-      <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+      <ScrollView
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        className="bg-blue-50">
         <View className="main pb-16">
           <View className="section-3 px-5 py-3">
             {[...transactions]
@@ -127,6 +120,11 @@ const Pesanan = () => {
         </View>
       </ScrollView>
       <BottomSheetAddPesanan bottomSheetModalRef={bottomSheetModalRef} />
+      <TouchableOpacity
+        onPress={handlePresentModalPress}
+        className="absolute bottom-10 right-5 rounded-full border bg-blue-800">
+        <Icon name="add-fill" size={40} color="white"></Icon>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -162,7 +160,7 @@ const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
         // onPress={handleClosePress}
       />
     ),
-    [],
+    []
   );
 
   const { lastHistory: history, fetchHistory, fetchTransactions, customers, products } = useGlobalContext();
@@ -187,16 +185,27 @@ const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
       setIsSubscriber(getCustomer.isSubscriber);
       // console.log(getCustomer.isSubscriber);
       if (getCustomer.isSubscriber == 0) {
-        setTotal(aquaVal * products[0]?.price + isiUlangVal * products[1]?.price + gasVal * products[2]?.price + (ongkir ? ongkir : 0));
+        setTotal(
+          aquaVal * products[0]?.price +
+            isiUlangVal * products[1]?.price +
+            gasVal * products[2]?.price +
+            (ongkir ? ongkir : 0)
+        );
       } else {
-        setTotal(aquaVal * products[0]?.subs_price + isiUlangVal * products[1]?.subs_price + gasVal * products[2]?.price + (ongkir ? ongkir : 0));
+        setTotal(
+          aquaVal * products[0]?.subs_price +
+            isiUlangVal * products[1]?.subs_price +
+            gasVal * products[2]?.price +
+            (ongkir ? ongkir : 0)
+        );
       }
     },
-    [customerId, total],
+    [customerId, total]
   );
 
   const handleSave = async () => {
-    if (!aquaVal && !isiUlangVal && !gasVal && !galonKosongVal && !gasKosongVal) return ToastAndroid.show("Isi Cart!", ToastAndroid.SHORT);
+    if (!aquaVal && !isiUlangVal && !gasVal && !galonKosongVal && !gasKosongVal)
+      return ToastAndroid.show("Isi Cart!", ToastAndroid.SHORT);
     if (!customerId) {
       ToastAndroid.show("Pilih Customer!", ToastAndroid.SHORT);
       return;
@@ -318,7 +327,14 @@ const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
             status={status}
           />
 
-          <ShippingCostInput ongkir={ongkir} setOngkir={setOngkir} total={total} setTotal={setTotal} antar={antar} setAntar={setAntar} />
+          <ShippingCostInput
+            ongkir={ongkir}
+            setOngkir={setOngkir}
+            total={total}
+            setTotal={setTotal}
+            antar={antar}
+            setAntar={setAntar}
+          />
           <TotalBox status={status} total={total} />
           <DateInput date={date} setDate={setDate} />
           <StatusBox
@@ -507,7 +523,7 @@ const CartInput = memo(
         </View>
       </View>
     );
-  },
+  }
 );
 const DateInput = ({ date, setDate }) => {
   const onDateChange = (event, selectedDate) => {

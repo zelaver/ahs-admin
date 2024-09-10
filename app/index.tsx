@@ -1,8 +1,15 @@
+import Handle from "@/components/CustomHandle";
+import StockItem from "@/components/StockItem";
+import images from "@/constants/images";
+import { useGlobalContext } from "@/context/GlobalProvider";
+import { addHistory } from "@/database/db";
+import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import { Redirect } from "expo-router";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   BackHandler,
-  Dimensions,
-  Image,
-  Platform,
+  Keyboard,
   SafeAreaView,
   ScrollView,
   Text,
@@ -10,20 +17,10 @@ import {
   ToastAndroid,
   TouchableOpacity,
   View,
-  Keyboard,
-  ActivityIndicator,
 } from "react-native";
-import Icon from "react-native-remix-icon";
-import images from "@/constants/images";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Redirect } from "expo-router";
-import StockItem from "@/components/StockItem";
-import { addHistory } from "@/database/db";
-import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView, BottomSheetTextInput } from "@gorhom/bottom-sheet";
-import Handle from "@/components/CustomHandle";
 import CurrencyInput from "react-native-currency-input";
 import { RefreshControl } from "react-native-gesture-handler";
-import { useGlobalContext } from "@/context/GlobalProvider";
+import Icon from "react-native-remix-icon";
 
 export default function Home() {
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -47,7 +44,6 @@ export default function Home() {
       setDebugMode(false);
     }, 500);
 
-    // Back handling when bottom sheet is opened
     const backAction = () => {
       bottomSheetModalRef.current?.close();
       return true;
@@ -72,7 +68,7 @@ export default function Home() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-blue-600 pt-8">
+    <SafeAreaView className="flex-1 bg-blue-100 pt-8">
       <ScrollView
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         contentContainerStyle={{
@@ -89,8 +85,9 @@ export default function Home() {
 
 const Header = () => {
   return (
-    <View className="section-1 px-5 py-2">
-      <Text className="text-2xl font-semibold text-blue-50">Home</Text>
+    <View className="section-1 px-5 py-2 flex-row items-center">
+      <Icon name="home-4-fill" color="#172554" size={26}/>
+      <Text className="text-2xl font-semibold text-blue-950 ml-2">Home</Text>
     </View>
   );
 };
@@ -102,9 +99,9 @@ const Saldo = ({ stocks, handlePresentModalPress }: any) => {
           <View className="pp h-8 w-8 items-center justify-center rounded-full border bg-cyan-600">
             <Text className="text-xs font-medium text-white">EM</Text>
           </View>
-          <Text className="text-sm font-bold text-blue-50">Euis Marlina</Text>
+          <Text className="text-sm font-bold text-blue-950">Euis Marlina</Text>
         </View>
-        <Icon name="settings-line" size={20} color="#fff"></Icon>
+        <Icon name="settings-line" size={20} color="#172554"></Icon>
       </View>
       <View className="saldo box-content flex-col rounded-lg border border-blue-50 bg-blue-800 px-3 py-2">
         <View className="mb-1 flex-row items-center justify-between">
@@ -126,7 +123,7 @@ const Saldo = ({ stocks, handlePresentModalPress }: any) => {
 const Stock = ({ stocks, products, fetchStocks }: any) => {
   return (
     <View className="section-3 flex-col gap-y-2 px-5">
-      <Text className="mb-2 text-sm font-bold text-blue-50">Stok/Harga Galon</Text>
+      <Text className="mb-2 text-sm font-bold text-blue-950">Stok/Harga Galon</Text>
       <View className="stok-row-1 mb-4 flex-row justify-between">
         <StockItem
           id={products[0]?.id}
@@ -152,7 +149,13 @@ const Stock = ({ stocks, products, fetchStocks }: any) => {
       </View>
 
       <View className="stok-row-2 mb-4 flex-row justify-between">
-        <StockItem image={images.galonKosong} name="Galon Kosong" stock={stocks?.stock_galon_kosong} stocks={stocks} fetchStocks={fetchStocks} />
+        <StockItem
+          image={images.galonKosong}
+          name="Galon Kosong"
+          stock={stocks?.stock_galon_kosong}
+          stocks={stocks}
+          fetchStocks={fetchStocks}
+        />
       </View>
       <View className="stok-row-3 flex-row justify-between">
         <StockItem
@@ -167,7 +170,13 @@ const Stock = ({ stocks, products, fetchStocks }: any) => {
           fetchStocks={fetchStocks}
         />
 
-        <StockItem image={images.gasKosong} name="Gas Kosong" stock={stocks?.stock_gas_kosong} stocks={stocks} fetchStocks={fetchStocks} />
+        <StockItem
+          image={images.gasKosong}
+          name="Gas Kosong"
+          stock={stocks?.stock_gas_kosong}
+          stocks={stocks}
+          fetchStocks={fetchStocks}
+        />
       </View>
     </View>
   );
@@ -188,8 +197,10 @@ const BottomSheetSaldo = ({ bottomSheetModalRef, stocks, fetchStocks }: any) => 
     bottomSheetModalRef.current?.close();
   }, []);
   const renderBackdrop = useCallback(
-    (props: any) => <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} pressBehavior={"close"} />,
-    [],
+    (props: any) => (
+      <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} pressBehavior={"close"} />
+    ),
+    []
   );
 
   const [saldoInput, setSaldoInput] = useState<number | null>(null);

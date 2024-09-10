@@ -1,21 +1,15 @@
 import GlobalProvider, {
   useGlobalContext,
 } from "@/context/GlobalProvider";
-import { useFonts } from "expo-font";
-import { SplashScreen } from "expo-router";
-import { useEffect } from "react";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
-import { Tabs } from "expo-router";
-import {
-  View,
-  Text,
-  ActivityIndicator,
-} from "react-native";
+import { SplashScreen, Tabs } from "expo-router";
+import { useEffect } from "react";
+import { Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Icon from "react-native-remix-icon";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
-// SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync();
 
 const TabIcon = ({
   icon,
@@ -43,6 +37,16 @@ const TabIcon = ({
 
 export default function RootLayout() {
   const { isLoading } = useGlobalContext();
+
+  useEffect(() => {
+    if (!isLoading) {
+      SplashScreen.hideAsync();
+    }
+  }, [isLoading]);
+
+  if (isLoading) {
+    return null;
+  }
 
   // if (isLoading) {
   //   return (

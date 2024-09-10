@@ -1,8 +1,8 @@
-import { View, Text, TouchableOpacity, Button } from "react-native";
-import React, { useState } from "react";
-import { execQuery, getAllTables, getQuery } from "@/database/debug";
-import DateTimePicker, { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
-import { useGlobalContext } from "@/context/GlobalProvider";
+import { View, Text, TouchableOpacity, Button } from 'react-native';
+import React, { useState } from 'react';
+import { execQuery, getAllTables, getQuery } from '@/database/debug';
+import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
+import { useGlobalContext } from '@/context/GlobalProvider';
 
 const Debug = () => {
   const [date, setDate] = useState(new Date());
@@ -23,18 +23,18 @@ const Debug = () => {
   };
 
   const showDatepicker = () => {
-    showMode("date");
+    showMode('date');
   };
 
   const showTimepicker = () => {
-    showMode("time");
+    showMode('time');
   };
   return (
     <View className="h-full flex-1 items-center justify-center gap-y-3 px-32 py-32">
       <TouchableOpacity
         activeOpacity={0.9}
         onPress={() => {
-          execQuery();
+          // execQuery();
           // fetchHistory()
           getQuery();
         }}>
@@ -49,7 +49,7 @@ const Debug = () => {
           title="Show date picker!"
         />
         <Button onPress={showTimepicker} title="Show time picker!" />
-        <Text>selected: {date.toLocaleDateString().split("/")[2]}</Text>
+        <Text>selected: {date.toLocaleDateString().split('/')[2]}</Text>
       </View>
     </View>
   );

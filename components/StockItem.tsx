@@ -1,24 +1,21 @@
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   BackHandler,
   Image,
-  Platform,
-  SafeAreaView,
-  ScrollView,
   Text,
   TextInput,
   ToastAndroid,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Icon from 'react-native-remix-icon';
 // import images from "@/constants/images";
-import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import Handle from './CustomHandle';
-import { addHistory, updateProductPrice } from '@/database/db';
-import CurrencyInput from 'react-native-currency-input';
 import { useGlobalContext } from '@/context/GlobalProvider';
+import { addHistory, updateProductPrice } from '@/database/db';
+import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import CurrencyInput from 'react-native-currency-input';
+import Handle from './CustomHandle';
 
 type StockItem = {
   id?: number;
@@ -189,7 +186,7 @@ const StockItem = ({
   }
 
   return (
-    <View className={`mini-box flex-1 flex-col gap-y-2 rounded-lg border-2 bg-blue-50 px-3 pb-2 ${otherStyles} `}>
+    <View className={`mini-box flex-1 flex-col gap-y-2 rounded-lg border-2 border-blue-950 bg-blue-50 px-3 pb-2 ${otherStyles} `}>
       <View className="flex-row items-center justify-between">
         <Text className="text-xs font-semibold text-gray-700">{name}</Text>
         <Icon name="more-2-fill" color="black" size={12}></Icon>

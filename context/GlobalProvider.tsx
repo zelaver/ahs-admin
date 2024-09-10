@@ -1,8 +1,5 @@
-import images from "@/constants/images";
 import { getAllContacts, getHistory, getProducts, getTransactions, initDB, initHistory } from "@/database/db";
 import { createContext, useContext, useEffect, useState } from "react";
-import { ActivityIndicator, Image } from "react-native";
-import { View } from "react-native";
 
 type context = {
   history: [];
@@ -125,13 +122,14 @@ const GlobalProvider = ({ children }: any) => {
         fetchCustomers,
         fetchProducts,
       }}>
-      {isLoading ? (
+      {/* {isLoading ? (
         <View className="h-full flex-1 items-center justify-center">
           <Image source={images.logo} className="w-[300px]" resizeMode="contain" />
         </View>
       ) : (
         children
-      )}
+      )} */}
+      {children}
     </GlobalContext.Provider>
   );
 };

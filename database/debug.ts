@@ -8,6 +8,7 @@ const getQuery = async () => {
   try {
     const result: any = await db.getAllAsync("SELECT * FROM transactions;");
     console.log(JSON.stringify(result, null, 2));
+    // console.log(result.length)
   } catch (e) {
     if (e instanceof Error) {
       console.log(e);

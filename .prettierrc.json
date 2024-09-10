@@ -4,7 +4,7 @@
   "printWidth": 120,
   "trailingComma": "es5",
   "singleAttributePerLine": false,
-  "singleQuote": true,
+  "singleQuote": false,
   "experimentalTernaries": true,
   "overrides": [
     {

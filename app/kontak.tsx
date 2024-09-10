@@ -1,26 +1,27 @@
-import { View, Text, SafeAreaView, ScrollView, TextInput, BackHandler, ToastAndroid, RefreshControl, ActivityIndicator } from "react-native";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import SearchInput from "@/components/SearchInput";
-import Icon from "react-native-remix-icon";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
-import Handle from "@/components/CustomHandle";
-import { addContact, getAllContacts } from "@/database/db";
 import ContactItem from "@/components/ContactItem";
+import Handle from "@/components/CustomHandle";
 import { useGlobalContext } from "@/context/GlobalProvider";
+import { addContact } from "@/database/db";
+import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  BackHandler,
+  RefreshControl,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TextInput,
+  ToastAndroid,
+  View,
+} from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import Icon from "react-native-remix-icon";
+import { useDebounce } from 'use-debounce';
 
 const Kontak = () => {
-  const [name, setName] = useState<string>("");
-  const [phone, setPhone] = useState<string>("");
-  const [address, setAddress] = useState<string>("");
-  const [status, setStatus] = useState<number>(0);
-  const { customers: contacts, fetchCustomers: fetchContacts } = useGlobalContext();
-  // const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [refreshing, setRefreshing] = useState(false);
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ["55%"], []);
-  const [query, setQuery] = useState<string>();
-
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
   }, []);
@@ -33,7 +34,7 @@ const Kontak = () => {
         setStatus(0);
       }
     },
-    [name, phone, address, status],
+    [name, phone, address, status]
   );
   const handleClosePress = useCallback(() => {
     bottomSheetModalRef.current?.close();
@@ -49,9 +50,18 @@ const Kontak = () => {
         // onPress={handleClosePress}
       />
     ),
-    [],
+    []
   );
 
+  const [name, setName] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
+  const [address, setAddress] = useState<string>("");
+  const [status, setStatus] = useState<number>(0);
+  const { customers: contacts, fetchCustomers: fetchContacts } = useGlobalContext();
+  // const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [query, setQuery] = useState<string>();
+  const [value] = useDebounce(query, 1000)
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -88,10 +98,11 @@ const Kontak = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-blue-600 pt-8">
-      <View className="Header pb-3">
-        <View className="section-1 px-5 py-2">
-          <Text className="text-2xl font-semibold text-blue-50">Kontak</Text>
+    <SafeAreaView className="flex-1 bg-blue-50 pt-8">
+      <View className="Header border-b border-gray-500 pb-4">
+        <View className="section-1 flex-row items-center px-5 py-2">
+          <Icon name="contacts-book-2-fill" color="#172554" size={26} />
+          <Text className="ml-2 text-2xl font-semibold text-blue-950">Kontak</Text>
         </View>
         <View className="section-2 flex-row items-center justify-between px-5">
           <View className={`mr-2 flex-1 flex-row items-center rounded-md border bg-white px-2 py-1`}>
@@ -109,17 +120,18 @@ const Kontak = () => {
               <Icon name="search-2-line" size={16}></Icon>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity activeOpacity={0.5} onPress={handlePresentModalPress} className="rounded-full bg-blue-800">
-            <Icon name="add-fill" size={32} color="white" />
-          </TouchableOpacity>
         </View>
       </View>
-      <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-        <View className="main pb-16">
+      <ScrollView
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} className="bg-blue-50" />}>
+        <View className="main pb-20">
           <View className="section-3 px-5 py-1.5">
             {[...contacts]
               .filter((item) =>
-                query ? item.name.toLowerCase().includes(query.toLowerCase()) || item.address.toLowerCase().includes(query.toLowerCase()) : item,
+                query ?
+                  item.name.toLowerCase().includes(value.toLowerCase()) ||
+                  item.address.toLowerCase().includes(value.toLowerCase())
+                : item
               )
               .map(({ id, name, address, phone, isSubscriber }, i) => {
                 return (
@@ -178,13 +190,17 @@ const Kontak = () => {
                   activeOpacity={1}
                   className={`rounded-md border px-3 py-1 ${status && "bg-blue-800"} border-blue-800`}
                   onPress={() => setStatus(1)}>
-                  <Text className={`text-center text-xs ${status ? "text-white" : "text-blue-800"} font-semibold`}>Warung</Text>
+                  <Text className={`text-center text-xs ${status ? "text-white" : "text-blue-800"} font-semibold`}>
+                    Warung
+                  </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   activeOpacity={1}
                   className={`rounded-md px-3 py-1 ${!status && "bg-blue-800"} border border-blue-800`}
                   onPress={() => setStatus(0)}>
-                  <Text className={`text-center text-xs ${!status ? "text-white" : "text-blue-800"} font-semibold`}>Customer</Text>
+                  <Text className={`text-center text-xs ${!status ? "text-white" : "text-blue-800"} font-semibold`}>
+                    Customer
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -199,7 +215,9 @@ const Kontak = () => {
                 }}
                 disabled={isLoading}>
                 <ActivityIndicator size={"small"} color={"#ffff"} className={`${!isLoading && "hidden"}`} />
-                <Text className={`text-center text-xs font-semibold text-gray-100 ${isLoading && "hidden"}`}>Simpan</Text>
+                <Text className={`text-center text-xs font-semibold text-gray-100 ${isLoading && "hidden"}`}>
+                  Simpan
+                </Text>
               </TouchableOpacity>
               {/* <TouchableOpacity
                 className={`rounded-lg ${isLoading ? "bg-red-600" : "bg-red-500"} px-3 py-2 border`}
@@ -211,6 +229,12 @@ const Kontak = () => {
           </View>
         </BottomSheetScrollView>
       </BottomSheetModal>
+      <TouchableOpacity
+        activeOpacity={0.5}
+        onPress={handlePresentModalPress}
+        className="absolute bottom-10 right-5 rounded-full border bg-blue-800">
+        <Icon name="add-fill" size={40} color="white" />
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };

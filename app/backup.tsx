@@ -1,12 +1,11 @@
-import { View, Text, SafeAreaView, TouchableOpacity, ToastAndroid, ActivityIndicator } from "react-native";
-import React, { useState } from "react";
-import { execQuery, getAllContacts, getQuery } from "@/database/debug";
-import * as Sharing from "expo-sharing";
-import * as FileSystem from "expo-file-system";
-import * as DocumentPicker from "expo-document-picker";
-import * as SQLite from "expo-sqlite";
-import JSZip from "jszip";
 import { useGlobalContext } from "@/context/GlobalProvider";
+import * as DocumentPicker from "expo-document-picker";
+import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
+import JSZip from "jszip";
+import React, { useState } from "react";
+import { ActivityIndicator, SafeAreaView, Text, ToastAndroid, TouchableOpacity, View } from "react-native";
+import Icon from "react-native-remix-icon";
 
 const Backup = () => {
   const { history, fetchHistory, fetchCustomers, fetchTransactions, fetchProducts } = useGlobalContext();
@@ -102,9 +101,10 @@ const Backup = () => {
 
   return (
     <SafeAreaView>
-      <View className="main bg-blue-600 py-8">
-        <View className="section-1 px-5 py-2">
-          <Text className="text-2xl font-semibold text-blue-50">Backup</Text>
+      <View className="main bg-blue-100 py-8">
+        <View className="section-1 flex-row items-center px-5 py-2">
+          <Icon name="upload-fill" color="#172554" size={26} />
+          <Text className="ml-2 text-2xl font-semibold text-blue-950">Backup</Text>
         </View>
         <View className="section-2 h-full items-center justify-center px-5 py-2">
           <TouchableOpacity
