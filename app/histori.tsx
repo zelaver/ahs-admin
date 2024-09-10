@@ -1,4 +1,5 @@
 import { useGlobalContext } from "@/context/GlobalProvider";
+import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -223,8 +224,14 @@ const Table = ({ history }) => {
     }
   };
 
+  const [date, setDate] = useState<Date>(new Date());
   const itemsPerPage = 10;
-  const totalPage = Math.ceil(history.length / itemsPerPage);
+  const [totalPage, setTotalPage] = useState(
+    Math.ceil(
+      [...history].filter((item) => new Date(item.date).toLocaleDateString() == date?.toLocaleDateString()).length /
+        itemsPerPage
+    )
+  );
   const [currentPage, setCurrentPage] = useState(totalPage);
 
   const getPaginatedItems = (items: any[]) => {
@@ -234,8 +241,34 @@ const Table = ({ history }) => {
     return items.slice(startIndex, endIndex);
   };
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
+  const onDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate;
+    setCurrentPage(1);
+    setDate(currentDate);
+    console.log(currentDate.toLocaleDateString())
+    setTotalPage(
+      Math.ceil(
+        [...history].filter((item) => new Date(item.date).toLocaleDateString() == currentDate?.toLocaleDateString()).length /
+          itemsPerPage
+      )
+    );
+  };
+
+  const showDateMode = (currentMode) => {
+    DateTimePickerAndroid.open({
+      value: date,
+      onChange: onDateChange,
+      mode: currentMode,
+      is24Hour: true,
+    });
+  };
+
+  const showDatepicker = () => {
+    showDateMode("date");
+  };
+
+  const showTimepicker = () => {
+    showDateMode("time");
   };
 
   return (
@@ -243,10 +276,19 @@ const Table = ({ history }) => {
       <View className="section-1 flex-row items-center justify-between py-2">
         <View className="flex-row items-center">
           <Text className="mr-2.5 text-lg font-semibold text-blue-950">Stock</Text>
-          <TouchableOpacity onPress={() => setAscending(!ascending)}>
+          <TouchableOpacity onPress={() => setAscending(!ascending)} className="ml-1">
             <Icon name={`${ascending ? "sort-desc" : "sort-asc"}`} size={20} color="#172554" />
           </TouchableOpacity>
         </View>
+        <TouchableOpacity
+          activeOpacity={0.5}
+          onPress={showDatepicker}
+          className="flex-row items-center justify-start rounded-md border border-blue-950 py-1 pl-2 pr-6">
+          <Icon name="calendar-line" size={16} color="#172554" />
+          <Text className="ml-1 text-xs font-semibold text-blue-950">
+            {date.toLocaleDateString() == new Date().toLocaleDateString() ? "Hari ini" : date?.toLocaleDateString()}
+          </Text>
+        </TouchableOpacity>
       </View>
       <ScrollView horizontal>
         <View>
@@ -278,16 +320,19 @@ const Table = ({ history }) => {
               </View>
             </View>
           </View>
-          <ScrollView
-            nestedScrollEnabled
+          <View
+            // nestedScrollEnabled
             // ref={scrollViewRef}
-            className="h-96 border-b border-blue-800 bg-white">
-            {getPaginatedItems([...history])
+            className="h-fit border-b border-blue-800 bg-white">
+            {getPaginatedItems(
+              [...history].filter((item) => new Date(item.date).toLocaleDateString() == date?.toLocaleDateString())
+              // [...history]
+            )
               .sort((a, b) => sort(b.id, a.id))
               .map((item, i) => (
                 <RowData key={i} id={item.id} data={history} />
               ))}
-          </ScrollView>
+          </View>
         </View>
       </ScrollView>
       <View className="mx-auto w-full flex-row items-center justify-center rounded-b-md bg-blue-800 py-2">
@@ -302,7 +347,7 @@ const Table = ({ history }) => {
         </TouchableOpacity>
         <Text className="mr-4 text-lg font-semibold text-white">{currentPage}</Text>
         <TouchableOpacity
-          disabled={currentPage == totalPage}
+          disabled={currentPage == totalPage || totalPage == 0}
           onPress={() => {
             if (currentPage == totalPage) return ToastAndroid.show(`sudah history paling akhir`, ToastAndroid.SHORT);
             setCurrentPage(currentPage + 1);
@@ -440,6 +485,12 @@ const RowData = ({ id, data }) => {
         </View>
         <View className="w-36 flex-row py-2.5 pl-2">
           <Text className="mr-2 text-sm text-gray-700">{dataRow.note}</Text>
+          {/* <TouchableOpacity
+            onPress={() => {
+              console.log(dataRow.date.split(" ")[0]);
+            }}>
+            <Text className="rounded-md border px-2 text-center">Debug</Text>
+          </TouchableOpacity> */}
         </View>
       </View>
     </View>
