@@ -61,7 +61,7 @@ const Kontak = () => {
   // const [isLoading, setIsLoading] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState(false);
   const [query, setQuery] = useState<string>();
-  const [value] = useDebounce(query, 1000)
+  const [value] = useDebounce(query, 600)
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -129,8 +129,8 @@ const Kontak = () => {
             {[...contacts]
               .filter((item) =>
                 query ?
-                  item.name.toLowerCase().includes(value.toLowerCase()) ||
-                  item.address.toLowerCase().includes(value.toLowerCase())
+                  item.name.toLowerCase().includes(value?.toLowerCase()) ||
+                  item.address.toLowerCase().includes(value?.toLowerCase())
                 : item
               )
               .map(({ id, name, address, phone, isSubscriber }, i) => {
