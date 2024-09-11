@@ -1,5 +1,5 @@
+import DatePicker from "@/components/DatePicker";
 import { useGlobalContext } from "@/context/GlobalProvider";
-import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -245,49 +245,41 @@ const Table = ({ history }) => {
     const currentDate = selectedDate;
     setCurrentPage(1);
     setDate(currentDate);
-    console.log(currentDate.toLocaleDateString())
+    console.log(currentDate.toLocaleDateString());
     setTotalPage(
       Math.ceil(
-        [...history].filter((item) => new Date(item.date).toLocaleDateString() == currentDate?.toLocaleDateString()).length /
-          itemsPerPage
+        [...history].filter((item) => new Date(item.date).toLocaleDateString() == currentDate?.toLocaleDateString())
+          .length / itemsPerPage
       )
     );
   };
 
-  const showDateMode = (currentMode) => {
-    DateTimePickerAndroid.open({
-      value: date,
-      onChange: onDateChange,
-      mode: currentMode,
-      is24Hour: true,
-    });
-  };
+  // const showDateMode = (currentMode) => {
+  //   DateTimePickerAndroid.open({
+  //     value: date,
+  //     onChange: onDateChange,
+  //     mode: currentMode,
+  //     is24Hour: true,
+  //   });
+  // };
 
-  const showDatepicker = () => {
-    showDateMode("date");
-  };
+  // const showDatepicker = () => {
+  //   showDateMode("date");
+  // };
 
-  const showTimepicker = () => {
-    showDateMode("time");
-  };
+  // const showTimepicker = () => {
+  //   showDateMode("time");
+  // };
 
   return (
     <View className="section-2 table px-5">
       <View className="section-1 flex-row items-center justify-between py-2">
         <View className="flex-row items-center">
           <Text className="mr-2.5 text-lg font-semibold text-blue-950">Stock</Text>
-          <TouchableOpacity onPress={() => setAscending(!ascending)} className="ml-1">
-            <Icon name={`${ascending ? "sort-desc" : "sort-asc"}`} size={20} color="#172554" />
-          </TouchableOpacity>
+          <DatePicker date={date} setDate={setDate} onDateChange={onDateChange} />
         </View>
-        <TouchableOpacity
-          activeOpacity={0.5}
-          onPress={showDatepicker}
-          className="flex-row items-center justify-start rounded-md border border-blue-950 py-1 pl-2 pr-6">
-          <Icon name="calendar-line" size={16} color="#172554" />
-          <Text className="ml-1 text-xs font-semibold text-blue-950">
-            {date.toLocaleDateString() == new Date().toLocaleDateString() ? "Hari ini" : date?.toLocaleDateString()}
-          </Text>
+        <TouchableOpacity onPress={() => setAscending(!ascending)} className="ml-1">
+          <Icon name={`${ascending ? "sort-desc" : "sort-asc"}`} size={20} color="#172554" />
         </TouchableOpacity>
       </View>
       <ScrollView horizontal>
@@ -320,10 +312,10 @@ const Table = ({ history }) => {
               </View>
             </View>
           </View>
-          <View
-            // nestedScrollEnabled
+          <ScrollView
+            nestedScrollEnabled
             // ref={scrollViewRef}
-            className="h-fit border-b border-blue-800 bg-white">
+            className={"min-h-[470px] border-b border-blue-800 bg-white"}>
             {getPaginatedItems(
               [...history].filter((item) => new Date(item.date).toLocaleDateString() == date?.toLocaleDateString())
               // [...history]
@@ -332,18 +324,26 @@ const Table = ({ history }) => {
               .map((item, i) => (
                 <RowData key={i} id={item.id} data={history} />
               ))}
-          </View>
+            {getPaginatedItems(
+              [...history].filter((item) => new Date(item.date).toLocaleDateString() == date?.toLocaleDateString())
+              // [...history]
+            ).length == 0 && (
+              <View className="mt-48 ml-24">
+                <Text className="text-xl">Tidak ada Data :(</Text>
+              </View>
+            )}
+          </ScrollView>
         </View>
       </ScrollView>
       <View className="mx-auto w-full flex-row items-center justify-center rounded-b-md bg-blue-800 py-2">
         <TouchableOpacity
           className="mr-4"
-          disabled={currentPage == 1}
+          disabled={currentPage == 1 || totalPage == 0}
           onPress={() => {
             if (currentPage == 1) return ToastAndroid.show(`sudah history paling awal`, ToastAndroid.SHORT);
             setCurrentPage(currentPage - 1);
           }}>
-          <Icon name="arrow-left-s-line" color={`${currentPage == 1 ? "gray" : "white"}`} />
+          <Icon name="arrow-left-s-line" color={`${currentPage == 1 || totalPage == 0 ? "gray" : "white"}`} />
         </TouchableOpacity>
         <Text className="mr-4 text-lg font-semibold text-white">{currentPage}</Text>
         <TouchableOpacity
@@ -352,7 +352,7 @@ const Table = ({ history }) => {
             if (currentPage == totalPage) return ToastAndroid.show(`sudah history paling akhir`, ToastAndroid.SHORT);
             setCurrentPage(currentPage + 1);
           }}>
-          <Icon name="arrow-right-s-line" color={`${currentPage == totalPage ? "gray" : "white"}`} />
+          <Icon name="arrow-right-s-line" color={`${currentPage == totalPage || totalPage == 0 ? "gray" : "white"}`} />
         </TouchableOpacity>
       </View>
     </View>
