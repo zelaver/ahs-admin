@@ -47,9 +47,15 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, curDa
   };
 
   return (
-    <View className="pesanan-item mb-4 flex-row items-center justify-between rounded-lg border bg-white p-2.5 shadow-lg">
+    <View className="pesanan-item mb-4 flex-row items-center justify-between rounded-lg border border-blue-950 bg-white p-2.5 shadow-lg">
       <CustomerLogo customerId={curCustomerId} date={curDate} />
       <StatusEdit status={curStatus} handleEdit={handleEdit} />
+      {/* <TouchableOpacity
+        onPress={() => {
+          console.log(curDate);
+        }}>
+        <Text>debug</Text>
+      </TouchableOpacity> */}
       <BottomSheetOrderItem
         bottomSheetModalRef={bottomSheetModalRef}
         id={id}
@@ -117,7 +123,7 @@ const StatusEdit = ({ status, handleEdit }) => {
         </Text>
       )}
       <TouchableOpacity onPress={handleEdit} activeOpacity={0.9}>
-        <Icon name="pencil-line" size={16} />
+        <Icon name="pencil-line" size={20} />
       </TouchableOpacity>
     </View>
   );

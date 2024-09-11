@@ -1,5 +1,6 @@
 import CartItem from "@/components/CartItem";
 import Handle from "@/components/CustomHandle";
+import DatePicker from "@/components/DatePicker";
 import OrderItem from "@/components/OrderItem";
 import images from "@/constants/images";
 import { useGlobalContext } from "@/context/GlobalProvider";
@@ -33,6 +34,12 @@ const Pesanan = () => {
 
   const [filterStatus, setFilterStatus] = useState("lunas");
 
+  const [dateFilter, setDateFilter] = useState(new Date());
+  const onDateChange = (e, selectedDate) => {
+    console.log(selectedDate);
+    setDateFilter(selectedDate);
+  };
+
   const [ascending, setAscending] = useState(false);
   const sort = (a, b) => {
     if (ascending) {
@@ -55,6 +62,9 @@ const Pesanan = () => {
         <View className="section-1 flex-row items-center px-5 py-2">
           <Icon name="file-list-fill" color="#172554" size={26} />
           <Text className="ml-2 text-2xl font-semibold text-blue-950">Pesanan</Text>
+          <TouchableOpacity onPress={() => setAscending(!ascending)} className="ml-auto">
+            <Icon name={`${ascending ? "sort-desc" : "sort-asc"}`} size={24} color="#172554" />
+          </TouchableOpacity>
         </View>
         <View className="section-2 flex-row items-center px-5">
           <View className={`mr-2 flex-1 flex-row items-center rounded-md py-1`}>
@@ -91,9 +101,8 @@ const Pesanan = () => {
               </Text>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={() => setAscending(!ascending)} className="ml-3">
-            <Icon name={`${ascending ? "sort-desc" : "sort-asc"}`} size={24} color="#172554" />
-          </TouchableOpacity>
+          <DatePicker date={dateFilter} setDate={setDateFilter} onDateChange={onDateChange} customStyle="ml-auto py-1.5" />
+          
         </View>
       </View>
       <ScrollView
@@ -103,6 +112,7 @@ const Pesanan = () => {
           <View className="section-3 px-5 py-3">
             {[...transactions]
               .filter((item) => item.status == filterStatus)
+              .filter((item) => new Date(item.date).toLocaleDateString() == dateFilter?.toLocaleDateString())
               .sort((a, b) => sort(b.id, a.id))
               .map((item: any, i: any) => (
                 <OrderItem

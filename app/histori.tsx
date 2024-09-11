@@ -254,29 +254,12 @@ const Table = ({ history }) => {
     );
   };
 
-  // const showDateMode = (currentMode) => {
-  //   DateTimePickerAndroid.open({
-  //     value: date,
-  //     onChange: onDateChange,
-  //     mode: currentMode,
-  //     is24Hour: true,
-  //   });
-  // };
-
-  // const showDatepicker = () => {
-  //   showDateMode("date");
-  // };
-
-  // const showTimepicker = () => {
-  //   showDateMode("time");
-  // };
-
   return (
-    <View className="section-2 table px-5">
-      <View className="section-1 flex-row items-center justify-between py-2">
+    <View className="main table px-5">
+      <View className="judul flex-row items-center justify-between py-2">
         <View className="flex-row items-center">
           <Text className="mr-2.5 text-lg font-semibold text-blue-950">Stock</Text>
-          <DatePicker date={date} setDate={setDate} onDateChange={onDateChange} />
+          <DatePicker date={date} setDate={setDate} onDateChange={onDateChange} customStyle="rounded-sm"/>
         </View>
         <TouchableOpacity onPress={() => setAscending(!ascending)} className="ml-1">
           <Icon name={`${ascending ? "sort-desc" : "sort-asc"}`} size={20} color="#172554" />

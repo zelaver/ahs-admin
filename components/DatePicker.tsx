@@ -25,9 +25,9 @@ const DatePicker = ({ date, setDate, onDateChange, customStyle = '' }) => {
     <TouchableOpacity
       activeOpacity={0.5}
       onPress={showDatepicker}
-      className={`flex-row items-center justify-start rounded-md border border-blue-950 px-2 py-1 ${customStyle}`}>
-      <Icon name="calendar-line" size={16} color="#172554" />
-      <Text className={`ml-1 text-xs font-semibold text-blue-950`}>
+      className={`flex-row items-center justify-start rounded-md border border-blue-800 px-2 py-1 ${customStyle}`}>
+      <Icon name="calendar-line" size={16} color="#1e40af" />
+      <Text className={`ml-1 text-xs font-semibold text-blue-800`}>
         {date.toLocaleDateString() == new Date().toLocaleDateString() ? "Hari ini" : date?.toLocaleDateString()}
       </Text>
     </TouchableOpacity>
