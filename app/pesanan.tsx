@@ -7,11 +7,11 @@ import { useGlobalContext } from "@/context/GlobalProvider";
 import { addHistory, addTransaction, getContact, getTransactions } from "@/database/db";
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import React, { memo, useCallback, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   RefreshControl,
-  SafeAreaView,
   ScrollView,
   Switch,
   Text,
@@ -21,26 +21,115 @@ import {
 } from "react-native";
 import CurrencyInput from "react-native-currency-input";
 import { SelectList } from "react-native-dropdown-select-list";
-import Popover from "react-native-popover-view/dist/Popover";
+import Popover from "react-native-popover-view";
 import Icon from "react-native-remix-icon";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+const { Navigator, Screen } = createMaterialTopTabNavigator();
 
 const Pesanan = () => {
-  // const [query, setQuery] = useState<string>();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
   }, []);
-  const { transactions, fetchTransactions } = useGlobalContext();
-
-  const [filterStatus, setFilterStatus] = useState("lunas");
-
+  const [ascending, setAscending] = useState(false);
   const [dateFilter, setDateFilter] = useState(new Date());
+  const { transactions } = useGlobalContext();
   const onDateChange = (e, selectedDate) => {
     console.log(selectedDate);
     setDateFilter(selectedDate);
   };
 
-  const [ascending, setAscending] = useState(false);
+  return (
+    <>
+      <SafeAreaView className="bg-blue-800">
+        <View className="section-1 flex-row items-center px-5 py-2.5">
+          <Icon name="file-list-fill" color="#eff6ff" size={26} />
+          <Text className="ml-2 text-2xl font-semibold text-blue-50">Pesanan</Text>
+          <DatePicker
+            date={dateFilter}
+            setDate={setDateFilter}
+            onDateChange={onDateChange}
+            containerStyle="ml-auto py-1.5 border-blue-50 "
+            textStyle="text-blue-50"
+            iconColor="#eff6ff"
+          />
+          <TouchableOpacity onPress={() => setAscending(!ascending)} className="ml-2">
+            <Icon name={`${ascending ? "sort-desc" : "sort-asc"}`} size={24} color="#eff6ff" />
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+      <Navigator
+        screenOptions={{
+          tabBarLabelStyle: { fontWeight: "bold" },
+          tabBarActiveTintColor: "#1e40af",
+          tabBarIndicatorStyle: { backgroundColor: "#1e40af" },
+        }}>
+        <Screen
+          name="Hutang"
+          children={() => (
+            <OrderList
+              items={[...transactions].filter((item) => item.status == "hutang")}
+              dateFilter={dateFilter}
+              ascending={ascending}
+            />
+          )}
+          options={{
+            title: "Hutang",
+            // tabBarLabelStyle: { color: "#ef4444", fontWeight: "bold" },
+            // tabBarIndicatorStyle: { backgroundColor: "#ef4444" },
+          }}
+        />
+        <Screen
+          name="Pinjam"
+          children={() => (
+            <OrderList
+              items={[...transactions].filter((item) => item.status == "pinjam")}
+              dateFilter={dateFilter}
+              ascending={ascending}
+            />
+          )}
+          options={{
+            title: "Pinjam",
+            // tabBarLabelStyle: { color: "#eab308", fontWeight: "bold" },
+            // tabBarIndicatorStyle: { backgroundColor: "#eab308" },
+          }}
+        />
+        <Screen
+          name="Lunas"
+          children={() => (
+            <OrderList
+              items={[...transactions].filter((item) => item.status == "lunas")}
+              dateFilter={dateFilter}
+              ascending={ascending}
+            />
+          )}
+          options={{
+            title: "Lunas",
+            // tabBarLabelStyle: { color: "#22c55e", fontWeight: "bold" },
+            // tabBarIndicatorStyle: { backgroundColor: "#22c55e" },
+          }}
+        />
+      </Navigator>
+      <BottomSheetAddPesanan bottomSheetModalRef={bottomSheetModalRef} />
+      <TouchableOpacity
+        onPress={handlePresentModalPress}
+        activeOpacity={0.8}
+        className="absolute bottom-10 right-5 rounded-full border bg-blue-800">
+        <Icon name="add-fill" size={40} color="white"></Icon>
+      </TouchableOpacity>
+    </>
+  );
+};
+
+const OrderList = ({ items, dateFilter, ascending }: { items: any[]; dateFilter: Date; ascending: boolean }) => {
+  const { fetchTransactions } = useGlobalContext();
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchTransactions();
+    setRefreshing(false);
+  };
   const sort = (a, b) => {
     if (ascending) {
       return b - a;
@@ -48,94 +137,31 @@ const Pesanan = () => {
       return a - b;
     }
   };
-
-  const [refreshing, setRefreshing] = useState(false);
-  const onRefresh = () => {
-    setRefreshing(true);
-    fetchTransactions();
-    setRefreshing(false);
-  };
-
   return (
-    <SafeAreaView className="flex-1 bg-blue-50 pt-8">
-      <View className="header border-b border-gray-500 pb-4">
-        <View className="section-1 flex-row items-center px-5 py-2">
-          <Icon name="file-list-fill" color="#172554" size={26} />
-          <Text className="ml-2 text-2xl font-semibold text-blue-950">Pesanan</Text>
-          <TouchableOpacity onPress={() => setAscending(!ascending)} className="ml-auto">
-            <Icon name={`${ascending ? "sort-desc" : "sort-asc"}`} size={24} color="#172554" />
-          </TouchableOpacity>
-        </View>
-        <View className="section-2 flex-row items-center px-5">
-          <View className={`mr-2 flex-1 flex-row items-center rounded-md py-1`}>
-            <TouchableOpacity
-              onPress={() => {
-                setFilterStatus("hutang");
-              }}
-              activeOpacity={1}
-              className="mr-2">
-              <Text
-                className={`w-min-[67px] rounded-md border border-red-500 px-3 py-1 text-center text-sm font-bold ${filterStatus == "hutang" ? "bg-red-500 text-white" : "bg-red-100 text-red-600"} `}>
-                Hutang
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setFilterStatus("pinjam");
-              }}
-              activeOpacity={1}
-              className="mr-2">
-              <Text
-                className={`w-min-[67px] rounded-md border border-yellow-500 px-3 py-1 text-center text-sm font-bold ${filterStatus == "pinjam" ? "bg-yellow-500 text-white" : "bg-yellow-100 text-yellow-500"}`}>
-                Pinjam
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setFilterStatus("lunas");
-              }}
-              activeOpacity={1}>
-              <Text
-                className={`w-min-[67px] rounded-md border border-green-500 px-3 py-1 text-center text-sm font-bold ${filterStatus == "lunas" ? "bg-green-500 text-white" : "bg-green-100 text-green-600"}`}>
-                Lunas
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <DatePicker date={dateFilter} setDate={setDateFilter} onDateChange={onDateChange} customStyle="ml-auto py-1.5" />
-          
+    <ScrollView
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      className="bg-blue-50">
+      <View className="main pb-16">
+        <View className="section-3 px-5 py-3">
+          {[...items]
+            // .filter((item) => item.status == filterStatus)
+            .filter((item) => new Date(item.date).toLocaleDateString() == dateFilter?.toLocaleDateString())
+            .sort((a, b) => sort(b.id, a.id))
+            .map((item: any, i: any) => (
+              <OrderItem
+                key={i}
+                curCustomerId={item.customerId}
+                curStatus={item.status}
+                curDate={item.date}
+                curOngkir={item.ongkir}
+                total_price={item.total_price}
+                id={item.id}
+                orderList={item.orderList}
+              />
+            ))}
         </View>
       </View>
-      <ScrollView
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-        className="bg-blue-50">
-        <View className="main pb-16">
-          <View className="section-3 px-5 py-3">
-            {[...transactions]
-              .filter((item) => item.status == filterStatus)
-              .filter((item) => new Date(item.date).toLocaleDateString() == dateFilter?.toLocaleDateString())
-              .sort((a, b) => sort(b.id, a.id))
-              .map((item: any, i: any) => (
-                <OrderItem
-                  key={i}
-                  curCustomerId={item.customerId}
-                  curStatus={item.status}
-                  curDate={item.date}
-                  curOngkir={item.ongkir}
-                  total_price={item.total_price}
-                  id={item.id}
-                  orderList={item.orderList}
-                />
-              ))}
-          </View>
-        </View>
-      </ScrollView>
-      <BottomSheetAddPesanan bottomSheetModalRef={bottomSheetModalRef} />
-      <TouchableOpacity
-        onPress={handlePresentModalPress}
-        className="absolute bottom-10 right-5 rounded-full border bg-blue-800">
-        <Icon name="add-fill" size={40} color="white"></Icon>
-      </TouchableOpacity>
-    </SafeAreaView>
+    </ScrollView>
   );
 };
 
