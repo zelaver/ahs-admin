@@ -254,12 +254,27 @@ const Table = ({ history }) => {
     );
   };
 
+  useEffect(() => {
+    setTotalPage(
+      Math.ceil(
+        [...history].filter((item) => new Date(item.date).toLocaleDateString() == date?.toLocaleDateString()).length /
+          itemsPerPage
+      )
+    );
+    // setCurrentPage(
+    //   Math.ceil(
+    //     [...history].filter((item) => new Date(item.date).toLocaleDateString() == date?.toLocaleDateString()).length /
+    //       itemsPerPage
+    //   )
+    // );
+  }, [history]);
+
   return (
     <View className="main table px-5">
       <View className="judul flex-row items-center justify-between py-2">
         <View className="flex-row items-center">
           <Text className="mr-2.5 text-lg font-semibold text-blue-950">Stock</Text>
-          <DatePicker date={date} setDate={setDate} onDateChange={onDateChange} customStyle="rounded-sm"/>
+          <DatePicker date={date} setDate={setDate} onDateChange={onDateChange} customStyle="rounded-sm" />
         </View>
         <TouchableOpacity onPress={() => setAscending(!ascending)} className="ml-1">
           <Icon name={`${ascending ? "sort-desc" : "sort-asc"}`} size={20} color="#172554" />
@@ -300,8 +315,9 @@ const Table = ({ history }) => {
             // ref={scrollViewRef}
             className={"min-h-[470px] border-b border-blue-800 bg-white"}>
             {getPaginatedItems(
-              [...history].filter((item) => new Date(item.date).toLocaleDateString() == date?.toLocaleDateString())
-              // [...history]
+              [...history]
+                .filter((item) => new Date(item.date).toLocaleDateString() == date?.toLocaleDateString())
+                .sort((a, b) => b.id - a.id)
             )
               .sort((a, b) => sort(b.id, a.id))
               .map((item, i) => (
@@ -311,7 +327,7 @@ const Table = ({ history }) => {
               [...history].filter((item) => new Date(item.date).toLocaleDateString() == date?.toLocaleDateString())
               // [...history]
             ).length == 0 && (
-              <View className="mt-48 ml-24">
+              <View className="ml-24 mt-48">
                 <Text className="text-xl">Tidak ada Data :(</Text>
               </View>
             )}
