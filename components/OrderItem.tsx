@@ -70,6 +70,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, curDa
   );
 };
 
+// Interface Component
 const CustomerLogo = ({ customerId, date }: { customerId: number; date: string }) => {
   const [customerName, setCustomerName] = useState<string>("");
   const [customerType, setCustomerType] = useState<number>();
@@ -103,7 +104,6 @@ const CustomerLogo = ({ customerId, date }: { customerId: number; date: string }
     </View>
   );
 };
-
 const StatusEdit = ({ status, handleEdit }) => {
   return (
     <View className="flex-row items-center">
@@ -746,6 +746,7 @@ const BottomSheetOrderItem = ({
   );
 };
 
+// Bottomsheet Component
 const DateInput = ({ date, setDate }) => {
   const onDateChange = (event, selectedDate) => {
     const currentDate = selectedDate;
