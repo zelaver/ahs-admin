@@ -163,6 +163,24 @@ export default function RootLayout() {
               }}
             />
             <Tabs.Screen
+              name="dev"
+              options={{
+                title: "dev",
+                href: null,
+                tabBarIcon: ({
+                  color,
+                  focused,
+                }) => (
+                  <TabIcon
+                    icon={"file-list"}
+                    color={color}
+                    name="Dev"
+                    focused={focused}
+                  />
+                ),
+              }}
+            />
+            <Tabs.Screen
               name="debug"
               options={{
                 title: "debug",
