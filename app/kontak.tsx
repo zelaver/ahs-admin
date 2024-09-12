@@ -8,7 +8,6 @@ import {
   ActivityIndicator,
   BackHandler,
   RefreshControl,
-  SafeAreaView,
   ScrollView,
   Text,
   TextInput,
@@ -17,6 +16,7 @@ import {
 } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Icon from "react-native-remix-icon";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useDebounce } from 'use-debounce';
 
 const Kontak = () => {
@@ -98,13 +98,13 @@ const Kontak = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-blue-50 pt-8">
-      <View className="Header border-b border-gray-500 pb-4">
-        <View className="section-1 flex-row items-center px-5 py-2">
-          <Icon name="contacts-book-2-fill" color="#172554" size={26} />
-          <Text className="ml-2 text-2xl font-semibold text-blue-950">Kontak</Text>
+    <SafeAreaView className="flex-1 bg-blue-800 ">
+      <View className="Header border-b border-gray-500 py-2.5">
+        <View className="section-1 flex-row items-center px-5">
+          <Icon name="contacts-book-2-fill" color="#eff6ff" size={26} />
+          <Text className="ml-2 text-2xl font-semibold text-blue-50">Kontak</Text>
         </View>
-        <View className="section-2 flex-row items-center justify-between px-5">
+        <View className="section-2 flex-row items-center justify-between px-5 py-2">
           <View className={`mr-2 flex-1 flex-row items-center rounded-md border bg-white px-2 py-1`}>
             <TextInput
               className="mr-2 flex-1 items-center justify-center text-xs font-normal"

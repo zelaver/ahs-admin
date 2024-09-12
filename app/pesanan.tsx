@@ -46,17 +46,17 @@ const Pesanan = () => {
         <View className="section-1 flex-row items-center px-5 py-2.5">
           <Icon name="file-list-fill" color="#eff6ff" size={26} />
           <Text className="ml-2 text-2xl font-semibold text-blue-50">Pesanan</Text>
+          <TouchableOpacity onPress={() => setAscending(!ascending)} className="ml-2">
+            <Icon name={`${ascending ? "sort-desc" : "sort-asc"}`} size={24} color="#eff6ff" />
+          </TouchableOpacity>
           <DatePicker
             date={dateFilter}
             setDate={setDateFilter}
             onDateChange={onDateChange}
-            containerStyle="ml-auto py-1.5 border-blue-50 "
-            textStyle="text-blue-50"
-            iconColor="#eff6ff"
+            containerStyle="ml-auto py-1.5 bg-white "
+            textStyle="text-blue-800"
+            iconColor="#1e40af"
           />
-          <TouchableOpacity onPress={() => setAscending(!ascending)} className="ml-2">
-            <Icon name={`${ascending ? "sort-desc" : "sort-asc"}`} size={24} color="#eff6ff" />
-          </TouchableOpacity>
         </View>
       </SafeAreaView>
       <Navigator

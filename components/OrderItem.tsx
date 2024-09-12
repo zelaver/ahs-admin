@@ -47,7 +47,7 @@ const OrderItem = ({ id, orderList, curCustomerId, curStatus, total_price, curDa
   };
 
   return (
-    <View className="pesanan-item mb-4 flex-row items-center justify-between rounded-lg border border-blue-950 bg-white p-2.5 shadow-lg">
+    <View className="pesanan-item mb-4 flex-row items-center justify-between rounded-lg border border-blue-950 bg-white p-2.5 shadow">
       <CustomerLogo customerId={curCustomerId} date={curDate} />
       <StatusEdit status={curStatus} handleEdit={handleEdit} />
       {/* <TouchableOpacity
@@ -108,22 +108,22 @@ const StatusEdit = ({ status, handleEdit }) => {
   return (
     <View className="flex-row items-center">
       {status == "hutang" && (
-        <Text className="mr-2 w-[67px] rounded-md bg-red-500 px-3 py-1 text-center text-xs font-semibold text-gray-50">
+        <Text className="w-max-[70px] mr-2 rounded-md border border-red-500 px-3 py-1 text-center text-sm font-semibold text-red-500">
           Hutang
         </Text>
       )}
       {status == "pinjam" && (
-        <Text className="mr-2 w-[67px] rounded-md bg-yellow-500 px-3 py-1 text-center text-xs font-semibold text-gray-50">
+        <Text className="w-max-[70px] mr-2 rounded-md border border-yellow-500 px-3 py-1 text-center text-sm font-semibold text-yellow-500">
           Pinjam
         </Text>
       )}
       {status == "lunas" && (
-        <Text className="mr-2 w-[67px] rounded-md bg-green-500 px-3 py-1 text-center text-xs font-semibold text-gray-50">
+        <Text className="w-max-[70px] mr-2 rounded-md border  border-green-500 px-3 py-1 text-center text-sm font-semibold text-green-500">
           Lunas
         </Text>
       )}
       <TouchableOpacity onPress={handleEdit} activeOpacity={0.9}>
-        <Icon name="pencil-line" size={20} />
+        <Icon name="pencil-line" size={20} color="#172554"/>
       </TouchableOpacity>
     </View>
   );
