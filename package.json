@@ -45,6 +45,7 @@
     "react-native-dropdown-select-list": "^2.0.5",
     "react-native-gesture-handler": "~2.16.1",
     "react-native-gifted-charts": "^1.4.30",
+    "react-native-pager-view": "^6.4.1",
     "react-native-popover-view": "^5.1.8",
     "react-native-reanimated": "~3.10.1",
     "react-native-redash": "^18.1.3",
