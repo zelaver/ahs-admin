@@ -232,7 +232,7 @@ const Table = ({ history }) => {
         itemsPerPage
     )
   );
-  const [currentPage, setCurrentPage] = useState(totalPage);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const getPaginatedItems = (items: any[]) => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -274,7 +274,7 @@ const Table = ({ history }) => {
       <View className="judul flex-row items-center justify-between py-2">
         <View className="flex-row items-center">
           <Text className="mr-2.5 text-lg font-semibold text-blue-950">Stock</Text>
-          <DatePicker date={date} setDate={setDate} onDateChange={onDateChange} customStyle="rounded-sm" />
+          <DatePicker date={date} setDate={setDate} onDateChange={onDateChange} containerStyle="rounded-sm" />
         </View>
         <TouchableOpacity onPress={() => setAscending(!ascending)} className="ml-1">
           <Icon name={`${ascending ? "sort-desc" : "sort-asc"}`} size={20} color="#172554" />
@@ -323,10 +323,8 @@ const Table = ({ history }) => {
               .map((item, i) => (
                 <RowData key={i} id={item.id} data={history} />
               ))}
-            {getPaginatedItems(
-              [...history].filter((item) => new Date(item.date).toLocaleDateString() == date?.toLocaleDateString())
-              // [...history]
-            ).length == 0 && (
+            {[...history].filter((item) => new Date(item.date).toLocaleDateString() == date?.toLocaleDateString())
+              .length == 0 && (
               <View className="ml-24 mt-48">
                 <Text className="text-xl">Tidak ada Data :(</Text>
               </View>
