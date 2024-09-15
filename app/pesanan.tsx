@@ -60,6 +60,7 @@ const Pesanan = () => {
         </View>
       </SafeAreaView>
       <Navigator
+        initialRouteName="Lunas"
         screenOptions={{
           tabBarLabelStyle: { fontWeight: "bold" },
           tabBarActiveTintColor: "#1e40af",
