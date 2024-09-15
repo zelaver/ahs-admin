@@ -17,7 +17,7 @@ import {
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Icon from "react-native-remix-icon";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useDebounce } from 'use-debounce';
+import { useDebounce } from "use-debounce";
 
 const Kontak = () => {
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -61,7 +61,7 @@ const Kontak = () => {
   // const [isLoading, setIsLoading] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState(false);
   const [query, setQuery] = useState<string>();
-  const [value] = useDebounce(query, 600)
+  const [value] = useDebounce(query, 600);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -98,7 +98,7 @@ const Kontak = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-blue-800 ">
+    <SafeAreaView className="flex-1 bg-blue-800">
       <View className="Header border-b border-gray-500 py-2.5">
         <View className="section-1 flex-row items-center px-5">
           <Icon name="contacts-book-2-fill" color="#eff6ff" size={26} />

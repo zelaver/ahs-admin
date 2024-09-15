@@ -85,9 +85,9 @@ export default function Home() {
 
 const Header = () => {
   return (
-    <View className="section-1 px-5 py-2 flex-row items-center">
-      <Icon name="home-4-fill" color="#172554" size={26}/>
-      <Text className="text-2xl font-semibold text-blue-950 ml-2">Home</Text>
+    <View className="section-1 flex-row items-center px-5 py-2">
+      <Icon name="home-4-fill" color="#172554" size={26} />
+      <Text className="ml-2 text-2xl font-semibold text-blue-950">Home</Text>
     </View>
   );
 };

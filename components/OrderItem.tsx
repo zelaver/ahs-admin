@@ -118,12 +118,12 @@ const StatusEdit = ({ status, handleEdit }) => {
         </Text>
       )}
       {status == "lunas" && (
-        <Text className="w-max-[70px] mr-2 rounded-md border  border-green-500 px-3 py-1 text-center text-sm font-semibold text-green-500">
+        <Text className="w-max-[70px] mr-2 rounded-md border border-green-500 px-3 py-1 text-center text-sm font-semibold text-green-500">
           Lunas
         </Text>
       )}
       <TouchableOpacity onPress={handleEdit} activeOpacity={0.9}>
-        <Icon name="pencil-line" size={20} color="#172554"/>
+        <Icon name="pencil-line" size={20} color="#172554" />
       </TouchableOpacity>
     </View>
   );
