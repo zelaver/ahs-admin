@@ -84,7 +84,7 @@ const OrderItemBottomSheet = ({
     }
   };
   const fetchOrderList = () => {
-    let parsedList = orderList == "string" ? JSON.parse(orderList) : orderList;
+    let parsedList = typeof orderList == "string" ? JSON.parse(orderList) : orderList;
 
     setAquaVal(parsedList[0].sum);
     setIsiUlangVal(parsedList[1].sum);
