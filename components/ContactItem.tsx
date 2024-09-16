@@ -139,14 +139,14 @@ const ContactItem = ({ index, name, address, phone, isSubscriber, id, fetchConta
           <Icon name="pencil-line" size={20} color="#172554" />
         </TouchableOpacity>
       </View>
-      <View className="rounded-lg border bg-white shadow-lg">
-        <View className="phone flex-row items-center border-b">
+      <View className="rounded-lg  bg-white shadow-lg">
+        <View className="phone flex-row items-center ">
           <View className="mr-3 rounded-tl-md bg-blue-800 p-2">
             <Icon name="phone-line" size={20} color="white" />
           </View>
           <Text className="text-sm font-normal">{phone}</Text>
         </View>
-        <View className="jenis flex-row items-center border-b">
+        <View className="jenis flex-row items-center ">
           <View className="mr-3 bg-blue-800 p-2">
             <Icon name={`${isSubscriber ? "home-smile-2-line" : "user-3-line"}`} size={20} color="white" />
           </View>

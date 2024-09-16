@@ -98,8 +98,8 @@ const Kontak = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-blue-800">
-      <View className="Header border-b border-gray-500 py-2.5">
+    <SafeAreaView className="flex-1 bg-blue-800 ">
+      <View className="Header border-b border-black py-2.5">
         <View className="section-1 flex-row items-center px-5">
           <Icon name="contacts-book-2-fill" color="#eff6ff" size={26} />
           <Text className="ml-2 text-2xl font-semibold text-blue-50">Kontak</Text>
@@ -123,7 +123,7 @@ const Kontak = () => {
         </View>
       </View>
       <ScrollView
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} className="bg-blue-50" />}>
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} className="bg-blue-100" />}>
         <View className="main pb-20">
           <View className="section-3 px-5 py-1.5">
             {[...contacts]
