@@ -141,7 +141,7 @@ const OrderList = ({ items, dateFilter, ascending }: { items: any[]; dateFilter:
   return (
     <ScrollView
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-      className="bg-blue-50">
+      className="bg-blue-100">
       <View className="main pb-16">
         <View className="section-3 px-5 py-3">
           {[...items]
@@ -154,10 +154,12 @@ const OrderList = ({ items, dateFilter, ascending }: { items: any[]; dateFilter:
                 curCustomerId={item.customerId}
                 curStatus={item.status}
                 curDate={item.date}
-                curOngkir={item.ongkir}
-                total_price={item.total_price}
+                // handlePresentModalPress={handlePresentModalPress}
+                // bottomSheetModalRef={bottomSheetModalRef}
                 id={item.id}
                 orderList={item.orderList}
+                curOngkir={item.ongkir}
+                total_price={item.total_price}
               />
             ))}
         </View>
