@@ -13,6 +13,7 @@ import Popover from "react-native-popover-view";
 import Icon from "react-native-remix-icon";
 
 const OrderItemBottomSheet = ({
+  editable = true,
   bottomSheetModalRef,
   id,
   orderList,
@@ -380,29 +381,35 @@ const OrderItemBottomSheet = ({
           <View className="customer px-3">
             <Text className="mb-2.5 text-sm font-semibold">Customer:</Text>
             <View className="rounded-md px-3">
-              <SelectList
-                data={[
-                  ...customers.map((item, i) => {
-                    return { key: item.id, value: item.name };
-                  }),
-                ]}
-                setSelected={(val: any) => {
-                  if (!val) return ToastAndroid.show("Customer tidak terpilih", ToastAndroid.SHORT);
-                  handleSelected(val);
-                }}
-                defaultOption={{
-                  key: curCustomerId,
-                  value: customers?.find((item) => item.id == curCustomerId)?.name,
-                }}
-                // setSelected={val => console.log(val)}
+              {editable ?
+                <SelectList
+                  data={[
+                    ...customers.map((item, i) => {
+                      return { key: item.id, value: item.name };
+                    }),
+                  ]}
+                  setSelected={(val: any) => {
+                    if (!val) return ToastAndroid.show("Customer tidak terpilih", ToastAndroid.SHORT);
+                    handleSelected(val);
+                  }}
+                  defaultOption={{
+                    key: curCustomerId,
+                    value: customers?.find((item) => item.id == curCustomerId)?.name,
+                  }}
+                  // setSelected={val => console.log(val)}
 
-                placeholder="pilih pelanggan"
-                searchPlaceholder="cari pelanggan"
-              />
+                  placeholder="pilih pelanggan"
+                  searchPlaceholder="cari pelanggan"
+                />
+              : <View className="rounded-lg border border-gray-600 px-5 py-3">
+                  <Text>{customers?.find((item) => item.id == curCustomerId)?.name}</Text>
+                </View>
+              }
             </View>
           </View>
           <View className="cart mb-6 border-b border-t py-4">
             <CartItem
+              editable={editable}
               name="Aqua"
               image={images.aqua}
               price={customerType == 0 ? products[0]?.price : products[0]?.subs_price}
@@ -413,6 +420,7 @@ const OrderItemBottomSheet = ({
               stok={history?.stock_aqua}
             />
             <CartItem
+              editable={editable}
               name="Isi Ulang"
               image={images.isiUlang}
               price={customerType == 0 ? products[1]?.price : products[1]?.subs_price}
@@ -423,6 +431,7 @@ const OrderItemBottomSheet = ({
               stok={history?.stock_isi_ulang}
             />
             <CartItem
+              editable={editable}
               name="Gas 12 kg"
               image={images.gas12Kg}
               price={customerType == 0 ? products[2]?.price : products[2]?.subs_price}
@@ -433,6 +442,7 @@ const OrderItemBottomSheet = ({
               stok={history?.stock_gas_12kg}
             />
             <CartItem
+              editable={editable}
               name="Galon Kosong"
               image={images.galonKosong}
               val={galonKosongVal}
@@ -442,6 +452,7 @@ const OrderItemBottomSheet = ({
               stok={history?.stock_galon_kosong}
             />
             <CartItem
+              editable={editable}
               name="Gas Kosong"
               image={images.gasKosong}
               val={gasKosongVal}
@@ -450,7 +461,7 @@ const OrderItemBottomSheet = ({
               total={total}
               stok={history?.stock_gas_kosong}
             />
-            <View className="add px-5">
+            <View className={`add px-5 ${!editable && "hidden"}`}>
               <Popover
                 animationConfig={{ duration: 200 }}
                 arrowSize={{ width: 0, height: 0 }}
@@ -524,15 +535,20 @@ const OrderItemBottomSheet = ({
               </Popover>
             </View>
           </View>
-          <ShippingCostInput
-            ongkir={ongkir}
-            setOngkir={setOngkir}
-            curOngkir={curOngkir}
-            total={total}
-            setTotal={setTotal}
-            antar={antar}
-            setAntar={setAntar}
-          />
+          {editable ?
+            <ShippingCostInput
+              ongkir={ongkir}
+              setOngkir={setOngkir}
+              curOngkir={curOngkir}
+              total={total}
+              setTotal={setTotal}
+              antar={antar}
+              setAntar={setAntar}
+            />
+          : <View className="rounded-lg border border-gray-600 px-5 py-3">
+              <Text>{customers?.find((item) => item.id == curCustomerId)?.name}</Text>
+            </View>
+          }
           <View className={`total px-3 ${status == 1 && "hidden"} mb-6`}>
             <View className="flex-row items-center justify-between rounded-lg bg-blue-800 px-3 py-2">
               <Text className="text-base font-bold text-gray-50">Total pembayaran</Text>
@@ -544,6 +560,7 @@ const OrderItemBottomSheet = ({
             <Text className="mb-2.5 text-sm font-semibold">Status:</Text>
             <View className="status-boxes flex-row gap-x-3 self-center">
               <TouchableOpacity
+                disabled={!editable}
                 onPress={() => {
                   setStatus("hutang");
                   setGalonKosongVal(0);
@@ -556,6 +573,7 @@ const OrderItemBottomSheet = ({
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
+                disabled={!editable}
                 onPress={() => {
                   setStatus("pinjam");
                   setAquaVal(0);
@@ -572,6 +590,7 @@ const OrderItemBottomSheet = ({
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
+                disabled={!editable}
                 onPress={() => {
                   if (curStatus == "pinjam") {
                     setStatus("lunas");
@@ -590,30 +609,38 @@ const OrderItemBottomSheet = ({
             </View>
           </View>
           <View className="action-button px-3">
-            <TouchableOpacity
-              className={`rounded-lg ${isLoading ? "bg-blue-900" : "bg-blue-800"} mb-2.5 px-3 py-2`}
-              activeOpacity={0.9}
-              disabled={isLoading}
-              onPress={async () => {
-                setIsLoading(true);
-                await handleSave();
-                setIsLoading(false);
-              }}>
-              <ActivityIndicator size={"small"} color={"#ffff"} className={`${!isLoading && "hidden"}`} />
-              <Text className={`text-center text-xs font-semibold text-gray-100 ${isLoading && "hidden"}`}>Simpan</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              className={`rounded-lg ${isLoading ? "bg-red-600" : "bg-red-500"} border px-3 py-2`}
-              activeOpacity={0.9}
-              disabled={isLoading}
-              onPress={async () => {
-                setIsLoading(true);
-                await handleDelete();
-                setIsLoading(false);
-              }}>
-              <ActivityIndicator size={"small"} color={"#ffff"} className={`${!isLoading && "hidden"}`} />
-              <Text className={`text-center text-xs font-semibold text-gray-100 ${isLoading && "hidden"}`}>Hapus</Text>
-            </TouchableOpacity>
+            {editable && (
+              <>
+                <TouchableOpacity
+                  className={`rounded-lg ${isLoading ? "bg-blue-900" : "bg-blue-800"} mb-2.5 px-3 py-2`}
+                  activeOpacity={0.9}
+                  disabled={isLoading}
+                  onPress={async () => {
+                    setIsLoading(true);
+                    await handleSave();
+                    setIsLoading(false);
+                  }}>
+                  <ActivityIndicator size={"small"} color={"#ffff"} className={`${!isLoading && "hidden"}`} />
+                  <Text className={`text-center text-xs font-semibold text-gray-100 ${isLoading && "hidden"}`}>
+                    Simpan
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  className={`rounded-lg ${isLoading ? "bg-red-600" : "bg-red-500"} border px-3 py-2`}
+                  activeOpacity={0.9}
+                  disabled={isLoading}
+                  onPress={async () => {
+                    setIsLoading(true);
+                    await handleDelete();
+                    setIsLoading(false);
+                  }}>
+                  <ActivityIndicator size={"small"} color={"#ffff"} className={`${!isLoading && "hidden"}`} />
+                  <Text className={`text-center text-xs font-semibold text-gray-100 ${isLoading && "hidden"}`}>
+                    Hapus
+                  </Text>
+                </TouchableOpacity>
+              </>
+            )}
             {/* <TouchableOpacity
                 onPress={() => {
                   const test = customers.find((item) => item.id == curCustomerId);
