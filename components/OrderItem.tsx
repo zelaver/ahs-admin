@@ -55,12 +55,12 @@ const OrderItem = ({
     <View className="pesanan-item mb-4 flex-row items-center justify-between rounded-lg bg-white p-2.5 shadow">
       <CustomerLogo customerId={curCustomerId} date={curDate} />
       <StatusEdit status={curStatus} handleEdit={handleEdit} />
-      {/* <TouchableOpacity
+      <TouchableOpacity
         onPress={() => {
           console.log(curDate);
         }}>
         <Text>debug</Text>
-      </TouchableOpacity> */}
+      </TouchableOpacity>
       <OrderItemBottomSheet
         bottomSheetModalRef={bottomSheetModalRef}
         id={id}
@@ -135,7 +135,7 @@ const StatusEdit = ({ status, handleEdit }) => {
 };
 
 const formatDate = (timestamp) => {
-  // const timestamp = '2024-08-17 08:19:03';
+  // const timestamp = "2024-08-17 08:09:03";
   const date = new Date(timestamp);
 
   // Membuat array bulan dalam bahasa Indonesia
@@ -159,14 +159,18 @@ const formatDate = (timestamp) => {
   const month = months[date.getMonth()];
   const year = date.getFullYear();
 
-  const hour = date.getHours();
-  const minute = date.getMinutes();
-  const second = date.getSeconds();
+  // const hour = date.getHours();
+  // const minute = date.getMinutes();
+  // const second = date.getSeconds();
+
+  const time = timestamp.split(" ")[1].split(":");
+  const hour = time[0];
+  const minute = time[1];
+  const second = time[2];
 
   // Menggabungkan dalam format yang diinginkan
   const formattedDate = `${day} ${month}, ${year}`;
   const formattedTime = `${hour}:${minute}`;
-
   // return formattedDate;
   return formattedTime;
 };
