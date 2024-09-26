@@ -151,12 +151,12 @@ const OrderItemBottomSheet = ({
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
 
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    const seconds = String(date.getSeconds()).padStart(2, "0");
+    const hours = String(new Date().getHours()).padStart(2, "0");
+    const minutes = String(new Date().getMinutes()).padStart(2, "0");
+    const seconds = String(new Date().getSeconds()).padStart(2, "0");
 
     const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-    // console.log(formattedDate)
+    console.log(formattedDate);
     await updateTransaction(
       {
         orderList: newOrderList,
@@ -545,8 +545,11 @@ const OrderItemBottomSheet = ({
               antar={antar}
               setAntar={setAntar}
             />
-          : <View className="rounded-lg border border-gray-600 px-5 py-3">
-              <Text>{customers?.find((item) => item.id == curCustomerId)?.name}</Text>
+          : <View className="px-3">
+              <Text className="mb-2 text-sm font-bold">Ongkir:</Text>
+              <View className="rounded-lg border border-gray-600 px-5 py-3">
+                <Text>{curOngkir}</Text>
+              </View>
             </View>
           }
           <View className={`total px-3 ${status == 1 && "hidden"} mb-6`}>
@@ -555,7 +558,7 @@ const OrderItemBottomSheet = ({
               <Text className="text-sm font-bold text-gray-50">{total?.toLocaleString()}</Text>
             </View>
           </View>
-          <DateInput date={date} setDate={setDate} />
+          <DateInput date={date} setDate={setDate} editable={editable} />
           <View className="status px-3">
             <Text className="mb-2.5 text-sm font-semibold">Status:</Text>
             <View className="status-boxes flex-row gap-x-3 self-center">
@@ -657,7 +660,7 @@ const OrderItemBottomSheet = ({
 };
 
 // Bottomsheet Component
-const DateInput = ({ date, setDate }) => {
+const DateInput = ({ date, setDate, editable }) => {
   const onDateChange = (event, selectedDate) => {
     const currentDate = selectedDate;
     setDate(currentDate);
@@ -682,6 +685,7 @@ const DateInput = ({ date, setDate }) => {
   return (
     <View className="date mb-6 px-3">
       <TouchableOpacity
+        disabled={!editable}
         className="flex-row items-center justify-between rounded-lg border border-blue-800 px-3 py-2"
         activeOpacity={0.8}
         onPress={showDatepicker}>
