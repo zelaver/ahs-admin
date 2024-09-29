@@ -1,6 +1,8 @@
 import DatePicker from "@/components/DatePicker";
+import OrderItemBottomSheet from "@/components/OrderBottomSheet";
 import { useGlobalContext } from "@/context/GlobalProvider";
-import React, { useEffect, useState } from "react";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   RefreshControl,
@@ -233,6 +235,8 @@ const Table = ({ history }) => {
     )
   );
   const [currentPage, setCurrentPage] = useState(1);
+  const [mode, setMode] = useState("galon");
+  const { transactions } = useGlobalContext();
 
   const getPaginatedItems = (items: any[]) => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -245,7 +249,7 @@ const Table = ({ history }) => {
     const currentDate = selectedDate;
     setCurrentPage(1);
     setDate(currentDate);
-    console.log(currentDate.toLocaleDateString());
+    // console.log(currentDate.toLocaleDateString());
     setTotalPage(
       Math.ceil(
         [...history].filter((item) => new Date(item.date).toLocaleDateString() == currentDate?.toLocaleDateString())
@@ -274,34 +278,60 @@ const Table = ({ history }) => {
       <View className="judul flex-row items-center justify-between py-2">
         <View className="flex-row items-center">
           <Text className="mr-2.5 text-lg font-semibold text-blue-950">Stock</Text>
-          <DatePicker date={date} setDate={setDate} onDateChange={onDateChange} containerStyle="rounded-sm" />
+          <TouchableOpacity
+            onPress={() => setMode("galon")}
+            activeOpacity={0.6}
+            className={`w-14 items-center rounded-md px-2 py-1 ${mode == "galon" ? "bg-blue-800" : "border border-blue-800"}`}>
+            <Text className={`text-xs font-semibold text-blue-800 ${mode == "galon" ? "text-white" : "text-blue-800"}`}>
+              Galon
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setMode("gas")}
+            activeOpacity={0.6}
+            className={`ml-2 w-14 items-center rounded-md px-2 py-1 ${mode == "gas" ? "bg-blue-800" : "border border-blue-800"}`}>
+            <Text className={`text-xs font-semibold text-blue-800 ${mode == "gas" ? "text-white" : "text-blue-800"}`}>
+              Gas
+            </Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity onPress={() => setAscending(!ascending)} className="ml-1">
-          <Icon name={`${ascending ? "sort-desc" : "sort-asc"}`} size={20} color="#172554" />
-        </TouchableOpacity>
+        <View className="flex-row items-center">
+          <TouchableOpacity onPress={() => setAscending(!ascending)} className="mr-1.5">
+            <Icon name={`${ascending ? "sort-desc" : "sort-asc"}`} size={24} color="#172554" />
+          </TouchableOpacity>
+          <DatePicker date={date} setDate={setDate} onDateChange={onDateChange} containerStyle="rounded-md" />
+        </View>
       </View>
       <ScrollView horizontal>
         <View>
           <View className="header rounded-t-lg bg-blue-800 px-2">
             <View className="flex-row items-center">
-              <View className="w-24 flex-row justify-center py-2.5 pl-2">
+              {/* <View className="w-24 flex-row justify-center py-2.5 pl-2">
                 <Text className="text-center text-sm font-semibold text-white">Tanggal</Text>
-              </View>
-              <View className="w-20 flex-row justify-center py-2.5 pl-2">
-                <Text className="text-center text-sm font-semibold text-white">Aqua</Text>
-              </View>
-              <View className="w-20 flex-row justify-center py-2.5 pl-2">
-                <Text className="w-20 text-center text-sm font-semibold text-white">Isi Ulang</Text>
-              </View>
-              <View className="w-20 flex-row justify-center py-2.5 pl-2">
-                <Text className="text-center text-sm font-semibold text-white">Galon Kosong</Text>
-              </View>
-              <View className="w-20 flex-row justify-center py-2.5 pl-2">
-                <Text className="text-center text-sm font-semibold text-white">Gas 12 Kg</Text>
-              </View>
-              <View className="w-20 flex-row justify-center py-2.5 pl-2">
-                <Text className="text-center text-sm font-semibold text-white">Gas Kosong</Text>
-              </View>
+              </View> */}
+              {mode == "galon" && (
+                <>
+                  <View className="w-20 flex-row justify-center py-2.5 pl-2">
+                    <Text className="text-center text-sm font-semibold text-white">Aqua</Text>
+                  </View>
+                  <View className="w-20 flex-row justify-center py-2.5 pl-2">
+                    <Text className="w-20 text-center text-sm font-semibold text-white">Isi Ulang</Text>
+                  </View>
+                  <View className="w-20 flex-row justify-center py-2.5 pl-2">
+                    <Text className="text-center text-sm font-semibold text-white">Galon Kosong</Text>
+                  </View>
+                </>
+              )}
+              {mode == "gas" && (
+                <>
+                  <View className="w-20 flex-row justify-center py-2.5 pl-2">
+                    <Text className="text-center text-sm font-semibold text-white">Gas 12 Kg</Text>
+                  </View>
+                  <View className="w-20 flex-row justify-center py-2.5 pl-2">
+                    <Text className="text-center text-sm font-semibold text-white">Gas Kosong</Text>
+                  </View>
+                </>
+              )}
               <View className="w-36 flex-row justify-center py-2.5 pl-2">
                 <Text className="text-center text-sm font-semibold text-white">Saldo</Text>
               </View>
@@ -310,26 +340,28 @@ const Table = ({ history }) => {
               </View>
             </View>
           </View>
-          <ScrollView
-            nestedScrollEnabled
+          <View
+            // nestedScrollEnabled
             // ref={scrollViewRef}
-            className={"min-h-[470px] border-b border-blue-800 bg-white"}>
+            className={"min-h-[410px] border-b border-blue-800 bg-white"}>
             {getPaginatedItems(
               [...history]
                 .filter((item) => new Date(item.date).toLocaleDateString() == date?.toLocaleDateString())
                 .sort((a, b) => b.id - a.id)
             )
               .sort((a, b) => sort(b.id, a.id))
-              .map((item, i) => (
-                <RowData key={i} id={item.id} data={history} />
-              ))}
+              .map((item, i) =>
+                mode == "galon" ?
+                  <RowDataGalon key={i} id={item.id} data={history} transactions={transactions} />
+                : <RowDataGas key={i} id={item.id} data={history} transactions={transactions} />
+              )}
             {[...history].filter((item) => new Date(item.date).toLocaleDateString() == date?.toLocaleDateString())
               .length == 0 && (
               <View className="ml-24 mt-48">
                 <Text className="text-xl">Tidak ada Data :(</Text>
               </View>
             )}
-          </ScrollView>
+          </View>
         </View>
       </ScrollView>
       <View className="mx-auto w-full flex-row items-center justify-center rounded-b-md bg-blue-800 py-2">
@@ -356,17 +388,216 @@ const Table = ({ history }) => {
   );
 };
 
-const RowData = ({ id, data }) => {
+const RowDataGalon = ({ id, data, transactions }) => {
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
   const dataRow = data.find((item) => item.id == id);
   // if()
   const dataRowBefore = data.find((item) => item.id == id - 1);
+  const dataTransaction = transactions.find((item) => item.id == dataRow.transactionId);
+  // Jika tidak ada data galon yang berubah maka hide
+  // if (
+  //   dataRow.stock_aqua - dataRowBefore?.stock_aqua == 0 &&
+  //   dataRow.stock_isi_ulang - dataRowBefore?.stock_isi_ulang == 0 &&
+  //   dataRow.stock_galon_kosong - dataRowBefore?.stock_galon_kosong == 0
+  // ) {
+  //   return null;
+  // }
+  const handleOpenInfo = () => {
+    if (!dataTransaction) {
+      ToastAndroid.show("Tidak ada transaksi di data ini!", ToastAndroid.SHORT);
+      return;
+    }
+    handlePresentModalPress();
+    // console.log(JSON.parse(dataTransaction.orderList)[0]);
+    // console.log(typeof JSON.parse(dataTransaction.orderList));
+  };
+
   return (
-    <View className="row-data border-b bg-white px-2">
-      <View className="flex-row">
-        <View className="w-24 flex-row border-r py-2.5 pl-2">
+    <>
+      <TouchableOpacity className="row-data border-b bg-white px-2" onPress={handleOpenInfo}>
+        <View className="flex-row">
+          {/* <View className="w-24 flex-row border-r py-2.5 pl-2">
           <Text className="mr-2 text-sm text-gray-700">{new Date(dataRow.date).toLocaleDateString()}</Text>
+        </View> */}
+          <View className="w-20 flex-row border-r py-2.5 pl-2">
+            <Text className="mr-2 text-sm text-gray-700">{dataRow.stock_aqua}</Text>
+            <View className="flex-row">
+              <Text
+                className={`text-xs ${!dataRowBefore && "hidden"} ${dataRow.stock_aqua - dataRowBefore?.stock_aqua == 0 && "hidden"} ${
+                  dataRow.stock_aqua - dataRowBefore?.stock_aqua > 0 ? "text-green-500" : "text-red-500"
+                }`}>
+                {Math.abs(dataRow.stock_aqua - dataRowBefore?.stock_aqua)}
+              </Text>
+              <View
+                className={`icon ${!dataRowBefore && "hidden"} ${dataRow.stock_aqua - dataRowBefore?.stock_aqua == 0 && "hidden"}`}>
+                <Icon
+                  name={`${dataRow.stock_aqua - dataRowBefore?.stock_aqua > 0 ? "arrow-up-line" : "arrow-down-line"}`}
+                  size={12}
+                  color={`${dataRow.stock_aqua - dataRowBefore?.stock_aqua > 0 ? "#22c55e" : "#ef4444"}`}
+                />
+              </View>
+            </View>
+          </View>
+          <View className="w-20 flex-row border-r py-2.5 pl-2">
+            <Text className="mr-2 text-sm text-gray-700">{dataRow.stock_isi_ulang}</Text>
+            <View className="flex-row">
+              <Text
+                className={`text-xs ${!dataRowBefore && "hidden"} ${dataRow.stock_isi_ulang - dataRowBefore?.stock_isi_ulang == 0 && "hidden"} ${
+                  dataRow.stock_isi_ulang - dataRowBefore?.stock_isi_ulang > 0 ? "text-green-500" : "text-red-500"
+                }`}>
+                {Math.abs(dataRow.stock_isi_ulang - dataRowBefore?.stock_isi_ulang)}
+              </Text>
+              <View
+                className={`icon ${!dataRowBefore && "hidden"} ${dataRow.stock_isi_ulang - dataRowBefore?.stock_isi_ulang == 0 && "hidden"}`}>
+                <Icon
+                  name={`${dataRow.stock_isi_ulang - dataRowBefore?.stock_isi_ulang > 0 ? "arrow-up-line" : "arrow-down-line"}`}
+                  size={12}
+                  color={`${dataRow.stock_isi_ulang - dataRowBefore?.stock_isi_ulang > 0 ? "#22c55e" : "#ef4444"}`}
+                />
+              </View>
+            </View>
+          </View>
+          <View className="w-20 flex-row border-r py-2.5 pl-2">
+            <Text className="mr-2 text-sm text-gray-700">{dataRow.stock_galon_kosong}</Text>
+            <View className="flex-row">
+              <Text
+                className={`text-xs ${!dataRowBefore && "hidden"} ${dataRow.stock_galon_kosong - dataRowBefore?.stock_galon_kosong == 0 && "hidden"} ${
+                  dataRow.stock_galon_kosong - dataRowBefore?.stock_galon_kosong > 0 ? "text-green-500" : "text-red-500"
+                }`}>
+                {Math.abs(dataRow.stock_galon_kosong - dataRowBefore?.stock_galon_kosong)}
+              </Text>
+              <View
+                className={`icon ${!dataRowBefore && "hidden"} ${dataRow.stock_galon_kosong - dataRowBefore?.stock_galon_kosong == 0 && "hidden"}`}>
+                <Icon
+                  name={`${dataRow.stock_galon_kosong - dataRowBefore?.stock_galon_kosong > 0 ? "arrow-up-line" : "arrow-down-line"}`}
+                  size={12}
+                  color={`${dataRow.stock_galon_kosong - dataRowBefore?.stock_galon_kosong > 0 ? "#22c55e" : "#ef4444"}`}
+                />
+              </View>
+            </View>
+          </View>
+          {/* <View className="w-20 flex-row border-r py-2.5 pl-2">
+          <Text className="mr-2 text-sm text-gray-700">{dataRow.stock_gas_12kg}</Text>
+          <View className="flex-row">
+            <Text
+              className={`text-xs ${!dataRowBefore && "hidden"} ${dataRow.stock_gas_12kg - dataRowBefore?.stock_gas_12kg == 0 && "hidden"} ${
+                dataRow.stock_gas_12kg - dataRowBefore?.stock_gas_12kg > 0 ? "text-green-500" : "text-red-500"
+              }`}>
+              {Math.abs(dataRow.stock_gas_12kg - dataRowBefore?.stock_gas_12kg)}
+            </Text>
+            <View
+              className={`icon ${!dataRowBefore && "hidden"} ${dataRow.stock_gas_12kg - dataRowBefore?.stock_gas_12kg == 0 && "hidden"}`}>
+              <Icon
+                name={`${dataRow.stock_gas_12kg - dataRowBefore?.stock_gas_12kg > 0 ? "arrow-up-line" : "arrow-down-line"}`}
+                size={12}
+                color={`${dataRow.stock_gas_12kg - dataRowBefore?.stock_gas_12kg > 0 ? "#22c55e" : "#ef4444"}`}
+              />
+            </View>
+          </View>
         </View>
         <View className="w-20 flex-row border-r py-2.5 pl-2">
+          <Text className="mr-2 text-sm text-gray-700">{dataRow.stock_gas_kosong}</Text>
+          <View className="flex-row">
+            <Text
+              className={`text-xs ${!dataRowBefore && "hidden"} ${dataRow.stock_gas_kosong - dataRowBefore?.stock_gas_kosong == 0 && "hidden"} ${
+                dataRow.stock_gas_kosong - dataRowBefore?.stock_gas_kosong > 0 ? "text-green-500" : "text-red-500"
+              }`}>
+              {Math.abs(dataRow.stock_gas_kosong - dataRowBefore?.stock_gas_kosong)}
+            </Text>
+            <View
+              className={`icon ${!dataRowBefore && "hidden"} ${dataRow.stock_gas_kosong - dataRowBefore?.stock_gas_kosong == 0 && "hidden"}`}>
+              <Icon
+                name={`${dataRow.stock_gas_kosong - dataRowBefore?.stock_gas_kosong > 0 ? "arrow-up-line" : "arrow-down-line"}`}
+                size={12}
+                color={`${dataRow.stock_gas_kosong - dataRowBefore?.stock_gas_kosong > 0 ? "#22c55e" : "#ef4444"}`}
+              />
+            </View>
+          </View>
+        </View> */}
+          <View className="w-36 flex-row border-r py-2.5 pl-2">
+            <Text className="mr-2 text-sm text-gray-700">{dataRow.saldo.toLocaleString()}</Text>
+            <View className="flex-row">
+              <Text
+                className={`text-xs ${!dataRowBefore && "hidden"} ${dataRow.saldo - dataRowBefore?.saldo == 0 && "hidden"} ${
+                  dataRow.saldo - dataRowBefore?.saldo > 0 ? "text-green-500" : "text-red-500"
+                }`}>
+                {Math.abs(dataRow.saldo - dataRowBefore?.saldo).toLocaleString()}
+              </Text>
+              <View
+                className={`icon ${!dataRowBefore && "hidden"} ${dataRow.saldo - dataRowBefore?.saldo == 0 && "hidden"}`}>
+                <Icon
+                  name={`${dataRow.saldo - dataRowBefore?.saldo > 0 ? "arrow-up-line" : "arrow-down-line"}`}
+                  size={12}
+                  color={`${dataRow.saldo - dataRowBefore?.saldo > 0 ? "#22c55e" : "#ef4444"}`}
+                />
+              </View>
+            </View>
+          </View>
+          <View className="w-36 flex-row py-2.5 pl-2">
+            <Text className="mr-2 text-sm text-gray-700">{dataRow.note}</Text>
+            {/* <TouchableOpacity
+            onPress={() => {
+              console.log(dataRow.date.split(" ")[0]);
+            }}>
+            <Text className="rounded-md border px-2 text-center">Debug</Text>
+          </TouchableOpacity> */}
+          </View>
+        </View>
+        {dataTransaction && (
+          <OrderItemBottomSheet
+            editable={false}
+            bottomSheetModalRef={bottomSheetModalRef}
+            id={dataTransaction?.id}
+            orderList={JSON.parse(dataTransaction?.orderList)}
+            curCustomerId={dataTransaction?.customerId}
+            curStatus={dataTransaction?.status}
+            curDate={dataTransaction?.date}
+            curOngkir={dataTransaction?.ongkir}
+            total_price={dataTransaction?.total_price}
+          />
+        )}
+      </TouchableOpacity>
+    </>
+  );
+};
+const RowDataGas = ({ id, data, transactions }) => {
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
+  const dataRow = data.find((item) => item.id == id);
+  // if()
+  const dataRowBefore = data.find((item) => item.id == id - 1);
+  // if (
+  //   dataRow.stock_gas_12kg - dataRowBefore?.stock_gas_12kg == 0 &&
+  //   dataRow.stock_gas_kosong - dataRowBefore?.stock_gas_kosong == 0
+  // ) {
+  //   return null;
+  // }
+
+  const dataTransaction = transactions.find((item) => item.id == dataRow.transactionId);
+
+  const handleOpenInfo = () => {
+    if (!dataTransaction) {
+      ToastAndroid.show("Tidak ada transaksi di data ini!", ToastAndroid.SHORT);
+      return;
+    }
+    handlePresentModalPress();
+    // console.log(JSON.parse(dataTransaction.orderList)[0]);
+    // console.log(typeof JSON.parse(dataTransaction.orderList));
+  };
+
+  return (
+    <>
+      <TouchableOpacity className="row-data border-b bg-white px-2" onPress={handleOpenInfo}>
+        <View className="flex-row">
+          {/* <View className="w-24 flex-row border-r py-2.5 pl-2">
+          <Text className="mr-2 text-sm text-gray-700">{new Date(dataRow.date).toLocaleDateString()}</Text>
+        </View> */}
+          {/* <View className="w-20 flex-row border-r py-2.5 pl-2">
           <Text className="mr-2 text-sm text-gray-700">{dataRow.stock_aqua}</Text>
           <View className="flex-row">
             <Text
@@ -422,75 +653,89 @@ const RowData = ({ id, data }) => {
               />
             </View>
           </View>
-        </View>
-        <View className="w-20 flex-row border-r py-2.5 pl-2">
-          <Text className="mr-2 text-sm text-gray-700">{dataRow.stock_gas_12kg}</Text>
-          <View className="flex-row">
-            <Text
-              className={`text-xs ${!dataRowBefore && "hidden"} ${dataRow.stock_gas_12kg - dataRowBefore?.stock_gas_12kg == 0 && "hidden"} ${
-                dataRow.stock_gas_12kg - dataRowBefore?.stock_gas_12kg > 0 ? "text-green-500" : "text-red-500"
-              }`}>
-              {Math.abs(dataRow.stock_gas_12kg - dataRowBefore?.stock_gas_12kg)}
-            </Text>
-            <View
-              className={`icon ${!dataRowBefore && "hidden"} ${dataRow.stock_gas_12kg - dataRowBefore?.stock_gas_12kg == 0 && "hidden"}`}>
-              <Icon
-                name={`${dataRow.stock_gas_12kg - dataRowBefore?.stock_gas_12kg > 0 ? "arrow-up-line" : "arrow-down-line"}`}
-                size={12}
-                color={`${dataRow.stock_gas_12kg - dataRowBefore?.stock_gas_12kg > 0 ? "#22c55e" : "#ef4444"}`}
-              />
+        </View> */}
+          <View className="w-20 flex-row border-r py-2.5 pl-2">
+            <Text className="mr-2 text-sm text-gray-700">{dataRow.stock_gas_12kg}</Text>
+            <View className="flex-row">
+              <Text
+                className={`text-xs ${!dataRowBefore && "hidden"} ${dataRow.stock_gas_12kg - dataRowBefore?.stock_gas_12kg == 0 && "hidden"} ${
+                  dataRow.stock_gas_12kg - dataRowBefore?.stock_gas_12kg > 0 ? "text-green-500" : "text-red-500"
+                }`}>
+                {Math.abs(dataRow.stock_gas_12kg - dataRowBefore?.stock_gas_12kg)}
+              </Text>
+              <View
+                className={`icon ${!dataRowBefore && "hidden"} ${dataRow.stock_gas_12kg - dataRowBefore?.stock_gas_12kg == 0 && "hidden"}`}>
+                <Icon
+                  name={`${dataRow.stock_gas_12kg - dataRowBefore?.stock_gas_12kg > 0 ? "arrow-up-line" : "arrow-down-line"}`}
+                  size={12}
+                  color={`${dataRow.stock_gas_12kg - dataRowBefore?.stock_gas_12kg > 0 ? "#22c55e" : "#ef4444"}`}
+                />
+              </View>
             </View>
           </View>
-        </View>
-        <View className="w-20 flex-row border-r py-2.5 pl-2">
-          <Text className="mr-2 text-sm text-gray-700">{dataRow.stock_gas_kosong}</Text>
-          <View className="flex-row">
-            <Text
-              className={`text-xs ${!dataRowBefore && "hidden"} ${dataRow.stock_gas_kosong - dataRowBefore?.stock_gas_kosong == 0 && "hidden"} ${
-                dataRow.stock_gas_kosong - dataRowBefore?.stock_gas_kosong > 0 ? "text-green-500" : "text-red-500"
-              }`}>
-              {Math.abs(dataRow.stock_gas_kosong - dataRowBefore?.stock_gas_kosong)}
-            </Text>
-            <View
-              className={`icon ${!dataRowBefore && "hidden"} ${dataRow.stock_gas_kosong - dataRowBefore?.stock_gas_kosong == 0 && "hidden"}`}>
-              <Icon
-                name={`${dataRow.stock_gas_kosong - dataRowBefore?.stock_gas_kosong > 0 ? "arrow-up-line" : "arrow-down-line"}`}
-                size={12}
-                color={`${dataRow.stock_gas_kosong - dataRowBefore?.stock_gas_kosong > 0 ? "#22c55e" : "#ef4444"}`}
-              />
+          <View className="w-20 flex-row border-r py-2.5 pl-2">
+            <Text className="mr-2 text-sm text-gray-700">{dataRow.stock_gas_kosong}</Text>
+            <View className="flex-row">
+              <Text
+                className={`text-xs ${!dataRowBefore && "hidden"} ${dataRow.stock_gas_kosong - dataRowBefore?.stock_gas_kosong == 0 && "hidden"} ${
+                  dataRow.stock_gas_kosong - dataRowBefore?.stock_gas_kosong > 0 ? "text-green-500" : "text-red-500"
+                }`}>
+                {Math.abs(dataRow.stock_gas_kosong - dataRowBefore?.stock_gas_kosong)}
+              </Text>
+              <View
+                className={`icon ${!dataRowBefore && "hidden"} ${dataRow.stock_gas_kosong - dataRowBefore?.stock_gas_kosong == 0 && "hidden"}`}>
+                <Icon
+                  name={`${dataRow.stock_gas_kosong - dataRowBefore?.stock_gas_kosong > 0 ? "arrow-up-line" : "arrow-down-line"}`}
+                  size={12}
+                  color={`${dataRow.stock_gas_kosong - dataRowBefore?.stock_gas_kosong > 0 ? "#22c55e" : "#ef4444"}`}
+                />
+              </View>
             </View>
           </View>
-        </View>
-        <View className="w-36 flex-row border-r py-2.5 pl-2">
-          <Text className="mr-2 text-sm text-gray-700">{dataRow.saldo.toLocaleString()}</Text>
-          <View className="flex-row">
-            <Text
-              className={`text-xs ${!dataRowBefore && "hidden"} ${dataRow.saldo - dataRowBefore?.saldo == 0 && "hidden"} ${
-                dataRow.saldo - dataRowBefore?.saldo > 0 ? "text-green-500" : "text-red-500"
-              }`}>
-              {Math.abs(dataRow.saldo - dataRowBefore?.saldo).toLocaleString()}
-            </Text>
-            <View
-              className={`icon ${!dataRowBefore && "hidden"} ${dataRow.saldo - dataRowBefore?.saldo == 0 && "hidden"}`}>
-              <Icon
-                name={`${dataRow.saldo - dataRowBefore?.saldo > 0 ? "arrow-up-line" : "arrow-down-line"}`}
-                size={12}
-                color={`${dataRow.saldo - dataRowBefore?.saldo > 0 ? "#22c55e" : "#ef4444"}`}
-              />
+          <View className="w-36 flex-row border-r py-2.5 pl-2">
+            <Text className="mr-2 text-sm text-gray-700">{dataRow.saldo.toLocaleString()}</Text>
+            <View className="flex-row">
+              <Text
+                className={`text-xs ${!dataRowBefore && "hidden"} ${dataRow.saldo - dataRowBefore?.saldo == 0 && "hidden"} ${
+                  dataRow.saldo - dataRowBefore?.saldo > 0 ? "text-green-500" : "text-red-500"
+                }`}>
+                {Math.abs(dataRow.saldo - dataRowBefore?.saldo).toLocaleString()}
+              </Text>
+              <View
+                className={`icon ${!dataRowBefore && "hidden"} ${dataRow.saldo - dataRowBefore?.saldo == 0 && "hidden"}`}>
+                <Icon
+                  name={`${dataRow.saldo - dataRowBefore?.saldo > 0 ? "arrow-up-line" : "arrow-down-line"}`}
+                  size={12}
+                  color={`${dataRow.saldo - dataRowBefore?.saldo > 0 ? "#22c55e" : "#ef4444"}`}
+                />
+              </View>
             </View>
           </View>
-        </View>
-        <View className="w-36 flex-row py-2.5 pl-2">
-          <Text className="mr-2 text-sm text-gray-700">{dataRow.note}</Text>
-          {/* <TouchableOpacity
+          <View className="w-36 flex-row py-2.5 pl-2">
+            <Text className="mr-2 text-sm text-gray-700">{dataRow.note}</Text>
+            {/* <TouchableOpacity
             onPress={() => {
               console.log(dataRow.date.split(" ")[0]);
             }}>
             <Text className="rounded-md border px-2 text-center">Debug</Text>
           </TouchableOpacity> */}
+          </View>
         </View>
-      </View>
-    </View>
+      </TouchableOpacity>
+      {dataTransaction && (
+        <OrderItemBottomSheet
+          editable={false}
+          bottomSheetModalRef={bottomSheetModalRef}
+          id={dataTransaction?.id}
+          orderList={JSON.parse(dataTransaction?.orderList)}
+          curCustomerId={dataTransaction?.customerId}
+          curStatus={dataTransaction?.status}
+          curDate={dataTransaction?.date}
+          curOngkir={dataTransaction?.ongkir}
+          total_price={dataTransaction?.total_price}
+        />
+      )}
+    </>
   );
 };
 
