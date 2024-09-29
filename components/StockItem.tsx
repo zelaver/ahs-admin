@@ -87,6 +87,18 @@ const StockItem = ({
 
   const handleSave = async () => {
     // console.log(name)
+    const currentTimestamp = new Date()
+      .toLocaleString("en-GB", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      })
+      .replace(",", "")
+      .replace(/(\d+)\/(\d+)\/(\d+)/, "$3-$2-$1");
     if (addStock == 0 && !addStock && price == prodPrice && subPrice == prodSubPrice) {
       ToastAndroid.show("Masukan jumlah stok!", ToastAndroid.SHORT);
       return;
@@ -111,6 +123,7 @@ const StockItem = ({
           return ToastAndroid.show("Galon Kosong tidak Cukup", ToastAndroid.SHORT);
         const newStocks = {
           ...stocks,
+          date: currentTimestamp,
           stock_aqua: stock + addStock,
           stock_galon_kosong: stocks.stock_galon_kosong - addStock,
           saldo: stocks.saldo - addStock * stockPrice,
@@ -126,6 +139,7 @@ const StockItem = ({
 
         const newStocks = {
           ...stocks,
+          date: currentTimestamp,
           stock_isi_ulang: stock + addStock,
           stock_galon_kosong: stocks.stock_galon_kosong - addStock,
           transactionId: null,
@@ -137,6 +151,7 @@ const StockItem = ({
       } else if (name == "Galon Kosong") {
         const newStocks = {
           ...stocks,
+          date: currentTimestamp,
           stock_galon_kosong: stock + addStock,
 
           transactionId: null,
@@ -151,6 +166,7 @@ const StockItem = ({
 
         const newStocks = {
           ...stocks,
+          date: currentTimestamp,
           stock_gas_12kg: stock + addStock,
           stock_gas_kosong: stocks.stock_gas_kosong - addStock,
           saldo: stocks.saldo - addStock * stockPrice,
@@ -163,6 +179,7 @@ const StockItem = ({
       } else if (name == "Gas Kosong") {
         const newStocks = {
           ...stocks,
+          date: currentTimestamp,
           stock_gas_kosong: stock + addStock,
           transactionId: null,
           note: `Tambah stock gas kosong: ${addStock}`,

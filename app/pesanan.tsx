@@ -319,6 +319,18 @@ const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
     const newStockGasKosong = history.stock_gas_kosong - gasKosongVal + gasVal;
     const newStockIsiUlang = history.stock_isi_ulang - isiUlangVal;
     const newNote = `-`;
+    const currentTimestamp = new Date()
+      .toLocaleString("en-GB", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      })
+      .replace(",", "")
+      .replace(/(\d+)\/(\d+)\/(\d+)/, "$3-$2-$1");
 
     await addHistory({
       saldo: newSaldo,
@@ -329,6 +341,7 @@ const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
       stock_isi_ulang: newStockIsiUlang,
       transactionId: transactionId,
       note: newNote,
+      date: currentTimestamp,
     });
 
     await fetchHistory();
