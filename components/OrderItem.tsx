@@ -1,5 +1,5 @@
 import { useGlobalContext } from "@/context/GlobalProvider";
-import { getContact } from "@/database/db";
+import { getContact } from "@/database/contact";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
@@ -55,12 +55,25 @@ const OrderItem = ({
     <View className="pesanan-item mb-4 flex-row items-center justify-between rounded-lg bg-white p-2.5 shadow">
       <CustomerLogo customerId={curCustomerId} date={curDate} />
       <StatusEdit status={curStatus} handleEdit={handleEdit} />
-      <TouchableOpacity
+      {/* <TouchableOpacity
         onPress={() => {
-          console.log(curDate);
+          console.log(
+            new Date()
+              .toLocaleString("en-GB", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: false,
+              })
+              .replace(",", "")
+              .replace(/(\d+)\/(\d+)\/(\d+)/, "$3-$2-$1")
+          );
         }}>
         <Text>debug</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <OrderItemBottomSheet
         bottomSheetModalRef={bottomSheetModalRef}
         id={id}

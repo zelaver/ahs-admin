@@ -12,7 +12,8 @@ import {
 import Icon from "react-native-remix-icon";
 // import images from "@/constants/images";
 import { useGlobalContext } from "@/context/GlobalProvider";
-import { addHistory, updateProductPrice } from "@/database/db";
+import { addHistory } from "@/database/history";
+import { updateProductPrice } from "@/database/product";
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import CurrencyInput from "react-native-currency-input";
 import Handle from "./CustomHandle";

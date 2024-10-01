@@ -1,4 +1,8 @@
-import { getAllContacts, getHistory, getProducts, getTransactions, initDB, initHistory } from "@/database/db";
+import { getAllContacts } from "@/database/contact";
+import { getHistory } from "@/database/history";
+import { initDB, initHistory } from "@/database/init";
+import { getProducts } from "@/database/product";
+import { getTransactions } from "@/database/transaction";
 import { createContext, useContext, useEffect, useState } from "react";
 
 type context = {

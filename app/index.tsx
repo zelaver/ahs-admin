@@ -2,7 +2,7 @@ import Handle from "@/components/CustomHandle";
 import StockItem from "@/components/StockItem";
 import images from "@/constants/images";
 import { useGlobalContext } from "@/context/GlobalProvider";
-import { addHistory } from "@/database/db";
+import { addHistory } from "@/database/history";
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { Redirect } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";

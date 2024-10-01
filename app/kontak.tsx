@@ -1,7 +1,7 @@
 import ContactItem from "@/components/ContactItem";
 import Handle from "@/components/CustomHandle";
 import { useGlobalContext } from "@/context/GlobalProvider";
-import { addContact } from "@/database/db";
+import { addContact } from "@/database/contact";
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
