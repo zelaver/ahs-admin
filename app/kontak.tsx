@@ -98,7 +98,7 @@ const Kontak = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-blue-800 ">
+    <SafeAreaView className="flex-1 bg-blue-800">
       <View className="Header border-b border-black py-2.5">
         <View className="section-1 flex-row items-center px-5">
           <Icon name="contacts-book-2-fill" color="#eff6ff" size={26} />
@@ -116,8 +116,8 @@ const Kontak = () => {
                 console.log(query);
               }}
             />
-            <TouchableOpacity>
-              <Icon name="search-2-line" size={16}></Icon>
+            <TouchableOpacity className={`${!query && "hidden"}`} onPress={() => setQuery("")}>
+              <Icon name="close-fill" size={16}></Icon>
             </TouchableOpacity>
           </View>
         </View>
