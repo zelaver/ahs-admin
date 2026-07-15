@@ -5,8 +5,8 @@ import OrderItem from "@/components/OrderItem";
 import images from "@/constants/images";
 import { useGlobalContext } from "@/context/GlobalProvider";
 import { getContact } from "@/database/contact";
+import { addHistory, type HistoryDTO } from "@/database/history";
 import { addTransaction, getTransactions } from "@/database/transaction";
-import { addHistory } from "@/database/history";
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
@@ -334,7 +334,7 @@ const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
       .replace(",", "")
       .replace(/(\d+)\/(\d+)\/(\d+)/, "$3-$2-$1");
 
-    await addHistory({
+    const historyEntry: HistoryDTO = {
       saldo: newSaldo,
       stock_aqua: newStockAqua,
       stock_galon_kosong: newStockGalonKosong,
@@ -344,7 +344,8 @@ const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
       transactionId: transactionId,
       note: newNote,
       date: currentTimestamp,
-    });
+    };
+    await addHistory(historyEntry);
 
     await fetchHistory();
     await fetchTransactions();

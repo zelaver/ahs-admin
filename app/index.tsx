@@ -2,7 +2,7 @@ import Handle from "@/components/CustomHandle";
 import StockItem from "@/components/StockItem";
 import images from "@/constants/images";
 import { useGlobalContext } from "@/context/GlobalProvider";
-import { addHistory } from "@/database/history";
+import { addHistory, type HistoryDTO } from "@/database/history";
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { Redirect } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -213,11 +213,12 @@ const BottomSheetSaldo = ({ bottomSheetModalRef, stocks, fetchStocks }: any) => 
       return ToastAndroid.show("Saldo anda tidak cukup", ToastAndroid.SHORT);
     }
     setIsLoading(true);
-    await addHistory({
+    const historyEntry: HistoryDTO = {
       ...stocks,
       saldo: stocks?.saldo + saldoInput,
       note: `${noteInput}`,
-    });
+    };
+    await addHistory(historyEntry);
     await fetchStocks();
     setIsLoading(false);
     handleClosePress();

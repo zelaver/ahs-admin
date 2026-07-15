@@ -1,18 +1,18 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  ActivityIndicator,
-  BackHandler,
-  Image,
-  Text,
-  TextInput,
-  ToastAndroid,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    BackHandler,
+    Image,
+    Text,
+    TextInput,
+    ToastAndroid,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import Icon from "react-native-remix-icon";
 // import images from "@/constants/images";
 import { useGlobalContext } from "@/context/GlobalProvider";
-import { addHistory } from "@/database/history";
+import { addHistory, type HistoryDTO } from "@/database/history";
 import { updateProductPrice } from "@/database/product";
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import CurrencyInput from "react-native-currency-input";
@@ -122,7 +122,7 @@ const StockItem = ({
       } else if (name == "Aqua") {
         if (stocks.stock_galon_kosong - addStock < 0)
           return ToastAndroid.show("Galon Kosong tidak Cukup", ToastAndroid.SHORT);
-        const newStocks = {
+        const newStocks: HistoryDTO = {
           ...stocks,
           date: currentTimestamp,
           stock_aqua: stock + addStock,
@@ -131,14 +131,14 @@ const StockItem = ({
           transactionId: null,
           note: `Tambah stock aqua: ${addStock}/Rp${stockPrice}`,
         };
-        await addHistory({ ...newStocks });
+        await addHistory(newStocks);
         await fetchStocks();
         handleClosePress();
       } else if (name == "Isi Ulang") {
         if (stocks.stock_galon_kosong - addStock < 0)
           return ToastAndroid.show("Galon Kosong tidak Cukup", ToastAndroid.SHORT);
 
-        const newStocks = {
+        const newStocks: HistoryDTO = {
           ...stocks,
           date: currentTimestamp,
           stock_isi_ulang: stock + addStock,
@@ -146,26 +146,25 @@ const StockItem = ({
           transactionId: null,
           note: `Tambah stock Isi Ulang: ${addStock}`,
         };
-        await addHistory({ ...newStocks });
+        await addHistory(newStocks);
         await fetchStocks();
         handleClosePress();
       } else if (name == "Galon Kosong") {
-        const newStocks = {
+        const newStocks: HistoryDTO = {
           ...stocks,
           date: currentTimestamp,
           stock_galon_kosong: stock + addStock,
-
           transactionId: null,
           note: `Tambah stock galon kosong: ${addStock}`,
         };
-        await addHistory({ ...newStocks });
+        await addHistory(newStocks);
         await fetchStocks();
         handleClosePress();
       } else if (name == "Gas 12 kg") {
         if (stocks.stock_gas_kosong - addStock < 0)
           return ToastAndroid.show("Gas Kosong tidak Cukup", ToastAndroid.SHORT);
 
-        const newStocks = {
+        const newStocks: HistoryDTO = {
           ...stocks,
           date: currentTimestamp,
           stock_gas_12kg: stock + addStock,
@@ -174,18 +173,18 @@ const StockItem = ({
           transactionId: null,
           note: `Tambah stock gas: ${addStock}/Rp${stockPrice}`,
         };
-        await addHistory({ ...newStocks });
+        await addHistory(newStocks);
         await fetchStocks();
         handleClosePress();
       } else if (name == "Gas Kosong") {
-        const newStocks = {
+        const newStocks: HistoryDTO = {
           ...stocks,
           date: currentTimestamp,
           stock_gas_kosong: stock + addStock,
           transactionId: null,
           note: `Tambah stock gas kosong: ${addStock}`,
         };
-        await addHistory({ ...newStocks });
+        await addHistory(newStocks);
         await fetchStocks();
         handleClosePress();
       }

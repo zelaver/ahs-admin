@@ -3,8 +3,8 @@ import Handle from "@/components/CustomHandle";
 import images from "@/constants/images";
 import { useGlobalContext } from "@/context/GlobalProvider";
 import { getContact } from "@/database/contact";
+import { addHistory, type HistoryDTO } from "@/database/history";
 import { deleteTransaction, updateTransaction } from "@/database/transaction";
-import { addHistory } from "@/database/history";
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
@@ -173,139 +173,46 @@ const OrderItemBottomSheet = ({
     await fetchTransactions();
 
     let parsedList = JSON.parse(orderList);
-    if (curStatus == "lunas" && status == "hutang") {
-      await addHistory({
-        saldo: history.saldo - total,
-        stock_aqua: history.stock_aqua - (aquaVal - parsedList[0].sum),
-        stock_galon_kosong:
-          history.stock_galon_kosong -
-          galonKosongVal +
-          (aquaVal - parsedList[0].sum) +
-          (isiUlangVal - parsedList[1].sum),
-        stock_gas_12kg: history.stock_gas_12kg - (gasVal - parsedList[2].sum),
-        stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + (gasVal - parsedList[2].sum),
-        stock_isi_ulang: history.stock_isi_ulang - (isiUlangVal - parsedList[1].sum),
-        transactionId: id,
-        note: "-",
-      });
-    }
 
-    if (curStatus == "lunas" && status == "pinjam") {
-      await addHistory({
-        saldo: history.saldo - total_price - curOngkir,
-        stock_aqua: history.stock_aqua + parsedList[0].sum,
-        stock_galon_kosong: history.stock_galon_kosong - galonKosongVal - parsedList[0].sum - parsedList[1].sum,
-        stock_gas_12kg: history.stock_gas_12kg + parsedList[2].sum,
-        stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + parsedList[3].sum,
-        stock_isi_ulang: history.stock_isi_ulang + parsedList[1].sum,
-        transactionId: id,
-        note: "-",
-      });
-    }
+    const oldCart = {
+      aqua: parsedList[0].sum,
+      isiUlang: parsedList[1].sum,
+      gas: parsedList[2].sum,
+      galonKosong: parsedList[3].sum,
+      gasKosong: parsedList[4].sum,
+    };
+    const newCart = {
+      aqua: aquaVal,
+      isiUlang: isiUlangVal,
+      gas: gasVal,
+      galonKosong: galonKosongVal,
+      gasKosong: gasKosongVal,
+    };
 
-    if (curStatus === "lunas" && status === "lunas") {
-      await addHistory({
-        saldo: history.saldo - (total_price + curOngkir - total),
-        stock_aqua: history.stock_aqua - (aquaVal - parsedList[0].sum),
-        stock_galon_kosong:
-          history.stock_galon_kosong -
-          galonKosongVal +
-          (aquaVal - parsedList[0].sum) +
-          (isiUlangVal - parsedList[1].sum),
-        stock_gas_12kg: history.stock_gas_12kg - (gasVal - parsedList[2].sum),
-        stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + (gasVal - parsedList[2].sum),
-        stock_isi_ulang: history.stock_isi_ulang - (isiUlangVal - parsedList[1].sum),
-        transactionId: id,
-        note: "-",
-      });
-    }
+    const oldEffect = computeEffect(curStatus, oldCart, total_price + curOngkir);
+    const newEffect = computeEffect(status, newCart, total);
 
-    if (curStatus === "hutang" && status === "lunas") {
-      // console.log(gasVal)
-      await addHistory({
-        saldo: history.saldo + total,
-        stock_aqua: history.stock_aqua - (aquaVal - parsedList[0].sum),
-        stock_galon_kosong:
-          history.stock_galon_kosong -
-          galonKosongVal +
-          (aquaVal - parsedList[0].sum) +
-          (isiUlangVal - parsedList[1].sum),
-        stock_gas_12kg: history.stock_gas_12kg - (gasVal - parsedList[2].sum),
-        stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + (gasVal - parsedList[2].sum),
-        stock_isi_ulang: history.stock_isi_ulang - (isiUlangVal - parsedList[1].sum),
-        transactionId: id,
-        note: "-",
-      });
-    }
+    console.log("saving edit transaction");
+    console.log("old cart", oldCart);
+    console.log("new cart", newCart);
+    console.log("old effect", oldEffect);
+    console.log("new effect", newEffect);
 
-    if (curStatus == "hutang" && status == "pinjam") {
-      await addHistory({
-        saldo: history.saldo,
-        stock_aqua: history.stock_aqua + parsedList[0].sum,
-        stock_galon_kosong: history.stock_galon_kosong - galonKosongVal - parsedList[0].sum - parsedList[1].sum,
-        stock_gas_12kg: history.stock_gas_12kg + parsedList[2].sum,
-        stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + parsedList[2].sum,
-        stock_isi_ulang: history.stock_isi_ulang + parsedList[1].sum,
-        transactionId: id,
-        note: "-",
-      });
-    }
+    const currentTimestamp = new Date()
 
-    if (curStatus == "hutang" && status == "hutang") {
-      await addHistory({
-        saldo: history.saldo + (total_price - total),
-        stock_aqua: history.stock_aqua - (aquaVal - parsedList[0].sum),
-        stock_galon_kosong:
-          history.stock_galon_kosong -
-          galonKosongVal +
-          (aquaVal - parsedList[0].sum) +
-          (isiUlangVal - parsedList[1].sum),
-        stock_gas_12kg: history.stock_gas_12kg - (gasVal - parsedList[2].sum),
-        stock_gas_kosong: history.stock_gas_kosong - gasKosongVal + (gasVal - parsedList[2].sum),
-        stock_isi_ulang: history.stock_isi_ulang - (isiUlangVal - parsedList[1].sum),
-        transactionId: id,
-        note: "-",
-      });
+    const newHistory: HistoryDTO = {
+      saldo: history.saldo + (newEffect.saldo - oldEffect.saldo),
+      stock_aqua: history.stock_aqua + (newEffect.stock_aqua - oldEffect.stock_aqua),
+      stock_isi_ulang: history.stock_isi_ulang + (newEffect.stock_isi_ulang - oldEffect.stock_isi_ulang),
+      stock_gas_12kg: history.stock_gas_12kg + (newEffect.stock_gas_12kg - oldEffect.stock_gas_12kg),
+      stock_galon_kosong: history.stock_galon_kosong + (newEffect.stock_galon_kosong - oldEffect.stock_galon_kosong),
+      stock_gas_kosong: history.stock_gas_kosong + (newEffect.stock_gas_kosong - oldEffect.stock_gas_kosong),
+      transactionId: id,
+      note: "-",
+      date: currentTimestamp,
     }
-
-    if (curStatus == "pinjam" && status == "lunas") {
-      await addHistory({
-        saldo: history.saldo + total,
-        stock_aqua: history.stock_aqua - aquaVal,
-        stock_galon_kosong: history.stock_galon_kosong + parsedList[3].sum + aquaVal + isiUlangVal,
-        stock_gas_12kg: history.stock_gas_12kg - gasVal,
-        stock_gas_kosong: history.stock_gas_kosong + parsedList[4].sum + gasVal,
-        stock_isi_ulang: history.stock_isi_ulang - isiUlangVal,
-        transactionId: id,
-        note: "-",
-      });
-    }
-
-    if (curStatus == "pinjam" && status == "hutang") {
-      await addHistory({
-        saldo: history.saldo,
-        stock_aqua: history.stock_aqua - aquaVal,
-        stock_galon_kosong: history.stock_galon_kosong + parsedList[3].sum + aquaVal + isiUlangVal,
-        stock_gas_12kg: history.stock_gas_12kg - gasVal,
-        stock_gas_kosong: history.stock_gas_kosong + parsedList[4].sum + gasVal,
-        stock_isi_ulang: history.stock_isi_ulang - isiUlangVal,
-        transactionId: id,
-        note: "-",
-      });
-    }
-
-    if (curStatus == "pinjam" && status == "pinjam") {
-      await addHistory({
-        saldo: history.saldo,
-        stock_aqua: history.stock_aqua,
-        stock_galon_kosong: history.stock_galon_kosong - (galonKosongVal - parsedList[3].sum) + aquaVal + isiUlangVal,
-        stock_gas_12kg: history.stock_gas_12kg,
-        stock_gas_kosong: history.stock_gas_kosong - (gasKosongVal - parsedList[4].sum) + gasVal,
-        stock_isi_ulang: history.stock_isi_ulang,
-        transactionId: id,
-        note: "-",
-      });
-    }
+    console.log(newHistory);
+    await addHistory(newHistory);
 
     fetchHistory();
     handleClosePress();
@@ -324,24 +231,25 @@ const OrderItemBottomSheet = ({
         },
         {
           text: "hapus",
-          onPress: async () => {
-            await deleteTransaction(id);
-            await addHistory({
-              saldo: history.saldo - (curStatus == "hutang" ? 0 : total_price) - curOngkir,
-              stock_aqua: history.stock_aqua + parsedList[0].sum,
-              stock_galon_kosong:
-                history.stock_galon_kosong -
-                (curStatus == "pinjam" ? -parsedList[3].sum : parsedList[3].sum) -
-                parsedList[0].sum -
-                parsedList[1].sum,
-              stock_gas_12kg: history.stock_gas_12kg + parsedList[2].sum,
-              stock_gas_kosong:
-                history.stock_gas_kosong -
-                (curStatus == "pinjam" ? -parsedList[4].sum : parsedList[4].sum) -
-                parsedList[2].sum,
-              stock_isi_ulang: history.stock_isi_ulang + parsedList[1].sum,
-              transactionId: null,
-            });
+            onPress: async () => {
+              await deleteTransaction(id);
+              const deletedHistory: HistoryDTO = {
+                saldo: history.saldo - (curStatus == "hutang" ? 0 : total_price) - curOngkir,
+                stock_aqua: history.stock_aqua + parsedList[0].sum,
+                stock_galon_kosong:
+                  history.stock_galon_kosong -
+                  (curStatus == "pinjam" ? -parsedList[3].sum : parsedList[3].sum) -
+                  parsedList[0].sum -
+                  parsedList[1].sum,
+                stock_gas_12kg: history.stock_gas_12kg + parsedList[2].sum,
+                stock_gas_kosong:
+                  history.stock_gas_kosong -
+                  (curStatus == "pinjam" ? -parsedList[4].sum : parsedList[4].sum) -
+                  parsedList[2].sum,
+                stock_isi_ulang: history.stock_isi_ulang + parsedList[1].sum,
+                transactionId: null,
+              };
+              await addHistory(deletedHistory);
             await fetchHistory();
             await fetchTransactions();
             handleClosePress();
@@ -762,6 +670,39 @@ const formatDate = (timestamp) => {
   const formattedDate = `${day} ${month}, ${year}`;
 
   return formattedDate;
+};
+
+const computeEffect = (
+  status: "lunas" | "hutang" | "pinjam",
+  cart: {
+    aqua: number;
+    isiUlang: number;
+    gas: number;
+    galonKosong: number;
+    gasKosong: number;
+  },
+  totalWithOngkir: number
+) => {
+  if (status === "lunas" || status === "hutang") {
+    return {
+      saldo: status === "lunas" ? totalWithOngkir : 0,
+      stock_aqua: -cart.aqua,
+      stock_isi_ulang: -cart.isiUlang,
+      stock_gas_12kg: -cart.gas,
+      stock_galon_kosong: cart.aqua + cart.isiUlang,
+      stock_gas_kosong: cart.gas,
+    };
+  }
+
+  // pinjam
+  return {
+    saldo: 0,
+    stock_aqua: 0,
+    stock_isi_ulang: 0,
+    stock_gas_12kg: 0,
+    stock_galon_kosong: -cart.galonKosong,
+    stock_gas_kosong: -cart.gasKosong,
+  };
 };
 
 export default OrderItemBottomSheet;
