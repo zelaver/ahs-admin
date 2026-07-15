@@ -219,49 +219,46 @@ const OrderItemBottomSheet = ({
   };
 
   const handleDelete = async () => {
-    let parsedList = JSON.parse(orderList);
-    Alert.alert(
-      "Yakin ingin menghapus?",
-      "gak di balikin loh",
-      [
-        {
-          text: "batal",
-          onPress: () => false,
-          style: "cancel",
-        },
-        {
-          text: "hapus",
-            onPress: async () => {
-              await deleteTransaction(id);
-              const deletedHistory: HistoryDTO = {
-                saldo: history.saldo - (curStatus == "hutang" ? 0 : total_price) - curOngkir,
-                stock_aqua: history.stock_aqua + parsedList[0].sum,
-                stock_galon_kosong:
-                  history.stock_galon_kosong -
-                  (curStatus == "pinjam" ? -parsedList[3].sum : parsedList[3].sum) -
-                  parsedList[0].sum -
-                  parsedList[1].sum,
-                stock_gas_12kg: history.stock_gas_12kg + parsedList[2].sum,
-                stock_gas_kosong:
-                  history.stock_gas_kosong -
-                  (curStatus == "pinjam" ? -parsedList[4].sum : parsedList[4].sum) -
-                  parsedList[2].sum,
-                stock_isi_ulang: history.stock_isi_ulang + parsedList[1].sum,
-                transactionId: null,
-              };
-              await addHistory(deletedHistory);
-            await fetchHistory();
-            await fetchTransactions();
-            handleClosePress();
-          },
-        },
-      ],
-      {
-        cancelable: true,
-        onDismiss() {},
-      }
-    );
+  let parsedList = JSON.parse(orderList);
+  const oldCart = {
+    aqua: parsedList[0].sum,
+    isiUlang: parsedList[1].sum,
+    gas: parsedList[2].sum,
+    galonKosong: parsedList[3].sum,
+    gasKosong: parsedList[4].sum,
   };
+  const oldEffect = computeEffect(curStatus, oldCart, total_price + curOngkir);
+
+  Alert.alert(
+    "Hapus Transaksi",
+    "Yakin ingin menghapus transaksi ini?",
+    [
+      { text: "batal", onPress: () => false, style: "cancel" },
+      {
+        text: "hapus",
+        onPress: async () => {
+          await deleteTransaction(id);
+          const currentTimestamp = new Date()
+          const deletedHistory: HistoryDTO = {
+            saldo: history.saldo - oldEffect.saldo,
+            stock_aqua: history.stock_aqua - oldEffect.stock_aqua,
+            stock_isi_ulang: history.stock_isi_ulang - oldEffect.stock_isi_ulang,
+            stock_gas_12kg: history.stock_gas_12kg - oldEffect.stock_gas_12kg,
+            stock_galon_kosong: history.stock_galon_kosong - oldEffect.stock_galon_kosong,
+            stock_gas_kosong: history.stock_gas_kosong - oldEffect.stock_gas_kosong,
+            transactionId: null,
+            date: currentTimestamp,
+          };
+          await addHistory(deletedHistory);
+          await fetchHistory();
+          await fetchTransactions();
+          handleClosePress();
+        },
+      },
+    ],
+    { cancelable: true, onDismiss() {} }
+  );
+};
 
   const handleSelected = async (id: number) => {
     setCustomerId(id);
