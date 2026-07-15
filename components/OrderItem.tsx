@@ -52,7 +52,7 @@ const OrderItem = ({
   };
 
   return (
-    <View className="pesanan-item mb-4 flex-row items-center justify-between rounded-lg bg-white p-2.5 shadow">
+    <View className="pesanan-item mb-4 flex-row items-center justify-between rounded-lg bg-blue-50 p-2.5 shadow">
       <CustomerLogo customerId={curCustomerId} date={curDate} />
       <StatusEdit status={curStatus} handleEdit={handleEdit} />
       {/* <TouchableOpacity

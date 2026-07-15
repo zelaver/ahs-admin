@@ -96,6 +96,7 @@ const Backup = () => {
       }
     } catch (error) {
       console.error("Error importing or extracting ZIP file:", error);
+      ToastAndroid.show("file gagal di import!", ToastAndroid.SHORT);
     }
   };
 

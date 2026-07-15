@@ -95,13 +95,13 @@ const Saldo = ({ stocks, handlePresentModalPress }: any) => {
   return (
     <View className="section-2 box-content gap-y-3 px-5 pb-3">
       <View className="profile flex-row items-center justify-between py-1.5">
-        <View className="pp-name flex-row items-center gap-3">
+        {/* <View className="pp-name flex-row items-center gap-3">
           <View className="pp h-8 w-8 items-center justify-center rounded-full border bg-cyan-600">
             <Text className="text-xs font-medium text-white">EM</Text>
           </View>
           <Text className="text-sm font-bold text-blue-950">Euis Marlina</Text>
-        </View>
-        <Icon name="settings-line" size={20} color="#172554"></Icon>
+        </View> */}
+        {/* <Icon name="settings-line" size={20} color="#172554"></Icon> */}
       </View>
       <View className="saldo box-content flex-col rounded-lg border border-blue-50 bg-blue-800 px-3 py-2">
         <View className="mb-1 flex-row items-center justify-between">
