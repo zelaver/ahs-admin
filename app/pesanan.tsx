@@ -10,16 +10,16 @@ import { addTransaction, getTransactions } from "@/database/transaction";
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import React, { memo, useCallback, useMemo, useRef, useState } from "react";
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  FlatList,
   RefreshControl,
-  ScrollView,
   Switch,
   Text,
   ToastAndroid,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import CurrencyInput from "react-native-currency-input";
 import { SelectList } from "react-native-dropdown-select-list";
@@ -28,6 +28,7 @@ import Icon from "react-native-remix-icon";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const { Navigator, Screen } = createMaterialTopTabNavigator();
+const PAGE_SIZE = 20;
 
 const Pesanan = () => {
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -35,7 +36,7 @@ const Pesanan = () => {
     bottomSheetModalRef.current?.present();
   }, []);
   const [ascending, setAscending] = useState(false);
-  const [dateFilter, setDateFilter] = useState(new Date());
+  const [dateFilter, setDateFilter] = useState<Date | null>(null);
   const { transactions } = useGlobalContext();
   const onDateChange = (e, selectedDate) => {
     console.log(selectedDate);
@@ -51,14 +52,21 @@ const Pesanan = () => {
           <TouchableOpacity onPress={() => setAscending(!ascending)} className="ml-2">
             <Icon name={`${ascending ? "sort-desc" : "sort-asc"}`} size={24} color="#eff6ff" />
           </TouchableOpacity>
-          <DatePicker
-            date={dateFilter}
-            setDate={setDateFilter}
-            onDateChange={onDateChange}
-            containerStyle="ml-auto py-1.5 bg-white "
-            textStyle="text-blue-800"
-            iconColor="#1e40af"
-          />
+          <View className="ml-auto flex-row items-center">
+            {dateFilter && (
+              <TouchableOpacity onPress={() => setDateFilter(null)} className="mr-2">
+                <Icon name="close-circle-fill" size={20} color="#eff6ff" />
+              </TouchableOpacity>
+            )}
+            <DatePicker
+              date={dateFilter}
+              setDate={setDateFilter}
+              onDateChange={onDateChange}
+              containerStyle="py-1.5 bg-white"
+              textStyle="text-blue-800"
+              iconColor="#1e40af"
+            />
+          </View>
         </View>
       </SafeAreaView>
       <Navigator
@@ -125,50 +133,80 @@ const Pesanan = () => {
   );
 };
 
-const OrderList = ({ items, dateFilter, ascending }: { items: any[]; dateFilter: Date; ascending: boolean }) => {
+const OrderList = ({ items, dateFilter, ascending }: { items: any[]; dateFilter: Date | null; ascending: boolean }) => {
   const { fetchTransactions } = useGlobalContext();
   const [refreshing, setRefreshing] = useState(false);
+  const [page, setPage] = useState(1);
+
+  const sort = (a, b) => (ascending ? b - a : a - b);
+
+  // filter cuma jalan kalau dateFilter ada isinya, kalau null -> semua data lolos
+  const filteredSorted = useMemo(() => {
+    return [...items]
+      .filter((item) => !dateFilter 
+      || new Date(item.date)?.toLocaleDateString() == dateFilter?.toLocaleDateString()
+      )
+      .sort((a, b) => sort(b.id, a.id));
+  }, [items, dateFilter, ascending]);
+
+  // reset ke page 1 kalau filter/sort berubah, biar gak nyangkut di data lama
+  useEffect(() => {
+    setPage(1);
+  }, [dateFilter, ascending]);
+
+  const paginatedData = useMemo(() => filteredSorted.slice(0, page * PAGE_SIZE), [filteredSorted, page]);
+
   const onRefresh = () => {
     setRefreshing(true);
     fetchTransactions();
+    setPage(1);
     setRefreshing(false);
   };
-  const sort = (a, b) => {
-    if (ascending) {
-      return b - a;
-    } else {
-      return a - b;
+
+  const loadMore = () => {
+    if (paginatedData.length < filteredSorted.length) {
+      setPage((p) => p + 1);
     }
   };
+
   return (
-    <ScrollView
+    <FlatList
+      data={paginatedData}
+      keyExtractor={(item) => String(item.id)}
+      renderItem={({ item }) => (
+        <OrderItem
+          curCustomerId={item.customerId}
+          curStatus={item.status}
+          curDate={item.date}
+          id={item.id}
+          orderList={item.orderList}
+          curOngkir={item.ongkir}
+          total_price={item.total_price}
+        />
+      )}
+      contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 12, paddingBottom: 64 }}
+      style={{ backgroundColor: "#dbeafe" }}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-      className="bg-blue-100">
-      <View className="main pb-16">
-        <View className="section-3 px-5 py-3">
-          {[...items]
-            // .filter((item) => item.status == filterStatus)
-            .filter((item) => new Date(item.date).toLocaleDateString() == dateFilter?.toLocaleDateString())
-            .sort((a, b) => sort(b.id, a.id))
-            .map((item: any, i: any) => (
-              <OrderItem
-                key={i}
-                curCustomerId={item.customerId}
-                curStatus={item.status}
-                curDate={item.date}
-                // handlePresentModalPress={handlePresentModalPress}
-                // bottomSheetModalRef={bottomSheetModalRef}
-                id={item.id}
-                orderList={item.orderList}
-                curOngkir={item.ongkir}
-                total_price={item.total_price}
-              />
-            ))}
+      onEndReached={loadMore}
+      onEndReachedThreshold={0.4}
+      initialNumToRender={10}
+      maxToRenderPerBatch={10}
+      windowSize={7}
+      removeClippedSubviews
+      ListFooterComponent={
+        paginatedData.length < filteredSorted.length ? (
+          <ActivityIndicator size="small" color="#1e40af" style={{ marginVertical: 16 }} />
+        ) : null
+      }
+      ListEmptyComponent={
+        <View className="mt-20 items-center">
+          <Text className="text-base text-gray-500">Tidak ada pesanan</Text>
         </View>
-      </View>
-    </ScrollView>
+      }
+    />
   );
 };
+
 
 const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
   const snapPoints = useMemo(() => ["90%"], []);
@@ -389,6 +427,7 @@ const BottomSheetAddPesanan = ({ bottomSheetModalRef }: any) => {
             setTotal={setTotal}
             antar={antar}
             setAntar={setAntar}
+            status={status}
           />
           <TotalBox status={status} total={total} />
           <DateInput date={date} setDate={setDate} />
@@ -609,12 +648,12 @@ const DateInput = ({ date, setDate }) => {
         activeOpacity={0.8}
         onPress={showDatepicker}>
         <Text className="text-sm font-semibold text-blue-800">Tanggal:</Text>
-        <Text className="text-sm font-semibold text-blue-800">{date.toLocaleDateString()}</Text>
+        <Text className="text-sm font-semibold text-blue-800">{date ? date?.toLocaleDateString() : "Semua"}</Text> 
       </TouchableOpacity>
     </View>
   );
 };
-const ShippingCostInput = ({ ongkir, setOngkir, total, setTotal, antar, setAntar }: any) => {
+const ShippingCostInput = ({ ongkir, setOngkir, total, setTotal, antar, setAntar, status }: any) => {
   const handleAntar = () => {
     setAntar(!antar);
     if (antar) {
@@ -625,6 +664,9 @@ const ShippingCostInput = ({ ongkir, setOngkir, total, setTotal, antar, setAntar
       setTotal(total + 1000);
     }
   };
+
+  if (status == 1) return null;
+
   return (
     <View className="ongkir mb-6 items-start px-3">
       <Text className="text-sm font-semibold">Antar:</Text>
