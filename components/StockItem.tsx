@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-    ActivityIndicator,
-    BackHandler,
-    Image,
-    Text,
-    TextInput,
-    ToastAndroid,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  BackHandler,
+  Image,
+  Text,
+  TextInput,
+  ToastAndroid,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import Icon from "react-native-remix-icon";
 // import images from "@/constants/images";
@@ -28,6 +28,7 @@ type StockItem = {
   otherStyles?: string;
   stocks: any;
   fetchStocks: () => Promise<void>;
+  dragHandle?: React.ReactNode;
 };
 
 const StockItem = ({
@@ -40,6 +41,7 @@ const StockItem = ({
   image,
   stocks,
   fetchStocks,
+  dragHandle,
 }: StockItem) => {
   const [price, setPrice] = useState<number | null>(prodPrice);
   const [subPrice, setSubPrice] = useState<number | null>(prodSubPrice);
@@ -204,10 +206,17 @@ const StockItem = ({
 
   return (
     <View
-      className={`mini-box flex-1 flex-col gap-y-2 rounded-lg border-2 border-blue-950 bg-blue-50 px-3 pb-2 ${otherStyles} `}>
+      className={`mini-box h-full w-full flex-col gap-y-2 rounded-lg border-2 border-blue-950 bg-blue-50 px-3 pb-2 ${otherStyles}`}>
       <View className="flex-row items-center justify-between">
         <Text className="text-xs font-semibold text-gray-700">{name}</Text>
-        <Icon name="more-2-fill" color="black" size={12}></Icon>
+        {dragHandle ?
+          <View className="-m-3 p-3">
+            {dragHandle}
+            <View style={{ position: "absolute", top: 12, left: 20 }} pointerEvents="none">
+              <Icon name="more-2-fill" color="black" size={12} />
+            </View>
+          </View>
+        : <Icon name="more-2-fill" color="black" size={12} />}
       </View>
       <View className="flex-row justify-between">
         <View className="justify-center">

@@ -1,6 +1,5 @@
 import Handle from "@/components/CustomHandle";
-import StockItem from "@/components/StockItem";
-import images from "@/constants/images";
+import DraggableStockGrid from "@/components/DraggableStockGrid";
 import { useGlobalContext } from "@/context/GlobalProvider";
 import { addHistory, type HistoryDTO } from "@/database/history";
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
@@ -106,7 +105,7 @@ const Saldo = ({ stocks, handlePresentModalPress }: any) => {
       <View className="saldo box-content flex-col rounded-lg border border-blue-50 bg-blue-800 px-3 py-2">
         <View className="mb-1 flex-row items-center justify-between">
           <Text className="text-base font-bold text-white">Saldo Toko</Text>
-          <Icon name="more-2-fill" color="white" size={12}></Icon>
+          {/* <Icon name="more-2-fill" color="white" size={12}></Icon> */}
         </View>
         <View className="mb-1 flex-row">
           <Text className="text-xs font-bold text-white">Rp</Text>
@@ -123,8 +122,9 @@ const Saldo = ({ stocks, handlePresentModalPress }: any) => {
 const Stock = ({ stocks, products, fetchStocks }: any) => {
   return (
     <View className="section-3 flex-col gap-y-2 px-5">
-      <Text className="mb-2 text-sm font-bold text-blue-950">Stok/Harga Galon</Text>
-      <View className="stok-row-1 mb-4 flex-row justify-between">
+      <Text className="mb-4 text-sm font-bold text-blue-950">Stok/Harga Galon</Text>
+      <DraggableStockGrid stocks={stocks} products={products} fetchStocks={fetchStocks} />
+      {/* <View className="stok-row-1 mb-4 flex-row justify-between">
         <StockItem
           id={products[0]?.id}
           otherStyles="mr-2"
@@ -177,7 +177,7 @@ const Stock = ({ stocks, products, fetchStocks }: any) => {
           stocks={stocks}
           fetchStocks={fetchStocks}
         />
-      </View>
+      </View> */}
     </View>
   );
 };
