@@ -2,7 +2,7 @@ import DatePicker from "@/components/DatePicker";
 import OrderItemBottomSheet from "@/components/OrderBottomSheet";
 import { useGlobalContext } from "@/context/GlobalProvider";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   RefreshControl,
@@ -103,7 +103,7 @@ const Histori = () => {
             nestedScrollEnabled
             showsHorizontalScrollIndicator
             refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-            <Chart chartData={chartData} />
+            {/* <Chart chartData={chartData} /> */}
             <Table history={history} />
           </ScrollView>
         }
@@ -113,6 +113,44 @@ const Histori = () => {
 };
 
 const Chart = ({ chartData }) => {
+  // === TAMBAHAN 1: bersihkan outlier ekstrem sebelum masuk ke chart ===
+  const cleanedData = useMemo(() => {
+    if (!chartData || chartData.length === 0) return chartData;
+
+    const values = chartData.map((d) => d.value).sort((a, b) => a - b);
+    const median = values[Math.floor(values.length / 2)];
+    const threshold = median * 20; // sesuaikan multiplier sesuai kebutuhan
+
+    return chartData.map((d) => ({
+      ...d,
+      value: d.value > threshold ? threshold : d.value,
+      // simpan nilai asli buat ditampilin di tooltip/pointer label
+      rawValue: d.value,
+    }));
+  }, [chartData]);
+
+  // === TAMBAHAN 2: hitung maxValue dari data yang udah bersih ===
+  const maxVal = useMemo(() => {
+    if (!cleanedData || cleanedData.length === 0) return 1000;
+    return cleanedData.reduce((max, item) => (item.value > max ? item.value : max), cleanedData[0].value);
+  }, [cleanedData]);
+
+  const paddedMax = maxVal * 1.15;
+
+  // === TAMBAHAN 3: format y-axis label jadi ringkas ===
+  const formatYLabel = (val) => {
+    const num = Number(val);
+    if (num >= 1_000_000_000) return (num / 1_000_000_000).toFixed(1) + "M";
+    if (num >= 1_000_000) return (num / 1_000_000).toFixed(1) + "Jt";
+    if (num >= 1_000) return (num / 1_000).toFixed(0) + "rb";
+    return String(val);
+  };
+
+  // === TAMBAHAN 4: format angka penuh buat tooltip (pakai rawValue) ===
+  const formatFullNumber = (num) => {
+    return new Intl.NumberFormat("id-ID").format(num);
+  };
+
   return (
     <View className="chart px-5 py-2">
       <View className="section-1 flex-row items-center py-2">
@@ -121,11 +159,10 @@ const Chart = ({ chartData }) => {
       <ScrollView className="rounded-md border bg-white py-2 shadow-md">
         <LineChart
           isAnimated
-          animationDuration={5000}
-          // height={200}
+          animationDuration={800} // diubah dari 5000 -> lebih responsif
           areaChart
           curved
-          data={chartData}
+          data={cleanedData} // diubah dari chartData -> pakai data yang udah dibersihkan
           rotateLabel
           width={300}
           hideDataPoints
@@ -134,21 +171,20 @@ const Chart = ({ chartData }) => {
           spacing={30}
           endSpacing={50}
           color="#1943b4"
-          // thickness={2}
           startFillColor="rgba(25, 67, 180,0.3)"
           endFillColor="rgba(25, 67, 180,0.01)"
-          // backgroundColor={"white"}
           startOpacity={0.9}
           endOpacity={0.2}
           noOfSections={6}
-          maxValue={chartData.reduce((max, item) => (item.value > max ? item.value : max), chartData[0].value) + 1500}
+          maxValue={paddedMax} // diubah -> pakai maxVal dari data bersih + padding proporsional
+          formatYLabel={formatYLabel} // tambahan -> label y-axis jadi ringkas (Jt/M/rb)
+          yAxisLabelWidth={55} // tambahan -> kasih ruang biar label nggak kepotong
           yAxisColor="blue"
           yAxisThickness={0}
           rulesType="solid"
           rulesColor="rgba(25, 67, 180,0.3)"
           yAxisTextStyle={{ color: "gray" }}
           yAxisSide="right"
-          // xAxisColor="blue"
           xAxisLabelsVerticalShift={10}
           pointerConfig={{
             pointerStripHeight: 150,
@@ -198,7 +234,8 @@ const Chart = ({ chartData }) => {
                         textAlign: "center",
                         color: "white",
                       }}>
-                      {"Rp" + items[0].saldo}
+                      {/* diubah -> pakai rawValue biar tooltip nunjukin angka asli, bukan hasil capping */}
+                      {"Rp" + formatFullNumber(items[0].rawValue ?? items[0].value)}
                     </Text>
                   </View>
                 </View>
@@ -207,11 +244,6 @@ const Chart = ({ chartData }) => {
           }}
         />
       </ScrollView>
-      {/* <TouchableOpacity
-              onPress={() => console.log(chartData[chartData.length - 1].value)}
-            >
-              <Text>test</Text>
-            </TouchableOpacity> */}
     </View>
   );
 };
