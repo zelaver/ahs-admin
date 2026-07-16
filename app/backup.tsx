@@ -47,56 +47,59 @@ const Backup = () => {
 
   const importAndExtractZip = async () => {
     try {
-      // Pilih file ZIP dari perangkat
       const result = await DocumentPicker.getDocumentAsync({
         type: "application/zip",
       });
 
-      if (!result.canceled) {
-        const asset = result.assets[0]; // Mengambil file pertama dari array assets
-        const zipFileUri = asset.uri; // URI file ZIP
-
-        // Baca file ZIP sebagai binary
-        const zipBlob = await FileSystem.readAsStringAsync(zipFileUri, {
-          encoding: FileSystem.EncodingType.Base64,
-        });
-
-        // Muat ZIP dari base64
-        const zip = await JSZip.loadAsync(zipBlob, { base64: true });
-
-        // Tentukan direktori untuk menyimpan file yang diekstrak
-        const extractDir = FileSystem.documentDirectory + "SQLite/";
-
-        // Pastikan direktori ada
-        await FileSystem.makeDirectoryAsync(extractDir, { intermediates: true });
-
-        // Ekstrak semua file
-        for (const [filename, file] of Object.entries(zip.files)) {
-          if (!file.dir) {
-            // Pastikan itu adalah file dan bukan direktori
-            const fileData = await file.async("base64");
-            await FileSystem.writeAsStringAsync(extractDir + filename, fileData, {
-              encoding: FileSystem.EncodingType.Base64,
-            });
-          }
-        }
-
-        console.log("Files extracted successfully!");
-        ToastAndroid.show("Backup berhasil di pulihkan!", ToastAndroid.SHORT);
-        // Buka database setelah ekstraksi
-        // const db = SQLite.openDatabaseAsync("ahs-admin.db", { useNewConnection: true });
-        // console.log("Database opened successfully!");
-        fetchHistory();
-        fetchCustomers();
-        fetchTransactions();
-        fetchProducts();
-      } else {
-        console.log("No file selected.");
-        ToastAndroid.show("file tidak terpilih!", ToastAndroid.SHORT);
+      if (result.canceled) {
+        ToastAndroid.show("File tidak terpilih!", ToastAndroid.SHORT);
+        return;
       }
+
+      const asset = result.assets[0];
+
+      // 1. Validasi ekstensi, karena filter type gak reliable
+      if (!asset.name?.toLowerCase().endsWith(".zip")) {
+        throw new Error("File yang dipilih bukan file .zip");
+      }
+
+      const zipBlob = await FileSystem.readAsStringAsync(asset.uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      const zip = await JSZip.loadAsync(zipBlob, { base64: true });
+
+      // 2. Validasi isi zip harus mengandung file db utama
+      const requiredFile = "ahs-admin.db";
+      if (!zip.files[requiredFile] || zip.files[requiredFile].dir) {
+        throw new Error(`File ZIP tidak valid: tidak ditemukan "${requiredFile}" di dalamnya`);
+      }
+
+      const extractDir = FileSystem.documentDirectory + "SQLite/";
+      await FileSystem.makeDirectoryAsync(extractDir, { intermediates: true });
+
+      // 3. (opsional tapi disarankan) tulis ke file sementara dulu,
+      // baru rename setelah semua sukses, biar db lama gak "setengah tertimpa"
+      // kalau di tengah proses ada error.
+      for (const [filename, file] of Object.entries(zip.files)) {
+        if (!file.dir) {
+          const fileData = await file.async("base64");
+          await FileSystem.writeAsStringAsync(extractDir + filename, fileData, {
+            encoding: FileSystem.EncodingType.Base64,
+          });
+        }
+      }
+
+      console.log("Files extracted successfully!");
+      ToastAndroid.show("Backup berhasil di pulihkan!", ToastAndroid.SHORT);
+
+      fetchHistory();
+      fetchCustomers();
+      fetchTransactions();
+      fetchProducts();
     } catch (error) {
       console.error("Error importing or extracting ZIP file:", error);
-      ToastAndroid.show("file gagal di import!", ToastAndroid.SHORT);
+      ToastAndroid.show(`Import gagal: ${error}`, ToastAndroid.SHORT);
     }
   };
 
